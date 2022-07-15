@@ -63,7 +63,7 @@ main{
   }
 
  #grid{
-    height: 75%;
+    /* height: 75%; */
     overflow-y: auto;
  }
 
@@ -71,8 +71,9 @@ main{
     color: lightgray;
 }
 
- #grid .row .col{
-
+ #grid .row{
+    /* margin-bottom: .5rem; */
+    padding: .2rem 0;
  }
 
 #grid .row.selectedRow{
@@ -94,6 +95,7 @@ main{
  }
 
  #notes{
+    margin-top: auto;
     height: 25%;
  }
   #sidebar{
