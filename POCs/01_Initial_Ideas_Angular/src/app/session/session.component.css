@@ -76,12 +76,12 @@ main{
     padding: .2rem 0;
  }
 
-#grid .row.selectedRow{
+.row.selectedRow{
     background-color: #e9e9e9;
     color: black;
 }
 
-#grid .row.selectedRow input.reps {
+.row.selectedRow input.reps {
     padding-left: .5rem;
     padding-right: .5rem;
 }

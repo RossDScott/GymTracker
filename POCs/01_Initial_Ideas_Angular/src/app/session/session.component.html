@@ -3,12 +3,12 @@
     <div id="sidebar" class="col-md-3 d-md-block collapse pt-2 ">
         <div class="d-flex flex-column" style="height: 100%">
             <div class="ps-2">
-                <ul class="list-group list-group-flush me-1">
-                    <li class="list-group-item fw-bold">Bench Press</li>
-                    <li class="list-group-item">Incline Bench Press</li>
-                    <li class="list-group-item">Dumbbell Chest Press</li>
-                    <li class="list-group-item">A fourth item</li>
-                    <li class="list-group-item">And a fifth one</li>
+                <ul *ngIf="session" class="list-group list-group-flush me-1">
+                    <li *ngFor="let exercise of session.exercises" 
+                        class="list-group-item" [class.fw-bold]="exercise === selectedExercise"
+                        (click)="handleSelectExercise(exercise)">
+                        {{exercise.exercise.name}}
+                    </li>
                     <li class="list-group-item"><i class="bi bi-plus-circle-fill fs-3"></i></li>
                 </ul>  
             </div>
@@ -21,13 +21,13 @@
                 <div class="d-flex justify-content-center">
                     <div style="width: 12rem;">
                         <span class="fw-semibold">Current Time</span>
-                        <h1>12:15:35</h1>
+                        <h1>{{currentTime.toJSDate() | date:'HH:mm'}}</h1>
                     </div>
                 </div>
                 <div class="d-flex justify-content-center">
                     <div style="width: 12rem;">
                         <span class="fw-semibold">Workout Time</span>
-                        <h1 class="mb-0">00:33:11</h1>
+                        <h1 class="mb-0">{{workoutTime.toFormat("hh:mm")}}</h1>
                         <div class="d-flex">
                             <button type="button" class="btn btn-outline-primary btn-sm ms-auto pt-0 pb-0">Pause</button>
                         </div>
@@ -37,10 +37,30 @@
                 <div class="d-flex justify-content-center">
                     <div style="width: 12rem;">
                         <span class="fw-semibold">Stopwatch</span>
-                        <h1 class="mb-0">00:00:12</h1>
+                        <h1 *ngIf="!stopWatch" class="mb-0">00:00:00</h1>
+                        <h1 *ngIf="stopWatch" class="mb-0">{{stopWatch.toFormat("hh:mm:ss.SS")}}</h1>
                         <div class="d-flex">
-                            <button type="button" class="btn btn-outline-primary btn-sm ms-auto pt-0 pb-0">Reset</button>
-                            <button type="button" class="btn btn-outline-primary btn-sm ms-1 pt-0 pb-0">Pause</button>
+                            <button 
+                                *ngIf="stopWatch && !stopWatchStopped" 
+                                type="button" 
+                                class="btn btn-outline-primary btn-sm ms-auto pt-0 pb-0"
+                                (click)="handleStopStopWatch()">Stop</button>
+                            <button 
+                                *ngIf="!stopWatch" 
+                                type="button" 
+                                class="btn btn-outline-primary btn-sm ms-auto pt-0 pb-0"
+                                (click)="handleStartStopWatch()">Start</button>
+                            <button 
+                                *ngIf="stopWatchStopped" 
+                                type="button" 
+                                class="btn btn-outline-primary btn-sm ms-auto pt-0 pb-0"
+                                (click)="handleResetStopWatch()">Reset</button>
+                            <button 
+                                *ngIf="stopWatchStopped" 
+                                type="button" 
+                                class="btn btn-outline-primary btn-sm ms-1 pt-0 pb-0"
+                                (click)="handleResumeStopWatch()">Resume</button>
+
                         </div>
                     </div>
                 </div>
@@ -60,7 +80,7 @@
 
     <main class="ms-3 d-flex flex-column">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">29/06/22 - Push Day - Bench Press</h1>
+            <h1 class="h2">29/06/22 - Push Day <span *ngIf="selectedExercise"> - {{selectedExercise.exercise.name}}</span></h1>
             <div class="btn-toolbar mb-2 mb-md-0">
                 <div class="btn-group me-2">
                     <i class="bi bi-list fs-1"></i>
@@ -69,119 +89,13 @@
         </div>
         <div id="mainContent" class="d-flex">
             <div id="session" class="me-3 d-flex flex-column" style="width: 70%;">
-                <div id="grid" [class.isEditing]="editRow" style="font-size: 0.99rem;">
-                    <div class="container-fluid">
-                        <div class="row fw-bold">
-                            <div class="col"></div>
-                            <div class="col-3 text-center ps-5 me-3">Target</div>
-                            <div class="col-3 text-center ps-5 me-3">Actual</div>
-                            <div class="col-1"></div>
-                        </div>
-                        <div class="row fw-bold">
-                            <div class="col">Set</div>
-                            <div class="col-2 text-center p-0">Weight</div>
-                            <div class="col-1 text-center p-0 me-3">Reps</div>
-                            <div class="col-2 text-center p-0">Weight</div>
-                            <div class="col-1 text-center p-0 me-3">Reps</div>
-                            <div class="col-1 text-center"></div>
-                        </div>
-                        <div class="row d-flex align-items-center align-self-center">
-                            <div class="col fw-bold">Warm-up 1</div>
-                            <div class="col-2 text-center p-0">20Kg</div>
-                            <div class="col-1 text-center p-0 me-3">8</div>
-                            <div class="col-2 text-center p-0">20Kg</div>
-                            <div class="col-1 text-center p-0 me-3">8</div>
-                            <div class="col-1 text-center"><i class="bi bi-check-circle"></i></div>
-                        </div>
-                        <div class="row d-flex align-items-center align-self-center">
-                            <div class="col fw-bold">Warm-up 2</div>
-                            <div class="col-2 text-center p-0">20Kg</div>
-                            <div class="col-1 text-center p-0 me-3">8</div>
-                            <div class="col-2 text-center p-0">20Kg</div>
-                            <div class="col-1 text-center p-0 me-3">8</div>
-                            <div class="col-1 text-center"><i class="bi bi-check-circle"></i></div>
-                        </div>
-                        <div class="row d-flex align-items-center align-self-center">
-                            <div class="col fw-bold">Set 1</div>
-                            <div class="col-2 text-center p-0">55Kg</div>
-                            <div class="col-1 text-center p-0 me-3">8</div>
-                            <div class="col-2 text-center p-0">55Kg</div>
-                            <div class="col-1 text-center p-0 me-3">9</div>
-                            <div class="col-1 text-center"><i class="bi bi-check-circle"></i></div>
-                        </div>
-                        <div class="row d-flex align-items-center align-self-center">
-                            <div class="col fw-bold">Set 2</div>
-                            <div class="col-2 text-center p-0">55Kg</div>
-                            <div class="col-1 text-center p-0 me-3">8</div>
-                            <div class="col-2 text-center p-0">55Kg</div>
-                            <div class="col-1 text-center p-0 me-3">9</div>
-                            <div class="col-1 text-center"><i class="bi bi-check-circle"></i></div>
-                        </div>                          
-                        <div *ngIf="!editRow" class="row d-flex align-items-center align-self-center" (click)="handleEditRow()">
-                            <div class="col fw-bold">Set 3</div>
-                            <div class="col-2 text-center p-0">55Kg</div>
-                            <div class="col-1 text-center p-0 me-3">8</div>
-                            <div class="col-2 text-center p-0">55Kg</div>
-                            <div class="col-1 text-center p-0 me-3">9</div>
-                            <div class="col-1 text-center" (click)="handleConfirm($event)"><i class="bi " [ngClass]="rowConfirmed ? 'bi-check-circle' : 'bi-circle'" style="font-size: 1.5rem;"></i></div>
-                        </div>  
-                        <div *ngIf="editRow" class="row selectedRow">
-                            <div class="col d-flex text-center flex-column justify-content-center">
-                                <i class="bi bi-arrow-up-circle invisible" style="font-size: 2rem; font-weight: bold;"></i>
-                                <select class="form-select" aria-label="Default select example">
-                                    <option selected>Set</option>
-                                    <option value="1">Warm-up</option>
-                                    <option value="2">Drop set</option>
-                                    <option value="3">Failure</option>
-                                  </select>
-                                <i class="bi bi-arrow-down-circle invisible" style="font-size: 2rem; font-weight: bold;"></i>
-                            </div>
-                            <div class="col-2 d-flex text-center flex-column justify-content-center">
-                                <i class="bi bi-arrow-up-circle" style="font-size: 2rem; font-weight: bold;"></i>
-                                <div class="input-group">
-                                    <input type="text" class="form-control text-center" value="55">
-                                    <span class="input-group-text" id="basic-addon2">Kg</span>
-                                </div>
-                                <i class="bi bi-arrow-down-circle" style="font-size: 2rem; font-weight: bold;"></i>
-                            </div>
-                            <div class="col-1 d-flex text-center flex-column justify-content-center me-3">
-                                <i class="bi bi-arrow-up-circle" style="font-size: 2rem; font-weight: bold;"></i>
-                                <div class="input-group">
-                                    <input type="text" class="form-control text-center reps" value="8">
-                                </div>
-                                <i class="bi bi-arrow-down-circle" style="font-size: 2rem; font-weight: bold;"></i>
-                            </div>
-                            <div class="col-2 d-flex text-center flex-column justify-content-center">
-                                <i class="bi bi-arrow-up-circle" style="font-size: 2rem; font-weight: bold;"></i>
-                                <div class="input-group" >
-                                    <input type="text" class="form-control text-center" value="55">
-                                    <span class="input-group-text" id="basic-addon2">Kg</span>
-                                </div>
-                                <i class="bi bi-arrow-down-circle" style="font-size: 2rem; font-weight: bold;"></i>
-                            </div>
-                            <div class="col-1 d-flex text-center flex-column justify-content-center me-3">
-                                <i class="bi bi-arrow-up-circle" style="font-size: 2rem; font-weight: bold;"></i>
-                                <div class="input-group">
-                                    <input type="text" class="form-control text-center reps" value="9">
-                                </div>
-                                <i class="bi bi-arrow-down-circle" style="font-size: 2rem; font-weight: bold;"></i>
-                            </div>
-                            <div class="col-1 d-flex flex-column align-items-center align-self-center">
-                                <i class="bi bi-trash"></i>
-                                <i class="bi bi-x-circle"></i>
-                                <i class="bi bi-check-circle" (click)="handleConfimEdit()"></i>
-                                
-                            </div>
-                        </div>
-                        <div class="row d-flex align-items-center align-self-center">
-                            <div class="col fw-bold">Set 4</div>
-                            <div class="col-2 text-center p-0">55Kg</div>
-                            <div class="col-1 text-center p-0 me-3">8</div>
-                            <div class="col-2 text-center p-0">55Kg</div>
-                            <div class="col-1 text-center p-0 me-3">9</div>
-                            <div class="col-1 text-center"><i class="bi bi-circle"></i></div>
-                        </div>
-                    </div>
+                <div *ngIf="selectedExercise" id="grid" [class.isEditing]="editRow" style="font-size: 0.99rem;">
+                    {{selectedExercise.type}}
+                    <app-weight-session 
+                        *ngIf="selectedExercise.exercise.metricType === 'weight'"
+                        [exercise]="$any(selectedExercise)"
+                        (onToggleComplete)="handleToggleComplete($event)"
+                        (onEdit)="handleEditRow($event)"></app-weight-session>
                 </div>
                 <div id="notes" class="border-top pt-3" >
                     <label for="exampleFormControlTextarea1" class="form-label">Notes</label>
