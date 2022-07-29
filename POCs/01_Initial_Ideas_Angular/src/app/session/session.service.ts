@@ -6,10 +6,16 @@ import { SessionVM, SetType, WorkoutPlan, ExerciseSetVM, SetWeightMetrics, SetTi
     providedIn: 'root'
 })
 export class SessionService {
-
     constructor() {
 
     }
+
+    fetchSetTypes = () : SetType[] => [
+        {name: "Warm-up"},
+        {name: "Set"},
+        {name: "Drop set"},
+        {name: "Failure"},
+    ]
 
     setupFakeSession() {
         let warmupSetType: SetType = {name: "Warm-up"};
@@ -23,37 +29,37 @@ export class SessionService {
                     metricType: 'weight',
                     name: "Barbell Bench Press", 
                     targetSets: [
-                        {setName: "Warm-up 1", target: {weight:20, reps: 10} },
-                        {setName: "Warm-up 2", target: {weight: 20, reps: 10}},
-                        {setName: "Set 1", target: {weight: 55, reps: 8} },
-                        {setName: "Set 2", target: {weight: 55, reps: 8}},
-                        {setName: "Set 3", target: {weight: 55, reps: 8}}
+                        {setType: "Warm-up", target: {weight:20, reps: 10} },
+                        {setType: "Warm-up", target: {weight: 20, reps: 10}},
+                        {setType: "Set", target: {weight: 55, reps: 8} },
+                        {setType: "Set", target: {weight: 55, reps: 8}},
+                        {setType: "Set", target: {weight: 55, reps: 8}}
                     ]
                 } as Exercise<SetWeightMetrics>,
                 { 
                     metricType: 'weight',
                     name: "Dumbbell Bench Press", 
                     targetSets: [
-                        {setName: "Set 1", target: {weight: 55, reps: 8}},
-                        {setName: "Set 2", target: {weight: 55, reps: 8}},
-                        {setName: "Set 3", target: {weight: 55, reps: 8}}
+                        {setType: "Set", target: {weight: 55, reps: 8}},
+                        {setType: "Set", target: {weight: 55, reps: 8}},
+                        {setType: "Set", target: {weight: 55, reps: 8}}
                     ]
                 } as Exercise<SetWeightMetrics>,
                 { 
                     metricType: 'weight',
                     name: "Triceps Pushdown", 
                     targetSets: [
-                        {setName: "Set 1", target: {weight: 55, reps: 8}},
-                        {setName: "Set 2", target: {weight: 55, reps: 8}},
-                        {setName: "Set 3", target: {weight: 55, reps: 8}},
+                        {setType: "Set", target: {weight: 55, reps: 8}},
+                        {setType: "Set", target: {weight: 55, reps: 8}},
+                        {setType: "Set", target: {weight: 55, reps: 8}},
                     ]
                 } as Exercise<SetWeightMetrics>,
                 { 
                     metricType: 'time',
                     name: "Plank", 
                     targetSets: [
-                        {setName: "Set 1", target: {timeMilliseconds: 60000}},
-                        {setName: "Set 2", target: {timeMilliseconds: 60000}}
+                        {setType: "Set", target: {timeMilliseconds: 60000}},
+                        {setType: "Set", target: {timeMilliseconds: 60000}}
                     ]
                 } as Exercise<SetTimeMetrics>
             ]
@@ -63,12 +69,11 @@ export class SessionService {
             workoutPlan: workoutPlan,
             workoutStart: DateTime.now(),
             exercises: workoutPlan.exercises.map(workoutExercise => ({
-                type: workoutExercise.targetSets[0].target.type,
                 exercise: workoutExercise,
                 sets: workoutExercise.targetSets.map(targetSet => ({
-                    name: targetSet.setName,
+                    setType: targetSet.setType,
                     targetMetrics: targetSet.target,
-                    actualMetrics: Object.assign({}, targetSet) as unknown as SetMetrics,
+                    actualMetrics: null,
                     completed: false,
                     isEditing: false
                 })),
@@ -78,4 +83,6 @@ export class SessionService {
 
         return session;
     }
+
+    
 }

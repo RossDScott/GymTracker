@@ -38,7 +38,7 @@
                     <div style="width: 12rem;">
                         <span class="fw-semibold">Stopwatch</span>
                         <h1 *ngIf="!stopWatch" class="mb-0">00:00:00</h1>
-                        <h1 *ngIf="stopWatch" class="mb-0">{{stopWatch.toFormat("hh:mm:ss.SS")}}</h1>
+                        <h1 *ngIf="stopWatch" class="mb-0">{{stopWatch.toFormat("hh:mm:ss.S")}}</h1>
                         <div class="d-flex">
                             <button 
                                 *ngIf="stopWatch && !stopWatchStopped" 
@@ -90,12 +90,27 @@
         <div id="mainContent" class="d-flex">
             <div id="session" class="me-3 d-flex flex-column" style="width: 70%;">
                 <div *ngIf="selectedExercise" id="grid" [class.isEditing]="editRow" style="font-size: 0.99rem;">
-                    {{selectedExercise.type}}
                     <app-weight-session 
                         *ngIf="selectedExercise.exercise.metricType === 'weight'"
                         [exercise]="$any(selectedExercise)"
                         (onToggleComplete)="handleToggleComplete($event)"
-                        (onEdit)="handleEditRow($event)"></app-weight-session>
+                        (onEdit)="handleEditRow($event)"
+                        (onEditConfirm)="handleEditConfirm($event)"
+                        (onEditCancel)="handleEditCancel($event)"
+                        (onDelete)="handleDelete($event)"
+                        (onAdd)="handleAdd($event)"></app-weight-session> 
+
+                    <app-time-session
+                        *ngIf="selectedExercise.exercise.metricType === 'time'"
+                        [exercise]="$any(selectedExercise)"
+                        (onToggleComplete)="handleToggleComplete($event)"
+                        (onEdit)="handleEditRow($event)"
+                        (onEditConfirm)="handleEditConfirm($event)"
+                        (onEditCancel)="handleEditCancel($event)"
+                        (onDelete)="handleDelete($event)"
+                        (onAdd)="handleAdd($event)">
+
+                    </app-time-session>
                 </div>
                 <div id="notes" class="border-top pt-3" >
                     <label for="exampleFormControlTextarea1" class="form-label">Notes</label>
@@ -103,7 +118,20 @@
                 </div>
             </div>
             <div id="sessionSidebar" class="border-start" style="width: 30%;">
-                side
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                      <a class="nav-link " aria-current="page" href="#">History</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link active">Charts</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link">Learning</a>
+                    </li>
+                  </ul>
+                <div>
+                    <canvas id="myChart"></canvas>
+                </div>
             </div>
         </div>
     </main>

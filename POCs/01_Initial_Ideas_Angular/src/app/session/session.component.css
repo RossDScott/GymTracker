@@ -65,10 +65,15 @@ main{
  #grid{
     /* height: 75%; */
     overflow-y: auto;
+    font-size: .9rem!important;
  }
 
 #grid.isEditing{
     color: lightgray;
+}
+
+.bi{
+    font-size: 1.5rem!important;
 }
 
  #grid .row{
@@ -81,9 +86,10 @@ main{
     color: black;
 }
 
-.row.selectedRow input.reps {
-    padding-left: .5rem;
-    padding-right: .5rem;
+.row.selectedRow input {
+    font-size: .9rem!important;
+    padding-left: .1rem;
+    padding-right: .1rem;
 }
 
 #grid .bi{

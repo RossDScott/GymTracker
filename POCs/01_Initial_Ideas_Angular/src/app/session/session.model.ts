@@ -15,7 +15,7 @@ export interface Exercise<T extends SetMetrics>{
 }
 
 export interface ExerciseTargetSet<T extends SetMetrics>{
-    setName: string;
+    setType: string;
     target: T;
 }
 
@@ -31,30 +31,27 @@ export type metricType = "weight" | "time";
 // }
 
 export interface SetMetrics{
-    type: metricType;
+
 }
 
 export interface SetWeightMetrics extends SetMetrics{
-    type: 'weight';
     weight: number;
     reps: number;
 }
 
 export interface SetTimeMetrics extends SetMetrics{
-    type: 'time'
     timeMilliseconds: number;
 }
 
 export interface ExerciseSetVM<T extends SetMetrics> {
-    name: string;
+    setType: string;
     targetMetrics: T;
-    actualMetrics: T;
+    actualMetrics: T | null;
     completed: boolean;
     isEditing: boolean;
 }
 
 export interface ExerciseVM<T extends SetMetrics>{
-    type: metricType;
     exercise: Exercise<T>;
     completed: boolean;
     

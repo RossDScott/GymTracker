@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ExerciseVM, SessionVM, ExerciseSetVM, SetMetrics, SetWeightMetrics, SetTimeMetrics } from './session.model';
 import { SessionService } from './session.service';
 import { DateTime, Duration } from "luxon";
+import * as _ from 'lodash';
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
 
 @Component({
     selector: 'app-session',
@@ -14,9 +17,6 @@ export class SessionComponent implements OnInit {
     stopWatch: Duration | null = null;
 
     session: SessionVM | null = null;
-
-    editRow = false;
-    rowConfirmed = false;
     
     constructor(private sessionService: SessionService) { 
         
@@ -31,29 +31,86 @@ export class SessionComponent implements OnInit {
 
     ngOnInit(): void {
         this.session = this.sessionService.setupFakeSession();
-        //this.selectedExercise = this.session.exercises[0];
+        this.selectedExercise = this.session.exercises[0];
+        console.dir(this.session)
+
+        const labels = [
+            '01/22',
+            '02/22',
+            '03/22',
+            '04/22',
+            '05/22',
+            '06/22',
+          ];
+        
+          const data = {
+            labels: labels,
+            datasets: [{
+              label: 'Best Set Weight',
+              backgroundColor: 'rgb(255, 99, 132)',
+              borderColor: 'rgb(255, 99, 132)',
+              data: [50, 51, 52, 50, 55, 55, 55],
+            }]
+          };
+        
+          const config = {
+            type: 'line',
+            data: data,
+            options: {}
+          }; 
+          const myChart = new Chart(document.getElementById('myChart') as HTMLCanvasElement, config as any);
+
+
     }
 
-    handleConfirm(event: Event){
-        event.cancelBubble = true;
-        this.rowConfirmed = true;
-    }
-
-    handleConfirmEdit(){
-        this.editRow = false;
-    }
-
-    selectedExercise: ExerciseVM<SetWeightMetrics> | ExerciseVM<SetTimeMetrics> | ExerciseVM<SetMetrics> | null = null;
+    selectedExercise: ExerciseVM<SetMetrics> | null = null;
     handleSelectExercise(exercise: ExerciseVM<SetMetrics>){
         this.selectedExercise = exercise;
     }
 
     handleToggleComplete(exerciseSet: ExerciseSetVM<SetMetrics>){
         exerciseSet.completed = !exerciseSet.completed;
+        if(exerciseSet.completed && !exerciseSet.actualMetrics)
+            exerciseSet.actualMetrics = _.clone(exerciseSet.targetMetrics);
+
+        if(!exerciseSet.completed)
+            exerciseSet.actualMetrics = null;
     }
+    editRow: ExerciseSetVM<SetMetrics> | null = null;
     handleEditRow(exerciseSet: ExerciseSetVM<SetMetrics>){
         this.selectedExercise?.sets.forEach(x => x.isEditing = false);
         exerciseSet.isEditing = true;
+        this.editRow = exerciseSet;
+    }
+    handleEditConfirm(exerciseSet: ExerciseSetVM<SetMetrics>){
+        const editRow = this.editRow;
+        if(!editRow)
+            return;
+
+        _.merge(editRow, exerciseSet);
+        editRow.completed = true;
+        editRow.isEditing = false;
+        this.editRow = null;
+    }
+    handleDelete(exerciseSet: ExerciseSetVM<SetMetrics>){
+        const editRow = this.editRow;
+        if(!editRow)
+            return;
+
+        _.pull(this.selectedExercise!.sets, editRow);
+        this.editRow = null;
+    }
+    handleEditCancel(exerciseSet: ExerciseSetVM<SetMetrics>){
+        const editRow = this.editRow;
+        if(!editRow)
+            return;
+
+        editRow.isEditing = false;
+        this.editRow = null;
+    }
+    handleAdd(exerciseSet: ExerciseSetVM<SetMetrics>){
+        this.selectedExercise!.sets.push(exerciseSet);
+        this.handleEditRow(exerciseSet);
     }
 
     stopWatchStartTime: DateTime | null = null;
@@ -88,6 +145,6 @@ export class SessionComponent implements OnInit {
             }
 
             this.stopWatch = DateTime.now().diff(this.stopWatchStartTime!, ['hours', 'minutes', 'seconds']);
-        }, 50);
+        }, 5);
     } 
 }

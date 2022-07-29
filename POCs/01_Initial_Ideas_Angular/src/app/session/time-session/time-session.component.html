@@ -1,17 +1,9 @@
 <div class="container-fluid">
     <div class="row fw-bold">
         <div class="col"></div>
-        <div class="col-3 text-center ps-5 me-3">Target</div>
-        <div class="col-3 text-center ps-5 me-3">Actual</div>
+        <div class="col-3 text-center ps-5 me-3">Target Time</div>
+        <div class="col-3 text-center ps-5 me-3">Actual Time</div>
         <div class="col-1"></div>
-    </div>
-    <div class="row fw-bold">
-        <div class="col"></div>
-        <div class="col-2 text-center p-0">Weight</div>
-        <div class="col-1 text-center p-0 me-3">Reps</div>
-        <div class="col-2 text-center p-0">Weight</div>
-        <div class="col-1 text-center p-0 me-3">Reps</div>
-        <div class="col-1 text-center"></div>
     </div>
     <div *ngFor="let exerciseSet of exercise.sets; let i=index" 
         class="row d-flex align-items-center align-self-center"
@@ -19,15 +11,13 @@
         (click)="handleStartEditRow($event, exerciseSet)">
         <ng-container *ngIf="!exerciseSet.isEditing">
             <div class="col fw-bold">{{exerciseSet.setType}}</div>
-            <div class="col-2 text-center p-0">{{exerciseSet.targetMetrics.weight}}</div>
-            <div class="col-1 text-center p-0 me-3">{{exerciseSet.targetMetrics.reps}}</div> 
-            <div class="col-2 text-center p-0">{{exerciseSet.actualMetrics?.weight}}</div>
-            <div class="col-1 text-center p-0 me-3">{{exerciseSet.actualMetrics?.reps}}</div>
+            <div class="col-3 text-center p-0 me-3">{{exerciseSet.targetMetrics.timeMilliseconds}}</div> 
+            <div class="col-3 text-center p-0 me-3">{{exerciseSet.actualMetrics?.timeMilliseconds}}</div>
             <div class="col-1 text-center" (click)="handleToggleComplete($event, exerciseSet)">
                 <i class="bi " [ngClass]="exerciseSet.completed ? 'bi-check-circle' : 'bi-circle'" style="font-size: 1.5rem;"></i>
             </div>
         </ng-container>
-        <ng-container *ngIf="exerciseSet.isEditing">
+        <!-- <ng-container *ngIf="exerciseSet.isEditing">
             <div class="col d-flex text-center flex-column justify-content-center">
                 <i class="bi bi-arrow-up-circle invisible" style="font-size: 2rem; font-weight: bold;"></i>
                 <select class="form-select" aria-label="Default select example" [(ngModel)]="editRow!.setType">
@@ -70,7 +60,7 @@
                 <i class="bi bi-x-circle" (click)="handleCancelEditRow($event)"></i>
                 <i class="bi bi-check-circle" (click)="handleConfirmEditRow($event)"></i>
             </div> 
-        </ng-container>
+        </ng-container> -->
     </div>
     <div class="row">
         <div class="col-11"></div>

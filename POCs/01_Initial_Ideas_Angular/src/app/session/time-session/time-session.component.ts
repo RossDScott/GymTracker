@@ -1,23 +1,23 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ExerciseSetVM, ExerciseVM, SetType, SetWeightMetrics } from '../session.model';
+import { ExerciseSetVM, ExerciseVM, SetTimeMetrics, SetType } from '../session.model';
 import { SessionService } from '../session.service';
 import * as _ from 'lodash';
 
 @Component({
-    selector: 'app-weight-session',
-    templateUrl: './weight-session.component.html',
-    styleUrls: ['./weight-session.component.css', '../session.component.css']
+    selector: 'app-time-session',
+    templateUrl: './time-session.component.html',
+    styleUrls: ['./time-session.component.css', '../session.component.css']
 })
-export class WeightSessionComponent implements OnInit {
+export class TimeSessionComponent implements OnInit {
 
-    @Input() exercise!: ExerciseVM<SetWeightMetrics>;
+    @Input() exercise!: ExerciseVM<SetTimeMetrics>;
 
-    @Output() onToggleComplete: EventEmitter<ExerciseSetVM<SetWeightMetrics>> = new EventEmitter<ExerciseSetVM<SetWeightMetrics>>();
-    @Output() onEdit: EventEmitter<ExerciseSetVM<SetWeightMetrics>> = new EventEmitter<ExerciseSetVM<SetWeightMetrics>>();
-    @Output() onEditConfirm: EventEmitter<ExerciseSetVM<SetWeightMetrics>> = new EventEmitter<ExerciseSetVM<SetWeightMetrics>>();
-    @Output() onEditCancel: EventEmitter<ExerciseSetVM<SetWeightMetrics>> = new EventEmitter<ExerciseSetVM<SetWeightMetrics>>();
-    @Output() onAdd: EventEmitter<ExerciseSetVM<SetWeightMetrics>> = new EventEmitter<ExerciseSetVM<SetWeightMetrics>>();
-    @Output() onDelete: EventEmitter<ExerciseSetVM<SetWeightMetrics>> = new EventEmitter<ExerciseSetVM<SetWeightMetrics>>();
+    @Output() onToggleComplete: EventEmitter<ExerciseSetVM<SetTimeMetrics>> = new EventEmitter<ExerciseSetVM<SetTimeMetrics>>();
+    @Output() onEdit: EventEmitter<ExerciseSetVM<SetTimeMetrics>> = new EventEmitter<ExerciseSetVM<SetTimeMetrics>>();
+    @Output() onEditConfirm: EventEmitter<ExerciseSetVM<SetTimeMetrics>> = new EventEmitter<ExerciseSetVM<SetTimeMetrics>>();
+    @Output() onEditCancel: EventEmitter<ExerciseSetVM<SetTimeMetrics>> = new EventEmitter<ExerciseSetVM<SetTimeMetrics>>();
+    @Output() onAdd: EventEmitter<ExerciseSetVM<SetTimeMetrics>> = new EventEmitter<ExerciseSetVM<SetTimeMetrics>>();
+    @Output() onDelete: EventEmitter<ExerciseSetVM<SetTimeMetrics>> = new EventEmitter<ExerciseSetVM<SetTimeMetrics>>();
 
     setTypes: SetType[];
 
@@ -29,13 +29,13 @@ export class WeightSessionComponent implements OnInit {
 
     }
 
-    handleToggleComplete(event: Event, exerciseSet: ExerciseSetVM<SetWeightMetrics>){
+    handleToggleComplete(event: Event, exerciseSet: ExerciseSetVM<SetTimeMetrics>){
         event.cancelBubble = true;
         this.onToggleComplete.emit(exerciseSet);
     }
 
-    editRow: ExerciseSetVM<SetWeightMetrics> | null = null;
-    handleStartEditRow(event: Event, exerciseSet: ExerciseSetVM<SetWeightMetrics>){
+    editRow: ExerciseSetVM<SetTimeMetrics> | null = null;
+    handleStartEditRow(event: Event, exerciseSet: ExerciseSetVM<SetTimeMetrics>){
         event.cancelBubble = true;
 
         if(this.editRow)
@@ -84,10 +84,10 @@ export class WeightSessionComponent implements OnInit {
 
     handleAddRow() {
         const lastRow = _.last(this.exercise.sets);
-        const newRow: ExerciseSetVM<SetWeightMetrics> = {
+        const newRow: ExerciseSetVM<SetTimeMetrics> = {
             setType: lastRow?.setType || "",
-            targetMetrics: lastRow?.targetMetrics || {weight: 0, reps: 0},
-            actualMetrics: lastRow?.actualMetrics || {weight: 0, reps: 0},
+            targetMetrics: lastRow?.targetMetrics || {timeMilliseconds: 0},
+            actualMetrics: lastRow?.actualMetrics || {timeMilliseconds: 0},
             isEditing: true,
             completed: false
         };
