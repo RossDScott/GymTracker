@@ -14,6 +14,9 @@ const Stopwatch = () => {
     const [pausedDuration, setPausedDuration] = useAtom(pausedDurationAtom);
 
     useEffect(() => {
+        if(!startTime)
+            return;
+
         const timer = setInterval(()=> {
             if(!startTime)
                 return;

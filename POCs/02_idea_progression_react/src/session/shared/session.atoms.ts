@@ -7,4 +7,4 @@ export const sessionAtom = atom(session);
 export const selectedExerciseAtom = atom(session.exercises[0]);
 
 export const defaultTimerDuration = Duration.fromMillis(2 * 1000);
-export const timerStartDurationAtom = atom<Duration | null>(defaultTimerDuration);
+export const timerStartDurationAtom = atom<Duration>(defaultTimerDuration);

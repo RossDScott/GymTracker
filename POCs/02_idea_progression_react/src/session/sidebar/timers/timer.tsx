@@ -1,10 +1,10 @@
 import userEvent from "@testing-library/user-event";
 import { atom, useAtom } from "jotai";
 import { DateTime, Duration } from "luxon";
-import { useEffect, useMemo } from "react";
+import React, { useEffect, useCallback } from "react";
 import { animated, config, useSpring, useTransition } from '@react-spring/web'
-import { defaultTimerDuration, sessionAtom, timerStartDurationAtom } from "../../shared/session.atoms";
-
+import { defaultTimerDuration, timerStartDurationAtom } from "../../shared/session.atoms";
+import { atomWithDefault, useAtomCallback } from "jotai/utils";
 
 const durationAtom = atom<Duration>(defaultTimerDuration);
 const startTimeAtom = atom<DateTime | null>(null);
@@ -22,6 +22,9 @@ const Timer = () => {
     const [timesUp, setTimesUp] = useAtom(timesUpAtom);
 
     useEffect(() => {
+        if(!startTime)
+            return;
+
         const timer = setInterval(()=> {
             if(!startTime)
                 return;
@@ -51,13 +54,14 @@ const Timer = () => {
     }
 
     const handleStart = () => {
+        handleReset();
         setStartTime(DateTime.now());
     }
 
     const handleReset = () => {
         setStartTime(null);
         setPausedDuration(null);
-        setDuration(defaultTimerDuration)
+        setDuration(startDuration);
         setTimesUp(false);
     }
 
@@ -65,9 +69,19 @@ const Timer = () => {
         setEditMode(true);
     }
 
-    const timerFace = editMode
-                        ? <h2><input type="time" value={duration!.toFormat("mm:ss")} step="1" min="00:00:01" max="00:59:59"></input></h2>
-                        : <h1 onClick={handleEditTime}>{duration?.toFormat("mm:ss.SSS") ?? '00:00:000'}</h1>
+    const handleDurationInputChange = (e: React.FormEvent<HTMLInputElement>) => {
+        console.log(e.currentTarget.value)
+        const duration = Duration.fromISOTime(e.currentTarget.value);
+        console.dir(duration);
+        setStartDuration(duration);
+    }
+
+    const startTimerFace = 
+        editMode
+            ? <h2><input type="time" value={startDuration.toFormat("hh:mm:ss")} step="1" min="00:00:01" max="00:59:59" onChange={handleDurationInputChange}></input></h2>
+            : <h1 onClick={handleEditTime}>{startDuration.toFormat("mm:ss.SSS") ?? '00:00:000'}</h1>
+
+    const timerFace = <h1>{duration.toFormat("mm:ss.SSS") ?? '00:00:000'}</h1>
 
     const timeControlButtons = (
         <>
@@ -85,7 +99,7 @@ const Timer = () => {
                     onClick={handleReset}>Reset</button>
             }
 
-            {!startTime && 
+            {!startTime && !timesUp && 
                 <button 
                     type="button" 
                     className={`btn btn-outline-primary btn-sm pt-0 pb-0 ${pausedDuration ? 'ms-1' : 'ms-auto'}`}
@@ -108,7 +122,8 @@ const Timer = () => {
     return (
         <>
             <span className="fw-semibold">Timer</span>
-            {!timesUp && timerFace}
+            {!startTime && !timesUp && startTimerFace}
+            {!timesUp && startTime && timerFace}
             {timesUp && <animated.h1 style={timesUpProps} onClick={handleReset}>Times Up!</animated.h1>}
             <div className="d-flex">
                 {editMode ? editButton : timeControlButtons}
