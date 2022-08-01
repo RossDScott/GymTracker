@@ -19,11 +19,11 @@ const Stopwatch = () => {
                 return;
 
             if(pausedDuration){
-                setDuration(DateTime.now().plus(pausedDuration).diff(startTime!, ['hours', 'minutes', 'seconds']));
+                setDuration(DateTime.now().plus(pausedDuration).diff(startTime!));
                 return;
             }
 
-            setDuration(DateTime.now().diff(startTime!, ['hours', 'minutes', 'seconds']));
+            setDuration(DateTime.now().diff(startTime!));
         }, 1);
 
         return () => clearInterval(timer);

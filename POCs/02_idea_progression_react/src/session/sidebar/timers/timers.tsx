@@ -2,6 +2,7 @@ import { atom, useAtom } from "jotai";
 import { DateTime } from "luxon";
 import CurrentTime from "./current-time";
 import Stopwatch from "./stopwatch";
+import Timer from "./timer";
 import WorkoutTime from "./workout-time";
 
 const clockAtom = atom(DateTime.now());
@@ -23,6 +24,11 @@ const Timers = () => {
             <div className="d-flex justify-content-center">
                 <div style={{width: '12rem'}}>
                     <Stopwatch></Stopwatch>
+                </div>
+            </div>
+            <div className="d-flex justify-content-center">
+                <div style={{width: '12rem'}}>
+                    <Timer></Timer>
                 </div>
             </div>
         </div>
