@@ -32,7 +32,7 @@ const Timer = () => {
             let durationCalc: Duration = startTime!.diff(DateTime.now()).plus(startDuration!);
 
             if(pausedDuration)
-                durationCalc = startTime!.diff(DateTime.now()).plus(startDuration!);
+                durationCalc = startTime!.diff(DateTime.now()).plus(pausedDuration!);
             
             if(durationCalc.toMillis() < 0){
                 durationCalc = Duration.fromMillis(0);
@@ -54,7 +54,9 @@ const Timer = () => {
     }
 
     const handleStart = () => {
-        handleReset();
+        if(!pausedDuration)
+            handleReset();
+
         setStartTime(DateTime.now());
     }
 
@@ -122,8 +124,8 @@ const Timer = () => {
     return (
         <>
             <span className="fw-semibold">Timer</span>
-            {!startTime && !timesUp && startTimerFace}
-            {!timesUp && startTime && timerFace}
+            {!startTime && !timesUp && !pausedDuration && startTimerFace}
+            {!timesUp && (startTime || pausedDuration) && timerFace}
             {timesUp && <animated.h1 style={timesUpProps} onClick={handleReset}>Times Up!</animated.h1>}
             <div className="d-flex">
                 {editMode ? editButton : timeControlButtons}
