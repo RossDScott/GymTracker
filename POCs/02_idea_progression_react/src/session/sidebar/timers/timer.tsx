@@ -105,6 +105,7 @@ const Timer = () => {
         const duration = Duration.fromISOTime(e.currentTarget.value);
         console.dir(duration);
         setStartDuration(duration);
+        setEditMode(false);
     }
     const handleSetTime = () => {
         setEditMode(false);
