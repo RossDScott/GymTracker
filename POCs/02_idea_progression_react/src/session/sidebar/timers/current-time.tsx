@@ -1,4 +1,3 @@
-import userEvent from "@testing-library/user-event";
 import { atom, useAtom } from "jotai";
 import { DateTime } from "luxon";
 import { useEffect } from "react";

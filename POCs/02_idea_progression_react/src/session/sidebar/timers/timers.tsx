@@ -1,4 +1,4 @@
-import { atom, useAtom } from "jotai";
+import { atom } from "jotai";
 import { DateTime } from "luxon";
 import CurrentTime from "./current-time";
 import Stopwatch from "./stopwatch";

@@ -1,9 +1,6 @@
 import './session-sidebar.css';
-import { SessionVM, ExerciseVM, SetMetrics } from '../shared/session.model';
 import Exercises from './exercises';
 import Timers from './timers/timers';
-import CurrentTime from './timers/current-time';
-import WorkoutTime from './timers/workout-time';
 
 const SideBar = () => {
     return (

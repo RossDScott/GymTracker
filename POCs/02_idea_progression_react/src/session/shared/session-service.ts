@@ -2,9 +2,6 @@ import { DateTime } from "luxon";
 import { Exercise, SessionVM, SetTimeMetrics, SetType, SetWeightMetrics, WorkoutPlan } from "./session.model";
 
 export function setupFakeSession(){
-    let warmupSetType: SetType = {name: "Warm-up"};
-    let mainSetType: SetType = {name: "Set"};
-
     let workoutPlan: WorkoutPlan = {
         id: "1",
         name: "Push Day",

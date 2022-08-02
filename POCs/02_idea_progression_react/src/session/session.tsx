@@ -1,6 +1,4 @@
-import { atom, useAtom } from "jotai";
 import { useUpdateAtom } from 'jotai/utils'
-import { setupFakeSession } from "./shared/session-service";
 import SideBar from "./sidebar/session-sidebar";
 import './session.css';
 import { startTimerWithDurationAtom, timerStartDurationAtom } from "./shared/session.atoms";

@@ -1,8 +1,6 @@
-import userEvent from "@testing-library/user-event";
 import { atom, useAtom } from "jotai";
 import { DateTime, Duration } from "luxon";
-import { useEffect, useMemo } from "react";
-import { sessionAtom } from "../../shared/session.atoms";
+import { useEffect } from "react";
 
 const durationAtom = atom<Duration | null>(null);
 const startTimeAtom = atom<DateTime | null>(null);

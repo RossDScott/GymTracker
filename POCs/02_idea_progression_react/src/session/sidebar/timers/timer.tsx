@@ -1,10 +1,9 @@
-import userEvent from "@testing-library/user-event";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { DateTime, Duration } from "luxon";
-import React, { useEffect, useCallback, useRef } from "react";
-import { animated, config, useSpring, useTransition } from '@react-spring/web'
+import React, { useEffect, useRef } from "react";
+import { animated, useSpring } from '@react-spring/web'
 import { defaultTimerDuration, startTimerWithDurationAtom, timerStartDurationAtom } from "../../shared/session.atoms";
-import { atomWithDefault, useAtomCallback, useResetAtom } from "jotai/utils";
+import { useResetAtom } from "jotai/utils";
 
 const durationAtom = atom<Duration>(defaultTimerDuration);
 const startTimeAtom = atom<DateTime | null>(null);

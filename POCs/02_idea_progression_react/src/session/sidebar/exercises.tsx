@@ -1,9 +1,7 @@
 import './session-sidebar.css';
-import { focusAtom } from 'jotai/optics'
 import { selectedExerciseAtom, sessionAtom } from '../shared/session.atoms';
-import { Atom, PrimitiveAtom, useAtom, WritableAtom } from 'jotai';
-import { splitAtom } from "jotai/utils";
-import { SessionVM, ExerciseVM, SetMetrics } from '../shared/session.model';
+import { useAtom } from 'jotai';
+import { ExerciseVM, SetMetrics } from '../shared/session.model';
 
 const Exercises = () => {
     const [session] = useAtom(sessionAtom);

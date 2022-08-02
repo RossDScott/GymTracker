@@ -1,7 +1,6 @@
-import userEvent from "@testing-library/user-event";
 import { atom, useAtom } from "jotai";
 import { DateTime, Duration } from "luxon";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { sessionAtom } from "../../shared/session.atoms";
 
 export const workoutStartAtom = atom((get) => get(sessionAtom).workoutStart);
@@ -14,7 +13,7 @@ const WorkoutTime = () => {
     useEffect(() => {
         const timer = setInterval(() => setWorkoutDuration(DateTime.now().diff(workoutStart, ['hours', 'minutes'])), 1000);
         return () => clearInterval(timer);
-    }, [setWorkoutDuration]);
+    }, [workoutStart, setWorkoutDuration]);
 
     return (
         <>
