@@ -1,18 +1,23 @@
 import userEvent from "@testing-library/user-event";
-import { atom, useAtom } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { DateTime, Duration } from "luxon";
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import { animated, config, useSpring, useTransition } from '@react-spring/web'
-import { defaultTimerDuration, timerStartDurationAtom } from "../../shared/session.atoms";
-import { atomWithDefault, useAtomCallback } from "jotai/utils";
+import { defaultTimerDuration, startTimerWithDurationAtom, timerStartDurationAtom } from "../../shared/session.atoms";
+import { atomWithDefault, useAtomCallback, useResetAtom } from "jotai/utils";
 
 const durationAtom = atom<Duration>(defaultTimerDuration);
 const startTimeAtom = atom<DateTime | null>(null);
 const pausedDurationAtom = atom<Duration | null>(null);
 const editModeAtom = atom(false);
 const timesUpAtom = atom(false);
+const showTimePickerAtom = atom(false);
 
 const Timer = () => {
+    const myRefname= useRef(null);
+
+    const startTimerWithDuration = useAtomValue(startTimerWithDurationAtom);
+    const resetStartTimerWithDuration = useResetAtom(startTimerWithDurationAtom)
     const [startDuration, setStartDuration] = useAtom(timerStartDurationAtom);
     const [duration, setDuration] = useAtom(durationAtom);
     const [startTime, setStartTime] = useAtom(startTimeAtom);
@@ -20,6 +25,7 @@ const Timer = () => {
     const [pausedDuration, setPausedDuration] = useAtom(pausedDurationAtom);
     const [editMode, setEditMode] = useAtom(editModeAtom);
     const [timesUp, setTimesUp] = useAtom(timesUpAtom);
+    const [showTimePicker, setShowTimePicker] = useAtom(showTimePickerAtom);
 
     useEffect(() => {
         if(!startTime)
@@ -48,6 +54,17 @@ const Timer = () => {
         return () => clearInterval(timer);
     }, [startTime, setDuration]);
 
+    useEffect(() => {
+        if(!startTimerWithDuration)
+            return;
+
+        handleReset();
+        setStartDuration(startTimerWithDuration);
+        handleStart();
+        
+        resetStartTimerWithDuration();
+    }, [startTimerWithDuration]);
+
     const handleStop = () => {
         setPausedDuration(duration!);
         setStartTime(null);
@@ -69,7 +86,20 @@ const Timer = () => {
 
     const handleEditTime = () => {
         setEditMode(true);
+        setShowTimePicker(true);
     }
+    useEffect(() => {
+        if(!showTimePicker)
+            return;
+
+        const timeout = setTimeout(() => {
+            (myRefname as any)!.current.focus();
+            (myRefname as any)!.current.showPicker();
+            setShowTimePicker(false);
+        }, 50); //This is probably an antipattern, some more learning to do here
+        
+        return () => clearTimeout(timeout);
+    }, [showTimePicker]);
 
     const handleDurationInputChange = (e: React.FormEvent<HTMLInputElement>) => {
         console.log(e.currentTarget.value)
@@ -77,10 +107,13 @@ const Timer = () => {
         console.dir(duration);
         setStartDuration(duration);
     }
+    const handleSetTime = () => {
+        setEditMode(false);
+    }
 
     const startTimerFace = 
         editMode
-            ? <h2><input type="time" value={startDuration.toFormat("hh:mm:ss")} step="1" min="00:00:01" max="00:59:59" onChange={handleDurationInputChange}></input></h2>
+            ? <h2><input ref={myRefname} type="time" value={startDuration.toFormat("hh:mm:ss")} step="1" min="00:00:01" max="00:59:59" onChange={handleDurationInputChange} onBlur={handleSetTime}></input></h2>
             : <h1 onClick={handleEditTime}>{startDuration.toFormat("mm:ss.SSS") ?? '00:00:000'}</h1>
 
     const timerFace = <h1>{duration.toFormat("mm:ss.SSS") ?? '00:00:000'}</h1>
@@ -110,9 +143,7 @@ const Timer = () => {
         </>
     )
 
-    const handleSetTime = () => {
-        setEditMode(false);
-    }
+
     const editButton =
         <button  
             type="button" 

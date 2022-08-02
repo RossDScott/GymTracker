@@ -1,16 +1,21 @@
 import { atom, useAtom } from "jotai";
+import { useUpdateAtom } from 'jotai/utils'
 import { setupFakeSession } from "./shared/session-service";
 import SideBar from "./sidebar/session-sidebar";
 import './session.css';
-import { timerStartDurationAtom } from "./shared/session.atoms";
+import { startTimerWithDurationAtom, timerStartDurationAtom } from "./shared/session.atoms";
 import { Duration } from "luxon";
 
 
 const Session = () => {
-    const [,setTimerDuration] = useAtom(timerStartDurationAtom);
-    
+    const setTimerDuration = useUpdateAtom(timerStartDurationAtom);
+    const startTimerWithDuration = useUpdateAtom(startTimerWithDurationAtom);
+
     const handleUpdateTimerDuration = () =>
         setTimerDuration(Duration.fromMillis(5000));
+
+    const handleStartTimerWithDuration = () =>
+        startTimerWithDuration(Duration.fromMillis(3000));
 
     return (
         <>
@@ -18,6 +23,7 @@ const Session = () => {
                 <SideBar></SideBar>
                 <div>
                     <button onClick={handleUpdateTimerDuration}>Test change time to 5secs</button>
+                    <button onClick={handleStartTimerWithDuration}>Start timer with 3secs</button>
                 </div>
             </div>
             <div>
