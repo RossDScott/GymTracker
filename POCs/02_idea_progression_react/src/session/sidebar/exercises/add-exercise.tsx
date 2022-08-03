@@ -8,11 +8,9 @@ import { useCallback, useRef } from "react";
 
 const showAddAtom = atom(false);
 const exercisesAtom = focusAtom(sessionAtom, (optic) => optic.prop('exercises'))
-const selectedExerciseAtom = atom("");
 
 const AddExercise = () => {
     const [showAdd, setShowAdd] = useAtom(showAddAtom);
-    const [selectedExercise, setSelectedExercise] = useAtom(selectedExerciseAtom);
     const setExercise = useUpdateAtom (exercisesAtom);
 
     const handleAddExercise = (x: string) => {
@@ -40,7 +38,7 @@ const AddExercise = () => {
 
     const addList = (
         <div className="input-group">
-            <select ref={showListRef} className="form-select" id="inputGroupSelect01" value={selectedExercise} onChange={(e) => handleAddExercise(e.target.value)} onBlur={() => setShowAdd(false)} >
+            <select ref={showListRef} className="form-select" id="inputGroupSelect01" onChange={(e) => handleAddExercise(e.target.value)} onBlur={() => setShowAdd(false)} >
                 <option value="">Choose...</option>
                 <option value="1">Something Heavy</option>
                 <option value="2" >Incline Barbell Bench Press</option>
