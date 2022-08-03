@@ -1,12 +1,12 @@
 import './session-sidebar.css';
-import Exercises from './exercises';
+import Exercises from './exercises/exercises';
 import Timers from './timers/timers';
 
 const SideBar = () => {
     return (
         <div id="sidebar" className="col-md-3 d-md-block collapse pt-2 ">
             <div className="d-flex flex-column">
-                <div className="ps-2">
+                <div className="ps-2" style={{height:"100%", overflowY:"auto"}}>
                     <Exercises></Exercises>
                 </div>
                 <div className="d-grid mt-auto">

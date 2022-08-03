@@ -9,7 +9,7 @@ const clockAtom = atom(DateTime.now());
 
 const Timers = () => {
     return (
-        <div className="d-flex flex-column mb-3 timers">
+        <div className="d-flex flex-column mt-1 mb-3 timers" style={{height: "50%"}}>
             <hr className="mb-3 mt-0" />
             <div className="d-flex justify-content-center">
                 <div style={{width: '12rem'}}>

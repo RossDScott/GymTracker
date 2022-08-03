@@ -23,7 +23,7 @@ const Timer = () => {
     const [editMode, setEditMode] = useAtom(editModeAtom);
     const [timesUp, setTimesUp] = useAtom(timesUpAtom);
 
-    useEffect(() => {
+    useEffect(function calculateRemainingDuration() {
         if(!startTime)
             return;
 
@@ -50,7 +50,7 @@ const Timer = () => {
         return () => clearInterval(timer);
     }, [startTime, setDuration]);
 
-    useEffect(() => {
+    useEffect(function triggerStartTimer() {
         if(!startTimerWithDuration)
             return;
 
@@ -90,6 +90,7 @@ const Timer = () => {
             node.showPicker();
         }
       }, []);
+
     const handleDurationInputChange = (e: React.FormEvent<HTMLInputElement>) => {
         console.log(e.currentTarget.value)
         const duration = Duration.fromISOTime(e.currentTarget.value);
@@ -108,12 +109,6 @@ const Timer = () => {
 
     const timerFace = <h1>{duration.toFormat("mm:ss.SSS") ?? '00:00:000'}</h1>
 
-    const editButton =
-        <button  
-            type="button" 
-            className="btn btn-outline-primary btn-sm ms-auto me-1 pt-0 pb-0"
-            onClick={handleSetTime}>Set</button>
-
     const timesUpProps = useSpring({ to: { opacity: 1, color: 'red' }, from: { opacity: 0 }, reset: true, delay: 200, config:{duration:500}, loop: { reverse: true }});
 
     return (
@@ -123,9 +118,8 @@ const Timer = () => {
             {!timesUp && (startTime || pausedDuration) && timerFace}
             {timesUp && <animated.h1 style={timesUpProps} onClick={handleReset}>Times Up!</animated.h1>}
             <div className="d-flex">
-                {editMode 
-                    ?editButton
-                    :<ControlButtons
+                {!editMode &&
+                    <ControlButtons
                         canPause={true}
                         isRunning={!!startTime}
                         isPaused={!!pausedDuration && !startTime}
