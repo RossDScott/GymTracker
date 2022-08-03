@@ -38,7 +38,7 @@ const AddExercise = () => {
 
     const addList = (
         <div className="input-group">
-            <select ref={showListRef} className="form-select" id="inputGroupSelect01" onChange={(e) => handleAddExercise(e.target.value)} onBlur={() => setShowAdd(false)} >
+            <select ref={showListRef} className="form-select me-2" id="inputGroupSelect01" onChange={(e) => handleAddExercise(e.target.value)} onBlur={() => setShowAdd(false)} >
                 <option value="">Choose...</option>
                 <option value="1">Something Heavy</option>
                 <option value="2" >Incline Barbell Bench Press</option>
