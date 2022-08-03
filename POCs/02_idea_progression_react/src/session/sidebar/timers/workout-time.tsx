@@ -1,13 +1,14 @@
-import { atom, useAtom } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
+import { selectAtom } from "jotai/utils";
 import { DateTime, Duration } from "luxon";
 import { useEffect } from "react";
 import { sessionAtom } from "../../shared/session.atoms";
 
-export const workoutStartAtom = atom((get) => get(sessionAtom).workoutStart);
+export const workoutStartAtom = selectAtom(sessionAtom, session => session.workoutStart);
 const workoutDurationAtom = atom(Duration.fromMillis(0));
 
 const WorkoutTime = () => {
-    const [workoutStart] = useAtom(workoutStartAtom);
+    const workoutStart = useAtomValue(workoutStartAtom);
     const [workoutDuration, setWorkoutDuration] = useAtom(workoutDurationAtom);
 
     useEffect(() => {

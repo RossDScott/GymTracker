@@ -1,0 +1,42 @@
+#session{
+    height: 100%;
+    width: 70%;
+  }
+
+#grid{
+    /* height: 75%; */
+    overflow-y: auto;
+    font-size: .9rem!important;
+ }
+
+#grid.isEditing{
+    color: lightgray;
+}
+
+.bi{
+    font-size: 1.5rem!important;
+}
+
+ #grid .row{
+    /* margin-bottom: .5rem; */
+    padding: .2rem 0;
+ }
+
+.row.selectedRow{
+    background-color: #e9e9e9;
+    color: black;
+}
+
+.row.selectedRow input {
+    font-size: .9rem!important;
+    padding-left: .1rem;
+    padding-right: .1rem;
+}
+
+#grid .bi{
+    font-size: 1.6rem;
+}
+
+ #rowDetail{
+    height: 25%;
+ }
