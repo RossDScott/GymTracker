@@ -3,7 +3,6 @@ import { useAtom, useAtomValue } from 'jotai';
 import { selectAtom } from "jotai/utils";
 import { ExerciseVM, SetMetrics } from '../../shared/session.model';
 import AddExercise from './add-exercise';
-import * as _ from 'lodash';
 
 const exercisesAtom = selectAtom(sessionAtom, session => session.exercises);
 
