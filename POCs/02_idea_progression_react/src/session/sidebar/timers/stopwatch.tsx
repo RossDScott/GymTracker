@@ -1,6 +1,7 @@
 import { atom, useAtom } from "jotai";
 import { DateTime, Duration } from "luxon";
 import { useEffect } from "react";
+import ControlButtons from "./control-buttons";
 
 const durationAtom = atom<Duration | null>(null);
 const startTimeAtom = atom<DateTime | null>(null);
@@ -30,7 +31,7 @@ const Stopwatch = () => {
         return () => clearInterval(timer);
     }, [startTime, setDuration]);
 
-    const handleStop = () => {
+    const handlePause = () => {
         setPausedDuration(duration!);
         setStartTime(null);
     }
@@ -45,32 +46,18 @@ const Stopwatch = () => {
         setDuration(null)
     }
 
-    const stopButton = startTime &&
-        <button  
-            type="button" 
-            className="btn btn-outline-primary btn-sm ms-auto pt-0 pb-0"
-            onClick={handleStop}>Stop</button>
-
-    const startButton = !startTime &&
-        <button  
-            type="button" 
-            className={`btn btn-outline-primary btn-sm pt-0 pb-0 ${pausedDuration ? 'ms-1' : 'ms-auto'}`}
-            onClick={handleStart}>{pausedDuration ? 'Resume' : 'Start'}</button>
-
-    const resetButton = pausedDuration && !startTime &&
-        <button  
-            type="button" 
-            className="btn btn-outline-primary btn-sm ms-auto me-1 pt-0 pb-0"
-            onClick={handleReset}>Reset</button>
-
     return (
         <>
             <span className="fw-semibold">Stopwatch</span>
             <h1>{duration?.toFormat("mm:ss.SSS") ?? '00:00:000'}</h1>
             <div className="d-flex">
-                {stopButton}
-                {resetButton}
-                {startButton}
+                <ControlButtons
+                        canPause={true}
+                        isRunning={!!startTime}
+                        isPaused={!!pausedDuration && !startTime}
+                        onStart={handleStart}
+                        onPause={handlePause}
+                        onReset={handleReset}></ControlButtons>
             </div>
         </>
     );

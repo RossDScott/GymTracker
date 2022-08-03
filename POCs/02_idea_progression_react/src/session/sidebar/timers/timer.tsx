@@ -1,20 +1,18 @@
 import { atom, useAtom, useAtomValue } from "jotai";
 import { DateTime, Duration } from "luxon";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { animated, useSpring } from '@react-spring/web'
 import { defaultTimerDuration, startTimerWithDurationAtom, timerStartDurationAtom } from "../../shared/session.atoms";
 import { useResetAtom } from "jotai/utils";
+import ControlButtons from "./control-buttons";
 
 const durationAtom = atom<Duration>(defaultTimerDuration);
 const startTimeAtom = atom<DateTime | null>(null);
 const pausedDurationAtom = atom<Duration | null>(null);
 const editModeAtom = atom(false);
 const timesUpAtom = atom(false);
-const showTimePickerAtom = atom(false);
 
 const Timer = () => {
-    const myRefname= useRef(null);
-
     const startTimerWithDuration = useAtomValue(startTimerWithDurationAtom);
     const resetStartTimerWithDuration = useResetAtom(startTimerWithDurationAtom)
     const [startDuration, setStartDuration] = useAtom(timerStartDurationAtom);
@@ -24,7 +22,6 @@ const Timer = () => {
     const [pausedDuration, setPausedDuration] = useAtom(pausedDurationAtom);
     const [editMode, setEditMode] = useAtom(editModeAtom);
     const [timesUp, setTimesUp] = useAtom(timesUpAtom);
-    const [showTimePicker, setShowTimePicker] = useAtom(showTimePickerAtom);
 
     useEffect(() => {
         if(!startTime)
@@ -41,7 +38,7 @@ const Timer = () => {
             
             if(durationCalc.toMillis() < 0){
                 durationCalc = Duration.fromMillis(0);
-                handleStop();
+                handlePause();
                 handleReset();
                 setTimesUp(true);
                 setInterval(() => setTimesUp(false), 5000);
@@ -64,7 +61,7 @@ const Timer = () => {
         resetStartTimerWithDuration();
     }, [startTimerWithDuration]);
 
-    const handleStop = () => {
+    const handlePause = () => {
         setPausedDuration(duration!);
         setStartTime(null);
     }
@@ -85,21 +82,14 @@ const Timer = () => {
 
     const handleEditTime = () => {
         setEditMode(true);
-        setShowTimePicker(true);
     }
-    useEffect(() => {
-        if(!showTimePicker)
-            return;
 
-        const timeout = setTimeout(() => {
-            (myRefname as any)!.current.focus();
-            (myRefname as any)!.current.showPicker();
-            setShowTimePicker(false);
-        }, 50); //This is probably an antipattern, some more learning to do here
-        
-        return () => clearTimeout(timeout);
-    }, [showTimePicker]);
-
+    const showPickerRef = useCallback((node: any) => {
+        if (node !== null) {
+            node.focus();
+            node.showPicker();
+        }
+      }, []);
     const handleDurationInputChange = (e: React.FormEvent<HTMLInputElement>) => {
         console.log(e.currentTarget.value)
         const duration = Duration.fromISOTime(e.currentTarget.value);
@@ -113,36 +103,10 @@ const Timer = () => {
 
     const startTimerFace = 
         editMode
-            ? <h2><input ref={myRefname} type="time" value={startDuration.toFormat("hh:mm:ss")} step="1" min="00:00:01" max="00:59:59" onChange={handleDurationInputChange} onBlur={handleSetTime}></input></h2>
+            ? <h2><input ref={showPickerRef} type="time" value={startDuration.toFormat("hh:mm:ss")} step="1" min="00:00:01" max="00:59:59" onChange={handleDurationInputChange} onBlur={handleSetTime}></input></h2>
             : <h1 onClick={handleEditTime}>{startDuration.toFormat("mm:ss.SSS") ?? '00:00:000'}</h1>
 
     const timerFace = <h1>{duration.toFormat("mm:ss.SSS") ?? '00:00:000'}</h1>
-
-    const timeControlButtons = (
-        <>
-            {startTime &&
-                <button  
-                    type="button" 
-                    className="btn btn-outline-primary btn-sm ms-auto pt-0 pb-0"
-                    onClick={handleStop}>Stop</button>
-            }
-
-            {pausedDuration && !startTime &&
-                <button  
-                    type="button" 
-                    className="btn btn-outline-primary btn-sm ms-auto me-1 pt-0 pb-0"
-                    onClick={handleReset}>Reset</button>
-            }
-
-            {!startTime && !timesUp && 
-                <button 
-                    type="button" 
-                    className={`btn btn-outline-primary btn-sm pt-0 pb-0 ${pausedDuration ? 'ms-1' : 'ms-auto'}`}
-                    onClick={handleStart}>{pausedDuration ? 'Resume' : 'Start'}</button>
-            }
-        </>
-    )
-
 
     const editButton =
         <button  
@@ -159,7 +123,15 @@ const Timer = () => {
             {!timesUp && (startTime || pausedDuration) && timerFace}
             {timesUp && <animated.h1 style={timesUpProps} onClick={handleReset}>Times Up!</animated.h1>}
             <div className="d-flex">
-                {editMode ? editButton : timeControlButtons}
+                {editMode 
+                    ?editButton
+                    :<ControlButtons
+                        canPause={true}
+                        isRunning={!!startTime}
+                        isPaused={!!pausedDuration && !startTime}
+                        onStart={handleStart}
+                        onPause={handlePause}
+                        onReset={handleReset}></ControlButtons>}
             </div>
         </>
     );
