@@ -1,17 +1,15 @@
 import exp from "constants"
 import { atom, useAtom } from "jotai";
 import { useUpdateAtom } from "jotai/utils";
-import { focusAtom } from 'jotai/optics'
-import { sessionAtom } from "../../shared/session.atoms";
-import { ExerciseVM, SessionVM, SetMetrics } from "../../shared/session.model";
+import { exercisesAtom } from "../../shared/session.atoms";
+import { ExerciseVM, SetMetrics } from "../../shared/session.model";
 import { useCallback, useRef } from "react";
 
 const showAddAtom = atom(false);
-const exercisesAtom = focusAtom(sessionAtom, (optic) => optic.prop('exercises'))
 
 const AddExercise = () => {
     const [showAdd, setShowAdd] = useAtom(showAddAtom);
-    const setExercise = useUpdateAtom (exercisesAtom);
+    const setExercise = useUpdateAtom(exercisesAtom);
 
     const handleAddExercise = (x: string) => {
         const y = "Test" + x;

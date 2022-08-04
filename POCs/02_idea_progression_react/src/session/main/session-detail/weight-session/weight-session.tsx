@@ -1,18 +1,18 @@
-import { PrimitiveAtom, useAtomValue } from 'jotai';
+import { PrimitiveAtom, useAtom, useAtomValue } from 'jotai';
 import { focusAtom } from 'jotai/optics';
 import { splitAtom } from 'jotai/utils';
-import { selectedExerciseAtom } from '../../../shared/session.atoms';
-import { ExerciseSetVM, ExerciseVM, SetWeightMetrics } from '../../../shared/session.model';
+import { useMemo } from 'react';
+import { ExerciseSetVM, SelectedExercise, SetWeightMetrics } from '../../../shared/session.model';
 
 import '../session-detail.css';
 import WeightSet from './weight-set';
 
-const setsAtom = focusAtom(selectedExerciseAtom, (optic) => optic.prop('sets'));
-const setsAtomAtoms = splitAtom(setsAtom);
+const WeightSession: React.FC<SelectedExercise> = ({selectedExerciseAtom}) => {
+    const setsAtom = useMemo(() => focusAtom(selectedExerciseAtom, (optic) => optic.prop('sets')), [selectedExerciseAtom]);
+    const setsAtomAtoms = splitAtom(setsAtom);
 
-const WeightSession = () => {
     const setAtoms = useAtomValue(setsAtomAtoms) as unknown as PrimitiveAtom<ExerciseSetVM<SetWeightMetrics>>[];
-    
+    const xx = useAtomValue(setsAtom);
     const sets = setAtoms.map((set, index) => 
         <WeightSet key={index} setAtom={set}></WeightSet>
     );
@@ -34,6 +34,9 @@ const WeightSession = () => {
                 <div className="col-1 text-center"></div>
             </div>
             {sets}
+            {/* <div>
+                {JSON.stringify(xx)}
+            </div> */}
             {/* <div *ngFor="let exerciseSet of exercise.sets; let i=index" 
                 className="row d-flex align-items-center align-self-center"
                 [className.selectedRow]="exerciseSet.isEditing"

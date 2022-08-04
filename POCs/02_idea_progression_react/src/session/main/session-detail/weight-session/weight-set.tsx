@@ -1,4 +1,3 @@
-import { type } from "@testing-library/user-event/dist/type";
 import { Atom, PrimitiveAtom, useAtom } from "jotai";
 import { ExerciseSetVM, SetWeightMetrics } from "../../../shared/session.model";
 

@@ -1,3 +1,4 @@
+import { Atom, WritableAtom } from "jotai";
 import { DateTime } from "luxon";
 
 export interface WorkoutPlan{
@@ -60,3 +61,10 @@ export interface SessionVM{
 
     exercises: ExerciseVM<SetMetrics>[];
 }
+
+
+export type SelectedExercise = {
+    selectedExerciseAtom: WritableAtom<ExerciseVM<SetMetrics>, ExerciseVM<SetMetrics>, void>;
+}
+
+//WritableAtom<ExerciseVM<SetMetrics>>, ExerciseVM<SetMetrics>>, void>
