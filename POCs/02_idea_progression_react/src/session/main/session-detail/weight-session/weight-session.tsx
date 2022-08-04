@@ -1,4 +1,4 @@
-import { PrimitiveAtom, useAtom, useAtomValue } from 'jotai';
+import { atom, PrimitiveAtom, useAtom, useAtomValue } from 'jotai';
 import { focusAtom } from 'jotai/optics';
 import { splitAtom } from 'jotai/utils';
 import { useMemo } from 'react';
@@ -7,16 +7,18 @@ import { ExerciseSetVM, SelectedExercise, SetWeightMetrics } from '../../../shar
 import '../session-detail.css';
 import WeightSet from './weight-set';
 
+const selectedRowIndexAtom = atom<number | null>(null);
+
 const WeightSession: React.FC<SelectedExercise> = ({selectedExerciseAtom}) => {
     const setsAtom = useMemo(() => focusAtom(selectedExerciseAtom, (optic) => optic.prop('sets')), [selectedExerciseAtom]);
     const setsAtomAtoms = splitAtom(setsAtom);
 
+    const [selectedRowIndex, setSelectedRowIndex] = useAtom(selectedRowIndexAtom);
     const setAtoms = useAtomValue(setsAtomAtoms) as unknown as PrimitiveAtom<ExerciseSetVM<SetWeightMetrics>>[];
-    const xx = useAtomValue(setsAtom);
     const sets = setAtoms.map((set, index) => 
-        <WeightSet key={index} setAtom={set}></WeightSet>
+        <WeightSet key={index} setAtom={set} isEditing={selectedRowIndex === index} onEdit={() => setSelectedRowIndex(index)}></WeightSet>
     );
-
+    
     return (
         <div className="container-fluid">
             <div className="row fw-bold">

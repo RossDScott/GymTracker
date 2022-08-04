@@ -11,9 +11,8 @@ const AddExercise = () => {
     const [showAdd, setShowAdd] = useAtom(showAddAtom);
     const setExercise = useUpdateAtom(exercisesAtom);
 
-    const handleAddExercise = (x: string) => {
-        const y = "Test" + x;
-        const newEx = {completed: false, sets: [], exercise: {name: y, metricType: "weight", targetSets: []}} as ExerciseVM<SetMetrics>;
+    const handleAddExercise = (name: string) => {
+        const newEx = {completed: false, sets: [], exercise: {name: name, metricType: "weight", targetSets: []}} as ExerciseVM<SetMetrics>;
         setExercise(exercises => [...exercises, newEx]);
         setShowAdd(false);
     }
@@ -36,11 +35,11 @@ const AddExercise = () => {
 
     const addList = (
         <div className="input-group">
-            <select ref={showListRef} className="form-select me-2" id="inputGroupSelect01" onChange={(e) => handleAddExercise(e.target.value)} onBlur={() => setShowAdd(false)} >
+            <select ref={showListRef} className="form-select me-2" onChange={(e) => handleAddExercise(e.target.value)} onBlur={() => setShowAdd(false)} >
                 <option value="">Choose...</option>
-                <option value="1">Something Heavy</option>
-                <option value="2" >Incline Barbell Bench Press</option>
-                <option value="3">Incline Dumbbell Bench Press</option>
+                <option value="Something Heavy">Something Heavy</option>
+                <option value="Incline Barbell Bench Press" >Incline Barbell Bench Press</option>
+                <option value="Incline Dumbbell Bench Press">Incline Dumbbell Bench Press</option>
             </select>
         </div>
     );

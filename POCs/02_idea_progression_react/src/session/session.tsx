@@ -8,7 +8,7 @@ import { useMemo } from "react";
 const Session = () => {
     const session = useAtomValue(sessionAtom);
     const selectedIndex = useAtomValue(selectedExerciseIndexAtom);
-    const exercisesAtoms = useAtomValue(exercisesAtomAtoms);
+    const [exercisesAtoms] = useAtom(exercisesAtomAtoms);
     const selectedExerciseAtom = useMemo(() => exercisesAtoms[selectedIndex], [selectedIndex]);
     
     //console.dir(session)
