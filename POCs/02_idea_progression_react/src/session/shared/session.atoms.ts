@@ -18,3 +18,5 @@ export const exercisesAtomAtoms = splitAtom(exercisesAtom);
 export const defaultTimerDuration = Duration.fromMillis(10 * 1000);
 export const timerStartDurationAtom = atom<Duration>(defaultTimerDuration);
 export const startTimerWithDurationAtom = atomWithReset<Duration | null>(null);
+
+export const selectedSetRowIndexAtom = atomWithReset<number | null>(null);

@@ -1,18 +1,21 @@
-import exp from "constants"
-import { atom, useAtom } from "jotai";
+import { useCallback } from "react";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { useUpdateAtom } from "jotai/utils";
+import { exercisesAtom as availableExercisesAtom } from "../../../exercises/exercises.atoms";
 import { exercisesAtom } from "../../shared/session.atoms";
 import { ExerciseVM, SetMetrics } from "../../shared/session.model";
-import { useCallback, useRef } from "react";
+
 
 const showAddAtom = atom(false);
 
 const AddExercise = () => {
     const [showAdd, setShowAdd] = useAtom(showAddAtom);
     const setExercise = useUpdateAtom(exercisesAtom);
+    const availableExercises = useAtomValue(availableExercisesAtom)
 
-    const handleAddExercise = (name: string) => {
-        const newEx = {completed: false, sets: [], exercise: {name: name, metricType: "weight", targetSets: []}} as ExerciseVM<SetMetrics>;
+    const handleAddExercise = (exerciseId: number) => {
+        const exercise = availableExercises.find(x => x.id === exerciseId)!;
+        const newEx = {completed: false, sets: [], exercise: {name: exercise.name, metricType: exercise.metricType, targetSets: []}} as ExerciseVM<SetMetrics>;
         setExercise(exercises => [...exercises, newEx]);
         setShowAdd(false);
     }
@@ -35,11 +38,9 @@ const AddExercise = () => {
 
     const addList = (
         <div className="input-group">
-            <select ref={showListRef} className="form-select me-2" onChange={(e) => handleAddExercise(e.target.value)} onBlur={() => setShowAdd(false)} >
-                <option value="">Choose...</option>
-                <option value="Something Heavy">Something Heavy</option>
-                <option value="Incline Barbell Bench Press" >Incline Barbell Bench Press</option>
-                <option value="Incline Dumbbell Bench Press">Incline Dumbbell Bench Press</option>
+            <select ref={showListRef} className="form-select me-2" onChange={(e) => handleAddExercise(+e.target.value)} onBlur={() => setShowAdd(false)} >
+                <option value={0}>Choose...</option>
+                {availableExercises.map(exercise => <option key={exercise.id} value={exercise.id}>{exercise.name}</option>)}
             </select>
         </div>
     );

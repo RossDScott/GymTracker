@@ -1,5 +1,6 @@
 import { Atom, WritableAtom } from "jotai";
 import { DateTime } from "luxon";
+import { MetricType } from "../../exercises/exercises.model";
 
 export interface WorkoutPlan{
     id: string;
@@ -9,7 +10,7 @@ export interface WorkoutPlan{
 }
 
 export interface Exercise<T extends SetMetrics>{
-    metricType: metricType;
+    metricType: MetricType;
     name: string;
     targetSets: ExerciseTargetSet<T>[];
 }
@@ -18,13 +19,6 @@ export interface ExerciseTargetSet<T extends SetMetrics>{
     setType: string;
     target: T;
 }
-
-export interface SetType{
-    name: string;
-}
-
-export type metricType = "weight" | "time";
-
 
 export interface SetMetrics{
 
@@ -58,7 +52,6 @@ export interface SessionVM{
     workoutStart: DateTime;
     workoutPlan: WorkoutPlan;
 
-
     exercises: ExerciseVM<SetMetrics>[];
 }
 
@@ -66,5 +59,3 @@ export interface SessionVM{
 export type SelectedExercise = {
     selectedExerciseAtom: WritableAtom<ExerciseVM<SetMetrics>, ExerciseVM<SetMetrics>, void>;
 }
-
-//WritableAtom<ExerciseVM<SetMetrics>>, ExerciseVM<SetMetrics>>, void>

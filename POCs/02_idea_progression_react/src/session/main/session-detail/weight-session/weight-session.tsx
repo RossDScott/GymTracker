@@ -1,22 +1,24 @@
 import { atom, PrimitiveAtom, useAtom, useAtomValue } from 'jotai';
 import { focusAtom } from 'jotai/optics';
 import { splitAtom } from 'jotai/utils';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
+import { selectedSetRowIndexAtom } from '../../../shared/session.atoms';
 import { ExerciseSetVM, SelectedExercise, SetWeightMetrics } from '../../../shared/session.model';
 
 import '../session-detail.css';
 import WeightSet from './weight-set';
 
-const selectedRowIndexAtom = atom<number | null>(null);
-
 const WeightSession: React.FC<SelectedExercise> = ({selectedExerciseAtom}) => {
     const setsAtom = useMemo(() => focusAtom(selectedExerciseAtom, (optic) => optic.prop('sets')), [selectedExerciseAtom]);
     const setsAtomAtoms = splitAtom(setsAtom);
 
-    const [selectedRowIndex, setSelectedRowIndex] = useAtom(selectedRowIndexAtom);
+    const [selectedRowIndex, setSelectedRowIndex] = useAtom(selectedSetRowIndexAtom);
     const setAtoms = useAtomValue(setsAtomAtoms) as unknown as PrimitiveAtom<ExerciseSetVM<SetWeightMetrics>>[];
+    const handleRowSelected =(index: number) => {
+        setSelectedRowIndex(index);
+    }
     const sets = setAtoms.map((set, index) => 
-        <WeightSet key={index} setAtom={set} isEditing={selectedRowIndex === index} onEdit={() => setSelectedRowIndex(index)}></WeightSet>
+        <WeightSet key={index} setAtom={set} isEditing={selectedRowIndex === index} onEdit={() => handleRowSelected(index)}></WeightSet>
     );
     
     return (

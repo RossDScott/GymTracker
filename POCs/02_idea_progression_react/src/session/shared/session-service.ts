@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { Exercise, SessionVM, SetTimeMetrics, SetType, SetWeightMetrics, WorkoutPlan } from "./session.model";
+import { Exercise, SessionVM, SetTimeMetrics, SetWeightMetrics, WorkoutPlan } from "./session.model";
 
 export function setupFakeExercises(){
     return [
