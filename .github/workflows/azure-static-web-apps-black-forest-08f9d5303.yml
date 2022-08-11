@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '/POCs/03_My_First_Blazor_App/GymTrackerBlazorPOC/**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:

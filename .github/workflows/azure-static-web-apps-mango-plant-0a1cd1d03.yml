@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '/POCs/01_Initial_Ideas_Angular/**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
