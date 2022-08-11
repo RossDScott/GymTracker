@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - '/POCs/02_idea_progression_react/**'
+      - 'POCs/02_idea_progression_react/**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
