@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '/POCs/03_My_First_Blazor_App/GymTrackerBlazorPOC/**'
+      - 'POCs/03_My_First_Blazor_App/GymTrackerBlazorPOC/**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
