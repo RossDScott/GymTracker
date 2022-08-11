@@ -1,0 +1,30 @@
+﻿@page "/"
+@page "/session"
+@using GymTrackerBlazorPOC.Session.Main
+@using GymTrackerBlazorPOC.Session.SideBar
+
+@inject SessionData sessionData
+@inject SessionService sessionService
+
+<div class="container-fluid d-flex">
+    <SideBar></SideBar>
+    <Main></Main>
+</div>
+
+@code {
+    private int _selectedIndex = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            sessionData.CurrentSession = sessionService.SetupFakeSession();
+            sessionData.SetSelectedIndex(1);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+    }
+}
