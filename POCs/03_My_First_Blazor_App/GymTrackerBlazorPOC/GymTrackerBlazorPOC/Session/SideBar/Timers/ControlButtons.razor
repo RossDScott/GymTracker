@@ -1,0 +1,42 @@
+﻿@if (!IsPaused && IsRunning && CanPause)
+{
+    <button  
+        type="button" 
+        class="btn btn-outline-primary btn-sm ms-auto pt-0 pb-0"
+        @onclick="OnPause">Pause</button>
+}
+
+@if(IsPaused)
+{
+    <button  
+        type="button" 
+        class="btn btn-outline-primary btn-sm ms-auto me-1 pt-0 pb-0"
+        @onclick="OnReset">Reset</button>
+}
+
+@if (!IsRunning)
+{
+    <button 
+        type="button" 
+        class="btn btn-outline-primary btn-sm pt-0 pb-0 @(IsPaused ? "ms-1" : "ms-auto")"
+        @onclick="OnStart">@(IsPaused ? "Resume" : "Start")</button>
+}
+
+@code {
+    [Parameter]
+    public bool IsPaused { get; set; }
+    [Parameter]
+    public bool IsRunning { get; set; }
+    [Parameter]
+    public bool CanPause { get; set; }
+
+    [Parameter]
+    public EventCallback OnStart { get; set; }
+    [Parameter]
+    public EventCallback OnPause { get; set; }
+    [Parameter]
+    public EventCallback OnReset { get; set; }
+
+
+
+}
