@@ -1,6 +1,26 @@
-﻿<span className="fw-semibold">Workout Time</span>
-<h1>00:00</h1>
+﻿@using System.Timers;
+@inject SessionData sessionData
+
+<span className="fw-semibold">Workout Time</span>
+<h1>@duration.ToString(@"hh\:mm")</h1>
 
 @code {
+    private TimeSpan duration = TimeSpan.FromMilliseconds(0);
+    private Timer timer = new(1000);
 
+    protected override void OnInitialized()
+    {
+        timer.Elapsed += (sender, eventArgs) => OnTimerCallback();
+        timer.Start();
+    }
+
+    private void OnTimerCallback()
+    {
+        calcDuration();
+        StateHasChanged();
+    }
+
+    private void calcDuration() => duration = DateTime.Now.Subtract(sessionData.CurrentSession!.WorkoutStart);
+
+    public void Dispose() => timer.Dispose();
 }

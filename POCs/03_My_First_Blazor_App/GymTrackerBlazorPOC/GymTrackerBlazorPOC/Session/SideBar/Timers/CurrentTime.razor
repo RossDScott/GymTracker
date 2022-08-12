@@ -15,11 +15,8 @@
 
     private void OnTimerCallback()
     {
-        _ = InvokeAsync(() =>
-        {
-            currentTime = TimeOnly.FromDateTime(DateTime.Now);
-            StateHasChanged();
-        });
+        currentTime = TimeOnly.FromDateTime(DateTime.Now);
+        StateHasChanged();
     }
 
     public void Dispose() => timer.Dispose();
