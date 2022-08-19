@@ -1,4 +1,6 @@
-﻿@inject SessionData sessionData
+﻿@using GymTrackerBlazorPOC.Session.SideBar.Timers
+@inject SessionData sessionData
+@inject CountdownTimerService countdownTimerService;
 
 <main class="ms-3 d-flex flex-column">
     <div id="title" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -11,6 +13,7 @@
     </div>
     <div id="mainContent" class="d-flex">
         Main content
+        @*<button @onclick="startTimer">Start Timer with 3.5secs</button>*@
     </div>
 </main>
 
@@ -20,8 +23,15 @@
         sessionData.OnChange += StateHasChanged;
     }
 
+    private void startTimer()
+    {
+        countdownTimerService.StartTimer(TimeSpan.FromMilliseconds(3500));
+    }
+
     public void Dispose()
     {
         sessionData.OnChange -= StateHasChanged;
     }
+
+
 }

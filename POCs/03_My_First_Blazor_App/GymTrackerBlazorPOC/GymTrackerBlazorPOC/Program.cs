@@ -1,5 +1,6 @@
 using GymTrackerBlazorPOC;
 using GymTrackerBlazorPOC.Session;
+using GymTrackerBlazorPOC.Session.SideBar.Timers;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -11,5 +12,6 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddScoped<SessionData>();
 builder.Services.AddScoped<SessionService>();
+builder.Services.AddScoped<CountdownTimerService>();
 
 await builder.Build().RunAsync();

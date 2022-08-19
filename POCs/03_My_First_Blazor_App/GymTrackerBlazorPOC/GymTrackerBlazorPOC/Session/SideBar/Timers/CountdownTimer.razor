@@ -1,0 +1,125 @@
+﻿@using System.Timers;
+@inject CountdownTimerService countdownTimerService;
+@inject IJSRuntime JS;
+
+<span className="fw-semibold">Timer</span>
+@if(startTime is null && !timesUp && pausedDuration is null)
+{
+    @startTimerFace()
+}
+@if(!timesUp && (startTime is not null || pausedDuration is not null))
+{
+    <h1>@duration.ToString(@"mm\:ss\:fff")</h1>
+}
+
+<div class="d-flex">
+    <ControlButtons
+        CanPause="true"
+        IsPaused="@(pausedDuration is not null && startTime is null)"
+        IsRunning="@(startTime is not null)"
+        OnStart="@handleStart"
+        OnPause="@handlePause"
+        OnReset="@handleReset">
+    </ControlButtons>
+</div>
+
+@code{
+    RenderFragment startTimerFace() => isEditing 
+        ? @<h2><input @ref="timeInput" @bind="StartDurationInputBindProxy" @bind:event="onchange" type="time" step="1" min="00:00:01" max="00:59:59"></h2>
+        : @<h1 @onclick="handleEditTime">@countdownTimerService.StartDuration.ToString(@"mm\:ss\:fff")</h1>;
+}
+
+@code {
+    private IJSObjectReference? module;
+    private ElementReference timeInput;
+    private DateTime? startTime = null;
+    private TimeSpan duration = TimeSpan.FromMilliseconds(0);
+    private TimeSpan? pausedDuration = null;
+    private bool timesUp = false;
+    private bool isEditing = false;
+
+    private Timer timer = new(1);
+
+    private TimeOnly StartDurationInputBindProxy {
+        get => TimeOnly.FromTimeSpan(countdownTimerService.StartDuration);
+        set => countdownTimerService.SetStartDuration(value.ToTimeSpan());
+    }
+
+    protected override void OnInitialized()
+    {
+        countdownTimerService.OnStartDurationChange += handleStartDurationChange;
+        countdownTimerService.OnStart += handleStart;
+
+        timer.Elapsed += (sender, eventArgs) => onTimerCalculateDuration();
+        timer.Start();
+    }
+
+    private void handleStartDurationChange()
+    {
+        isEditing = false;
+        handleReset();
+    }
+
+    private void onTimerCalculateDuration()
+    {
+        if (startTime is null)
+            return;
+
+        duration = startTime.Value.Subtract(DateTime.Now).Add(countdownTimerService.StartDuration);
+
+        if (pausedDuration is not null)
+            duration = startTime.Value.Subtract(DateTime.Now).Add(pausedDuration.Value);
+
+        if(duration.TotalMilliseconds < 0)
+        {
+            duration = TimeSpan.FromMilliseconds(0);
+            handlePause();
+            handleReset();
+        }
+
+        StateHasChanged();
+    }
+
+    private void handleStart() => startTime = DateTime.Now;
+    private void handlePause()
+    {
+        pausedDuration = duration;
+        startTime = null;
+    }
+    private void handleReset()
+    {
+        startTime = null;
+        pausedDuration = null;
+        duration = TimeSpan.FromMilliseconds(0);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", 
+                "./Session/SideBar/Timers/CountdownTimer.razor.js");
+        }
+
+        if (isEditing && timeInput.Context is not null)
+        {
+            await timeInput.FocusAsync();
+            await module.InvokeVoidAsync("showPicker", timeInput);
+        }
+    }
+
+    private async Task handleEditTime()
+    {
+        isEditing = true;
+    }
+
+    public async Task Dispose(){
+        if(module is not null)
+        {
+            await module.DisposeAsync();
+        }
+        timer.Dispose();
+        countdownTimerService.OnStartDurationChange -= handleStartDurationChange;
+        countdownTimerService.OnStart -= handleStart;
+    }
+}
