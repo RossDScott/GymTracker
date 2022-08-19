@@ -5,12 +5,12 @@
 <h1>@duration.ToString(@"mm\:ss\:fff")</h1>
 <div class="d-flex">
     <ControlButtons
-        CanPause=true
+        CanPause="true"
         IsPaused="@(pausedDuration is not null && startTime is null)"
-        IsRunning=@(startTime is not null)
-        OnStart=handleStart
-        OnPause=handlePause
-        OnReset=handleReset>
+        IsRunning="@(startTime is not null)"
+        OnStart="@handleStart"
+        OnPause="@handlePause"
+        OnReset="@handleReset">
     </ControlButtons>
 </div>
 
