@@ -23,6 +23,7 @@ public interface IExercise<T> where T : SetMetrics
 
 public class Exercise<T> : IExercise<T> where T : SetMetrics
 {
+    public int Id { get; set; }
     public string Name { get; set; }
     public IEnumerable<IExerciseTargetSet<T>>? TargetSets { get; set; }
 }
@@ -68,5 +69,5 @@ public class SessionVM
     public DateTime WorkoutStart { get; set; }
     public WorkoutPlan? WorkoutPlan { get; set; }
 
-    public IEnumerable<ExerciseVM<SetMetrics>>? Exercises { get; set; }
+    public List<ExerciseVM<SetMetrics>>? Exercises { get; set; }
 }

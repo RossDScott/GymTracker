@@ -23,11 +23,11 @@
     </ControlButtons>
 </div>
 
-@code{
+@code{//Some interesting coversations around this one. Will leave here for now
     RenderFragment startTimerFace() => isEditing 
         ? @<h2><input @ref="timeInput" @bind="StartDurationInputBindProxy" @bind:event="onchange" type="time" step="1" min="00:00:01" max="00:59:59"></h2>
         : @<h1 @onclick="handleEditTime">@countdownTimerService.StartDuration.ToString(@"mm\:ss\:fff")</h1>;
-}
+} 
 
 @code {
     private IJSObjectReference? module;

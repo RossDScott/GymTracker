@@ -2,6 +2,15 @@
 
 public class SessionService
 {
+    public List<Exercise<SetMetrics>> BuildExercises()
+    {
+        return new List<Exercise<SetMetrics>>
+        {
+            new Exercise<SetMetrics>{Id = 1, Name = "Incline Bench Press", TargetSets=null},
+            new Exercise<SetMetrics>{Id = 2, Name = "Incline Dumbell Bench Press", TargetSets=null},
+        };
+    }
+
     public List<IExercise<SetMetrics>> SetupFakeExercises()
     {
         return new List<IExercise<SetMetrics>>
@@ -59,7 +68,7 @@ public class SessionService
             {
                 Exercise = workoutExercise,
                 Sets = workoutExercise.TargetSets.Select(targetSet => new ExerciseSetVM<SetMetrics> { SetType = targetSet.SetType, TargetMetrics = targetSet.Target, ActualMetrics = null })
-            })
+            }).ToList()
         };
 
         return session;

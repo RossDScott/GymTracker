@@ -1,0 +1,20 @@
+﻿@inject SessionData sessionData
+
+<ul class="list-group list-group-flush me-1">
+    @if(sessionData.CurrentSession?.Exercises != null)
+    {
+        @foreach (var item in sessionData.CurrentSession.Exercises.Select((exercise,i) => new{exercise, i}))
+        {
+            @renderExerciseRow(item.exercise, item.i)
+        }
+    }
+</ul>
+<AddExercise OnAdd="(exercise) => sessionData.AddExercise(exercise)"></AddExercise>
+
+@code {
+    private RenderFragment renderExerciseRow(ExerciseVM<SetMetrics> exercise, int i) =>
+        @<li class="list-group-item @(i == sessionData.SelectedExerciseIndex ? "fw-bold" : "")"
+            @onclick="() => sessionData.SetSelectedIndex(i)">
+            @exercise.Exercise!.Name
+        </li>;
+}

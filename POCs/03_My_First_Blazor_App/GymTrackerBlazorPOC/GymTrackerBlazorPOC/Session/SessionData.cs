@@ -14,4 +14,10 @@ public class SessionData
     }
 
     public ExerciseVM<SetMetrics>? SelectedExercise => CurrentSession?.Exercises?.ElementAt(SelectedExerciseIndex);
+
+    public void AddExercise(Exercise<SetMetrics> exercise)
+    {
+        var sessionExercise = new ExerciseVM<SetMetrics> { Exercise = exercise, Sets = new List<ExerciseSetVM<SetMetrics>>() };
+        CurrentSession!.Exercises!.Add(sessionExercise);
+    }
 }
