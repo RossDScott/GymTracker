@@ -22,5 +22,9 @@ A live version can be viewed here: https://gentle-tree-09ca08503.1.azurestaticap
 ### POC 3 My First Blazor App
 
 My experience from the first two POCs put me in a good position to concentrate on the Blazor technology rather than the functionality of the app. It also forced me to tackle concepts such a rendering and state management that I might have a avoided at POC1 stage.  
+I didn't like the guidance (or lack of) on state management here: https://docs.microsoft.com/en-us/aspnet/core/blazor/state-management?view=aspnetcore-6.0&pivots=webassembly so I dicided to do some research into alternatives. As a result of this, I've stopped this POC and I'm moving onto POC 4 which will be with Blazor and [Fluxor](https://github.com/mrpmorris/Fluxor)  
 A live version can be viewed here: https://black-forest-08f9d5303.1.azurestaticapps.net/   
-POC3 is still WIP
+
+### POC 4 Blazor & Fluxor
+
+Initial release soon, currently experimenting...
