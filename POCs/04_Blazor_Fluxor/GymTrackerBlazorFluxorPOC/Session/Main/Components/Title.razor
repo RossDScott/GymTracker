@@ -1,0 +1,16 @@
+﻿@inherits FluxorComponent
+
+@inject IState<SessionState> State
+
+<div id="title" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">@State.Value.SessionDate.ToString(@"dd/MM/yy") - @State.Value.SessionName - @State.Value.ExerciseName </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <i class="bi bi-list fs-1"></i>
+        </div>
+    </div>
+</div>
+
+@code {
+
+}

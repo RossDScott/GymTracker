@@ -1,0 +1,20 @@
+﻿@using GymTrackerBlazorFluxorPOC.Session.SideBar.Exercises
+@using GymTrackerBlazorFluxorPOC.Session.SideBar.Exercises.Components
+@using GymTrackerBlazorFluxorPOC.Session.SideBar.Timers
+
+<div id="sidebar" class="col-md-3 d-md-block collapse pt-2 ">
+    <div class="d-flex flex-column">
+        <div class="ps-2 exercisesContainer">
+            <Exercises></Exercises>
+        </div>
+        <div class="d-grid mt-auto">
+            <button type="button" class="btn btn-outline-primary m-2">End Workout</button>
+        </div>
+        <Timers></Timers>
+    </div>
+</div>
+
+@code {
+
+
+}

@@ -1,0 +1,23 @@
+﻿@using System.Timers
+
+<span class="fw-semibold">Current Time</span>
+<h1>@currentTime.ToString("HH:mm")</h1>
+
+@code {
+    private TimeOnly currentTime = TimeOnly.FromDateTime(DateTime.Now);
+    private Timer timer = new(1000);
+
+    protected override void OnInitialized()
+    {
+        timer.Elapsed += (sender, eventArgs) => OnTimerCallback();
+        timer.Start();
+    }
+
+    private void OnTimerCallback()
+    {
+        currentTime = TimeOnly.FromDateTime(DateTime.Now);
+        StateHasChanged();
+    }
+
+    public void Dispose() => timer.Dispose();
+}

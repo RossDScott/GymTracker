@@ -1,0 +1,48 @@
+﻿@inject SessionData sessionData
+@inject SessionService sessionService
+
+@if (showAdd)
+{
+    <div class="input-group">
+        <select @onchange="HandlePickExercise" class="form-select me-2">
+            <option value="0">Choose...</option>
+            @foreach (var exercise in availableExercises)
+            {
+                <option value="@exercise.Id">@exercise.Name</option>
+            }
+        </select>
+    </div>
+
+}
+else
+{
+    <div>
+        <i @onclick="() => showAdd = true" class="bi bi-plus-circle-fill fs-3"></i>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public EventCallback<Exercise<SetMetrics>> OnAdd { get; set; }
+
+    private bool showAdd = false;
+    private List<Exercise<SetMetrics>> availableExercises = new();
+
+    protected override void OnInitialized()
+    {
+        availableExercises = sessionService.BuildExercises();
+    }
+
+    private void HandlePickExercise(ChangeEventArgs  e)
+    {
+        if (e.Value is null)
+            return;
+
+        int id = int.Parse(e.Value.ToString()!);
+        var exerciseToAdd = availableExercises.Single(x => x.Id == id);
+        OnAdd.InvokeAsync(exerciseToAdd);
+        showAdd = false;
+    }
+
+}
