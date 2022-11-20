@@ -1,0 +1,23 @@
+﻿@using GymTrackerBlazorFluxorPOC.Session.Actions
+@using GymTrackerBlazorFluxorPOC.Session.Components.Main.Components.SessionDetail
+
+@inherits FluxorComponent
+
+@inject IDispatcher Dispatcher
+@inject IState<SessionState> State
+
+
+<main class="ms-3 d-flex flex-column">
+    <Title></Title>
+    <div id="mainContent" class="d-flex">
+        <SessionDetail></SessionDetail>
+        <SessionSideBar></SessionSideBar>
+    </div>
+</main>
+
+@code {
+    protected override void OnInitialized()
+    {
+        //Dispatcher.Dispatch(new LoadExistingSessionAction(Guid.NewGuid()));
+    }
+}

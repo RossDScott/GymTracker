@@ -1,0 +1,80 @@
+﻿@inherits FluxorComponent
+
+@using GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Timers.CountdownTimer.Actions
+
+@inject IDispatcher Dispatcher
+@inject IState<CountdownTimerState> State
+@inject IJSRuntime JS;
+
+<span class="fw-semibold">Timer</span>
+@if(State.Value.ShowStartTimerFace)
+{
+    @startTimerFace()
+}
+@if(State.Value.ShowCountdownDuration)
+{
+    <h1>@State.Value.Duration.ToString(@"mm\:ss\:fff")</h1>
+}
+
+@if(State.Value.TimesUp)
+{
+    <h1 class="pulsate">Times Up!</h1>
+}
+
+@if (!State.Value.TimesUp)
+{
+    <div class="d-flex">
+        <ControlButtons
+        CanPause="true"
+        IsPaused="@State.Value.IsPaused"
+        IsRunning="@(State.Value.StartTime is not null)"
+        OnStart="@handleStart"
+        OnPause="@handlePause"
+        OnReset="@handleReset">
+        </ControlButtons>
+    </div>
+}
+@code{//Some interesting coversations around this one. Will leave here for now
+    RenderFragment startTimerFace() => State.Value.IsEditing 
+        ? @<h2><input @ref="timeInput" @bind="StartDurationInputBindProxy" @bind:event="onchange" type="time" step="1" min="00:00:01" max="00:59:59"></h2>
+        : @<h1 @onclick="handleStartEditTime">@State.Value.StartDuration.ToString(@"mm\:ss\:fff")</h1>;
+}
+
+@code {
+    private IJSObjectReference? module;
+    private ElementReference timeInput;
+
+    private TimeOnly StartDurationInputBindProxy {
+        get => State.Value.StartDurationTime;
+        set => Dispatcher.Dispatch(new CountdownTimerSetStartDurationAction(value.ToTimeSpan()));
+    }
+
+    private void handleSetDuration(TimeOnly value) => Dispatcher.Dispatch(new CountdownTimerSetStartDurationAction(value.ToTimeSpan()));
+    private void handleStart() => Dispatcher.Dispatch(new CountdownTimerStartAction(StartTime: DateTime.Now));
+    private void handlePause() => Dispatcher.Dispatch(new CountdownTimerPauseAction());
+    private void handleReset() => Dispatcher.Dispatch(new CountdownTimerResetAction());
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", 
+                "./Session/Components/SideBar/Timers/CountdownTimer/Components/CountdownTimer.razor.js");
+        }
+
+        if (State.Value.IsEditing && timeInput.Context is not null)
+        {
+            await timeInput.FocusAsync();
+            await module.InvokeVoidAsync("showPicker", timeInput);
+        }
+    }
+
+    private void handleStartEditTime() => Dispatcher.Dispatch(new CountdownTimerStartEditAction());
+
+    public async Task Dispose(){
+        if(module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+}

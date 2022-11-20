@@ -1,0 +1,36 @@
+﻿@using GymTrackerBlazorFluxorPOC.Session.Actions
+@using GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Exercises.Actions
+@inherits FluxorComponent
+
+@inject IDispatcher Dispatcher
+@inject IState<ExercisesState> State
+@inject IJSRuntime JS;
+
+
+<ul class="list-group list-group-flush me-1">
+    @foreach (var item in State.Value.Exercises)
+    {
+        @renderExerciseRow((
+            exercise: item, 
+            selectedId: State.Value.SelectedExerciseId, 
+            onClick: () => Dispatcher.Dispatch(new SetSelectedExerciseAction(item!))))
+    }
+</ul>
+@*<AddExercise OnAdd="(exercise) => sessionData.AddExercise(exercise)"></AddExercise>*@
+
+@code {
+    RenderFragment<(Exercise exercise, Guid? selectedId, Action onClick)> renderExerciseRow = value =>
+        @<li class="list-group-item @(value.exercise.Id == value.selectedId ? "fw-bold" : "")"
+            onclick="@value.onClick">
+            @value.exercise.Name
+        </li>;
+}
+
+@code {
+    protected override Task OnInitializedAsync()
+    {
+        Dispatcher.Dispatch(new LoadExercisesAction());
+
+        return base.OnInitializedAsync();
+    }
+}

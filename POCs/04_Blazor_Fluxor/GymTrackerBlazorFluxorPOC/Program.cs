@@ -1,6 +1,6 @@
 using Fluxor;
 using GymTrackerBlazorFluxorPOC;
-using GymTrackerBlazorFluxorPOC.Session;
+using GymTrackerBlazorFluxorPOC.Session.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -12,7 +12,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddFluxor(o => o.ScanAssemblies(typeof(Program).Assembly).UseReduxDevTools());
 
-builder.Services.AddScoped<SessionData>();
+//builder.Services.AddScoped<SessionData>();
 builder.Services.AddScoped<SessionService>();
 
 await builder.Build().RunAsync();

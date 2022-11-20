@@ -1,0 +1,16 @@
+﻿@page "/"
+@using GymTrackerBlazorFluxorPOC.Session.Actions
+
+@inject IDispatcher Dispatcher
+
+<h3>Gym Tracker</h3>
+<h4>Welcome Home</h4>
+
+<button type="button" class="btn btn-outline-primary m-2" @onclick="handleStartNewWorkout">Start New Workout</button>
+
+@code {
+    private void handleStartNewWorkout()
+    {
+        Dispatcher.Dispatch(new CreateNewSessionAction(Guid.NewGuid()));
+    }
+}

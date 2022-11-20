@@ -14,7 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Session\SideBar\Exercises\Actions\" />
+    <Folder Include="Session\Components\Main\Effects\" />
+    <Folder Include="Session\Components\Main\Actions\" />
+    <Folder Include="Session\Components\Main\Reducers\" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,36 @@
+﻿@page "/session/{Id:guid}"
+
+@inherits FluxorComponent
+
+@using GymTrackerBlazorFluxorPOC.Session.Actions
+@using GymTrackerBlazorFluxorPOC.Session.Components.Main.Components
+@using GymTrackerBlazorFluxorPOC.Session.Components.SideBar
+@using GymTrackerBlazorFluxorPOC.Session.Services
+
+@inject IState<SessionState> State
+@inject IDispatcher Dispatcher
+
+@if (State.Value.Session is not null)
+{
+    <div class="container-fluid d-flex">
+        <SideBar></SideBar>
+        <Main></Main>
+    </div>
+} else
+{
+    <span>loading...</span>
+}
+
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if(State.Value.Session is null)
+        {
+            Dispatcher.Dispatch(new LoadExistingSessionAction(Id));
+        }
+    }
+}
