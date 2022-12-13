@@ -1,9 +1,8 @@
 ﻿using System.Collections.Immutable;
 using Fluxor;
-using GymTrackerBlazorFluxorPOC.Session.Actions;
-using GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Exercises.Actions;
+using GymTrackerBlazorFluxorPOC.Session.Store;
 
-namespace GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Exercises.Reducers;
+namespace GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Exercises.Store;
 
 public static class ExercisesReducer
 {
@@ -19,6 +18,6 @@ public static class ExercisesReducer
     [ReducerMethod]
     public static ExercisesState OnSetSelectedExercise(ExercisesState state, SetSelectedExerciseAction action)
     {
-        return state with { SelectedExerciseId = action.Exercise.Id };
+        return state with { SelectedSessionExerciseId = action.SessionExercise.Id };
     }
 }

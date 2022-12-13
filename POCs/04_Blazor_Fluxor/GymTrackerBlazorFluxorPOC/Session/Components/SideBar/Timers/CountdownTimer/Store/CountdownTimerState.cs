@@ -1,5 +1,8 @@
-﻿namespace GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Timers.CountdownTimer;
+﻿using Fluxor;
 
+namespace GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Timers.CountdownTimer.Store;
+
+[FeatureState]
 public record CountdownTimerState
 {
     public DateTime? StartTime { get; init; } = null;

@@ -1,0 +1,23 @@
+﻿@using GymTrackerBlazorFluxorPOC.Session.Components.Main.Components.ExerciseDetail.Store
+
+@inject IDispatcher Dispatcher
+
+<div class="col-2 d-flex text-center flex-column justify-content-center">
+    <i class="bi bi-arrow-up-circle"></i>
+    <div class="input-group">
+        <input type="text" class="form-control text-center" 
+            @bind="@EditSet.TargetWeight" @onblur="handleRowDataChange">
+        <span class="input-group-text">Kg</span>
+    </div>
+    <i class="bi bi-arrow-down-circle"></i>
+</div>
+<div class="col-1 text-center p-0 me-3">@EditSet.TargetReps</div> 
+<div class="col-2 text-center p-0">@EditSet.ActualWeight</div>
+<div class="col-1 text-center p-0 me-3">@EditSet.ActualReps</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public EditSet EditSet { get; set; } = default!;
+
+    private void handleRowDataChange() => Dispatcher.Dispatch(new SetSetDataAction(EditSet));
+}

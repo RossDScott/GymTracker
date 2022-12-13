@@ -13,10 +13,4 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.5" PrivateAssets="all" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Session\Components\Main\Effects\" />
-    <Folder Include="Session\Components\Main\Actions\" />
-    <Folder Include="Session\Components\Main\Reducers\" />
-  </ItemGroup>
-
 </Project>

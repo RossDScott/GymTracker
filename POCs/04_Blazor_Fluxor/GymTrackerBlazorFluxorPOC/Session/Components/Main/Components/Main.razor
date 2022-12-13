@@ -1,5 +1,5 @@
-﻿@using GymTrackerBlazorFluxorPOC.Session.Actions
-@using GymTrackerBlazorFluxorPOC.Session.Components.Main.Components.SessionDetail
+﻿@using GymTrackerBlazorFluxorPOC.Session.Store
+@using GymTrackerBlazorFluxorPOC.Session.Components.Main.Components.ExerciseDetail.Components
 
 @inherits FluxorComponent
 
@@ -10,7 +10,7 @@
 <main class="ms-3 d-flex flex-column">
     <Title></Title>
     <div id="mainContent" class="d-flex">
-        <SessionDetail></SessionDetail>
+        <ExerciseDetail></ExerciseDetail>
         <SessionSideBar></SessionSideBar>
     </div>
 </main>

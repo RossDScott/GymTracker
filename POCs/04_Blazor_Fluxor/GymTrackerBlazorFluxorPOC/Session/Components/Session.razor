@@ -2,17 +2,18 @@
 
 @inherits FluxorComponent
 
-@using GymTrackerBlazorFluxorPOC.Session.Actions
 @using GymTrackerBlazorFluxorPOC.Session.Components.Main.Components
+@using GymTrackerBlazorFluxorPOC.Session.Components.Main.Components.ExerciseDetail.Store
 @using GymTrackerBlazorFluxorPOC.Session.Components.SideBar
 @using GymTrackerBlazorFluxorPOC.Session.Services
+@using GymTrackerBlazorFluxorPOC.Session.Store
 
 @inject IState<SessionState> State
 @inject IDispatcher Dispatcher
 
 @if (State.Value.Session is not null)
 {
-    <div class="container-fluid d-flex">
+    <div class="container-fluid d-flex" @onclick="() => Dispatcher.Dispatch(new SetSelectedSetAction(null))">
         <SideBar></SideBar>
         <Main></Main>
     </div>

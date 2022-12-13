@@ -1,6 +1,7 @@
 ﻿using Fluxor;
 namespace GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Timers.Stopwatch.Store;
 
+[FeatureState]
 public record StopwatchState
 {
     public DateTime? StartTime { get; init; } = null;
@@ -8,16 +9,6 @@ public record StopwatchState
     public TimeSpan? PausedDuration { get; init; } = null;
 
     public bool IsPaused => PausedDuration is not null && StartTime is null;
-}
-
-public class StopwatchFeature : Feature<StopwatchState>
-{
-    public override string GetName() => "Stopwatch";
-
-    protected override StopwatchState GetInitialState()
-    {
-        return new StopwatchState();
-    }
 }
 
 public record StopwatchStartAction { }

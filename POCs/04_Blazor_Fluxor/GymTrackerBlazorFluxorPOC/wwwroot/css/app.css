@@ -45,3 +45,7 @@ html, body {
 #app {
     height: 100%;
 }
+
+.bi {
+    font-size: 1.5rem !important;
+}

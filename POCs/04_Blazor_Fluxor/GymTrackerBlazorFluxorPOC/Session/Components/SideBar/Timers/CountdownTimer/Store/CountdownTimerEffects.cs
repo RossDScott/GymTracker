@@ -1,16 +1,15 @@
 ﻿using Fluxor;
-using GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Timers.CountdownTimer.Actions;
 using System.Timers;
 
-namespace GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Timers.CountdownTimer.Effects;
+namespace GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Timers.CountdownTimer.Store;
 
-public class CountdownTimerControlEffects
+public class CountdownTimerEffects
 {
     private System.Timers.Timer _timer = new(1);
     private readonly IState<CountdownTimerState> _state;
     private IDispatcher _dispatcher;
 
-    public CountdownTimerControlEffects(IState<CountdownTimerState> state, IDispatcher dispatcher)
+    public CountdownTimerEffects(IState<CountdownTimerState> state, IDispatcher dispatcher)
     {
         _state = state;
         _dispatcher = dispatcher;

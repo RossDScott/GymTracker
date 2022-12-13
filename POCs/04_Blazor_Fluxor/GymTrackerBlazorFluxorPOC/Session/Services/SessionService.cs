@@ -1,93 +1,111 @@
 ﻿using GymTrackerBlazorFluxorPOC.Session.Models;
+using System.Collections.Immutable;
 
 namespace GymTrackerBlazorFluxorPOC.Session.Services;
 
 public class SessionService
 {
-    //public SessionVM FetchSession()
-
-
-    public List<Exercise<SetMetrics>> BuildExercises()
-    {
-        return new List<Exercise<SetMetrics>>
+    private List<Models.Exercise> setupFakeExercises() =>
+        new List<Models.Exercise>
         {
-            new Exercise<SetMetrics>{Id = 1, Name = "Incline Bench Press", TargetSets=null},
-            new Exercise<SetMetrics>{Id = 2, Name = "Incline Dumbell Bench Press", TargetSets=null},
+            new Models.Exercise{Id = Guid.NewGuid(), Name = "Barbell Bench Press", MetricType = MetricType.Weight, Units = "Kg"},
+            new Models.Exercise{Id = Guid.NewGuid(), Name = "Dumbell Bench Press", MetricType = MetricType.Weight, Units = "Kg"},
+            new Models.Exercise{Id = Guid.NewGuid(), Name = "Triceps Pushdown", MetricType = MetricType.Weight, Units = "Kg"},
+            new Models.Exercise{Id = Guid.NewGuid(), Name = "Plank", MetricType = MetricType.Time, Units = "Seconds"}
         };
-    }
-
-    public List<IExercise<SetMetrics>> SetupFakeExercises()
+    
+    private IEnumerable<WorkoutTargetExercise> buildWorkoutTargetExercises()
     {
-        return new List<IExercise<SetMetrics>>
-        {
-            new Exercise<SetMetrics>{
-                Name = "Barbell Bench Press",
-                TargetSets = new List<ExerciseTargetSet<SetMetrics>>
-                {
-                    new ExerciseTargetSet<SetMetrics>
-                    {
-                        SetType = "Warm Up",
-                        Target = new SetWeightMetrics{Weight = 20, Reps = 10}
-                    }
-                }
-            },
-            new Exercise<SetMetrics>{
-                Name = "Dumbell Bench Press",
-                TargetSets = new List<ExerciseTargetSet<SetMetrics>>
-                {
-                    new ExerciseTargetSet<SetMetrics>
-                    {
-                        SetType = "Warm Up",
-                        Target = new SetWeightMetrics{Weight = 20, Reps = 10}
-                    }
-                }
-            },
-            new Exercise<SetMetrics>{
-                Name = "Triceps Pushdown",
-                TargetSets = new List<ExerciseTargetSet<SetMetrics>>
-                {
-                    new ExerciseTargetSet<SetMetrics>
-                    {
-                        SetType = "Warm Up",
-                        Target = new SetWeightMetrics{Weight = 20, Reps = 10}
-                    }
-                }
-            }
-        };
-    }
+        var exercises = setupFakeExercises();
 
-    public SessionVM? CurrentSession { get; private set; }
-
-    public SessionVM CreateNewSession(Guid workoutId)
-    {
-        var workoutPlan = new WorkoutPlan
+        return new List<WorkoutTargetExercise>
         {
-            Id = workoutId,
-            Name = "Push Day",
-            Exercises = SetupFakeExercises()
-        };
-
-        var session = new SessionVM
-        {
-            Id = Guid.NewGuid(),
-            WorkoutPlan = workoutPlan,
-            WorkoutStart = DateTime.Now,
-            Exercises = workoutPlan.Exercises.Select(workoutExercise => new ExerciseVM<SetMetrics>
+            new WorkoutTargetExercise
             {
                 Id = Guid.NewGuid(),
-                Exercise = workoutExercise,
-                Sets = workoutExercise.TargetSets.Select(targetSet => new ExerciseSetVM<SetMetrics> { SetType = targetSet.SetType, TargetMetrics = targetSet.Target, ActualMetrics = null })
-            }).ToList()
+                Exercise = exercises[0],
+                
+                TargetSets = ImmutableList.Create<ExerciseSet>(
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Warm-up", Weight = 20, Reps = 10},
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Warm-up", Weight = 20, Reps = 10},
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Weight = 55, Reps = 8},
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Weight = 55, Reps = 8},
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Weight = 55, Reps = 8}
+                    )
+            },
+            new WorkoutTargetExercise
+            {
+                Id = Guid.NewGuid(),
+                Exercise = exercises[1],
+                TargetSets = ImmutableList.Create<ExerciseSet>(
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Weight = 18, Reps = 10},
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Weight = 18, Reps = 10},
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Weight = 18, Reps = 10}
+                    )
+            },
+            new WorkoutTargetExercise
+            {
+                Id = Guid.NewGuid(),
+                Exercise = exercises[2],
+                TargetSets = ImmutableList.Create<ExerciseSet>(
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Weight = 18, Reps = 10},
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Weight = 18, Reps = 10},
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Weight = 18, Reps = 10}
+                    )
+            },
+            new WorkoutTargetExercise
+            {
+                Id = Guid.NewGuid(),
+                Exercise = exercises[3],
+                TargetSets = ImmutableList.Create<ExerciseSet>(
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Time = 60},
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Time = 60},
+                        new ExerciseSet{Id = Guid.NewGuid(),Name = "Set", Time = 60}
+                    )
+            },
+        };
+    }
+
+    private WorkoutPlan setupFakeWorkoutPlan() => new WorkoutPlan
+    {
+        Id = Guid.NewGuid(),
+        Name = "Push Day",
+        PlannedExercises = buildWorkoutTargetExercises().ToImmutableList()
+    };
+
+    public Models.Session? CurrentSession { get; private set; }
+
+    public WorkoutPlan FetchWorkoutPlan(Guid workoutId) => setupFakeWorkoutPlan();
+
+    public Models.Session CreateNewSession(Guid workoutId)
+    {
+        var workout = FetchWorkoutPlan(workoutId);
+
+        var session = new Models.Session(workout)
+        {
+            Id = Guid.NewGuid(),
+            WorkoutStart = DateTimeOffset.Now,
+            Exercises = workout.PlannedExercises.Select(exercise =>
+                new SessionExercise(exercise.Exercise)
+                {
+                    Id = Guid.NewGuid(),
+                    Sets = exercise.TargetSets.Select(ts => new SessionExerciseSet(ts) { Id = Guid.NewGuid() }).ToList()
+                }).ToImmutableList()
         };
 
-        CurrentSession = session;
+        this.CurrentSession = session;
 
         return session;
     }
 
-    public SessionVM LoadExistingSession(Guid sessionId)
+    public Models.Session FetchExistingSession(Guid sessionId)
     {
-        return CreateNewSession(Guid.NewGuid());
+        if(CurrentSession is null)
+            CreateNewSession(Guid.NewGuid());
+
+        return CurrentSession!;
     }
+
+    //public SessionExercise FetchExercise(Guid id) => CurrentSession?.Exercises?.SingleOrDefault(x => x.Id == id);
 
 }

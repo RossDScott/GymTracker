@@ -1,10 +1,11 @@
-﻿@inherits FluxorComponent
+﻿@using GymTrackerBlazorFluxorPOC.Session.Components.Main.Components.ExerciseDetail.Store
+@inherits FluxorComponent
 
-@inject IState<SessionState> State
+@inject IState<ExerciseDetailState> State
 
 <div id="session" class="me-3 d-flex flex-column">
-    @*<WeightSession selectedExerciseAtom={selectedExerciseAtom}></WeightSession>*@
-    <WeightSession></WeightSession>
+    <ExerciseSets></ExerciseSets>
+
     <div id="notes" class="border-top pt-3" >
         <label class="form-label">Notes</label>
         <textarea class="form-control" rows="3"></textarea>

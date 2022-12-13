@@ -1,7 +1,6 @@
 ﻿using Fluxor;
-using GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Timers.CountdownTimer.Actions;
 
-namespace GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Timers.CountdownTimer.Reducers;
+namespace GymTrackerBlazorFluxorPOC.Session.Components.SideBar.Timers.CountdownTimer.Store;
 
 public static class CountdownTimerEditReducer
 {

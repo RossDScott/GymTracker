@@ -1,0 +1,10 @@
+﻿@using GymTrackerBlazorFluxorPOC.Session.Components.Main.Components.ExerciseDetail.Store
+<div class="col-2 text-center p-0">@Set.TargetWeight</div>
+<div class="col-1 text-center p-0 me-3">@Set.TargetReps</div> 
+<div class="col-2 text-center p-0">@Set.ActualWeight</div>
+<div class="col-1 text-center p-0 me-3">@Set.ActualReps</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public Set Set { get; set; } = default!;
+}

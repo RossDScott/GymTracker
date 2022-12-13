@@ -1,7 +1,6 @@
 ﻿using Fluxor;
-using GymTrackerBlazorFluxorPOC.Session.Actions;
 
-namespace GymTrackerBlazorFluxorPOC.Session.Reducers;
+namespace GymTrackerBlazorFluxorPOC.Session.Store;
 
 public static class SessionReducer
 {
@@ -11,13 +10,13 @@ public static class SessionReducer
         return new SessionState
         {
             Session = action.Session,
-            SelectedExercise = null
+            SelectedSessionExercise = null
         };
     }
 
     [ReducerMethod]
     public static SessionState OnSetSelectedExercise(SessionState state, SetSelectedExerciseAction action)
     {
-        return state with { SelectedExercise = action.Exercise };
+        return state with { SelectedSessionExercise = action.SessionExercise };
     }
 }

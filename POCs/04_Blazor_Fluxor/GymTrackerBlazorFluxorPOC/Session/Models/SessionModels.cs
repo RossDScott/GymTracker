@@ -1,13 +1,23 @@
-﻿namespace GymTrackerBlazorFluxorPOC.Session.Models;
+﻿using System.Collections.Immutable;
 
-public class WorkoutPlan
+namespace GymTrackerBlazorFluxorPOC.Session.Models;
+
+
+public record WorkoutPlan
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; }
+    public Guid Id { get; init; }
+    public string Name { get; set; } = default!;
 
-    public IEnumerable<IExercise<SetMetrics>>? Exercises { get; set; }
+    public IList<WorkoutTargetExercise> PlannedExercises { get; set; } = new List<WorkoutTargetExercise>();
 }
-public interface SetMetrics { }
+
+public record WorkoutTargetExercise
+{
+    public Guid Id { get; init; }
+    public Exercise Exercise { get; set; } = default!;
+
+    public IList<ExerciseSet> TargetSets { get; set; } = new List<ExerciseSet>();
+}
 
 public enum MetricType
 {
@@ -15,61 +25,61 @@ public enum MetricType
     Time
 }
 
-public interface IExercise<T> where T : SetMetrics
+public record Exercise
 {
-    string Name { get; set; }
-    IEnumerable<IExerciseTargetSet<T>> TargetSets { get; set; }
+    public Guid Id { get; init; }
+    public string Name { get; set; } = default!;
+    public MetricType MetricType { get; set; }
+    public string Units { get; set; } = "Kg";
 }
 
-public class Exercise<T> : IExercise<T> where T : SetMetrics
+public record ExerciseSet
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public IEnumerable<IExerciseTargetSet<T>>? TargetSets { get; set; }
+    public Guid Id { get; init; }
+    public string Name { get; set; } = default!;
+    public int? Reps { get; set; }
+    public decimal? Weight { get; set; }
+    public decimal? Time { get; set; }
 }
 
-public interface IExerciseTargetSet<T> where T : SetMetrics
+public record Session
 {
-    string SetType { get; set; }
-    T Target { get; set; }
+    public Session(WorkoutPlan workoutPlan)
+    {
+        this.WorkoutPlan = workoutPlan;
+    }
+
+    public Guid Id { get; init; }
+    public DateTimeOffset WorkoutStart { get; set; }
+    public WorkoutPlan WorkoutPlan { get; }
+
+    public IList<SessionExercise> Exercises { get; set; } = new List<SessionExercise>();
 }
 
-public class ExerciseTargetSet<T> : IExerciseTargetSet<T> where T : SetMetrics
+public record SessionExercise
 {
-    public string? SetType { get; set; }
-    public T? Target { get; set; }
+    public SessionExercise(Exercise exercise)
+    {
+        this.Exercise = exercise;
+    }
+
+    public Guid Id { get; init; }
+    public Exercise Exercise { get; }
+    public IList<SessionExerciseSet> Sets { get; set; } = new List<SessionExerciseSet>();
 }
 
-public class SetWeightMetrics : SetMetrics
+public record SessionExerciseSet
 {
-    public decimal Weight { get; set; }
-    public int Reps { get; set; }
-}
+    public SessionExerciseSet() : this(new ExerciseSet()){ }
 
-public class SetTimeMetrics : SetMetrics
-{
-    public decimal TimeMilliSeconds { get; set; }
-}
+    public SessionExerciseSet(ExerciseSet targetSet)
+    {
+        this.TargetSet = targetSet;
+        this.ActualSet = new ExerciseSet { Name = targetSet.Name };
+    }
 
-public class ExerciseSetVM<T> where T : SetMetrics
-{
-    public string? SetType { get; set; }
-    public T? TargetMetrics { get; set; }
-    public T? ActualMetrics { get; set; }
-}
+    public Guid Id { get; init; }
 
-public class ExerciseVM<T> where T : SetMetrics
-{
-    public Guid Id { get; set; }
-    public IExercise<T> Exercise { get; set; } = default!;
-    public IEnumerable<ExerciseSetVM<T>>? Sets { get; set; }
-}
-
-public class SessionVM
-{
-    public Guid Id { get; set; }
-    public DateTime WorkoutStart { get; set; }
-    public WorkoutPlan WorkoutPlan { get; set; } = default!;
-
-    public List<ExerciseVM<SetMetrics>>? Exercises { get; set; }
+    public ExerciseSet TargetSet { get; set; }
+    public ExerciseSet ActualSet { get; set; }
 }
