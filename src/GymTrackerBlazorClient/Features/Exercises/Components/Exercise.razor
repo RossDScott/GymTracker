@@ -1,0 +1,96 @@
+﻿@using GymTracker.BlazorClient.Features.Exercises.Store;
+@using GymTracker.Domain.Models;
+@using System.Collections.Immutable;
+
+@inject IDispatcher Dispatcher
+
+<MudPaper Class="pa-2">
+    <MudStack>
+        <MudTextField 
+            @bind-Value="_exerciseName"
+            OnBlur="HandleUpdateExercise"
+            Label="Exercise Name"
+            Variant="Variant.Outlined">
+        </MudTextField>
+
+        <MudSelect 
+            Class="mt-6"
+            Label="Metric Type" 
+            Variant="Variant.Outlined" 
+            AnchorOrigin="Origin.BottomCenter"
+            Value="_metricType"
+            ValueChanged="(MetricType value) => HandleMetricTypeChange(value)">
+
+            @foreach (MetricType item in Enum.GetValues(typeof(MetricType)))
+            {
+                <MudSelectItem Value="item">@item</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudField
+            Class="mt-6"
+            Label="Body Type" 
+            Variant="Variant.Outlined">
+            @foreach (var item in _bodyTargets)
+            {
+                <MudChip 
+                    Color="Color.Info"
+                    OnClose="Closed">
+                    @item
+                </MudChip>
+            }
+            <AddBodyTarget OnAddBodyTarget="HandleAddBodyTarget"></AddBodyTarget>
+        </MudField>
+    </MudStack>
+</MudPaper>
+
+@code {
+
+}
+
+@code {
+    [Parameter]
+    public DetailItem ExerciseDetail { get; set; } = default!;
+
+    string _exerciseName = string.Empty;
+    MetricType _metricType = MetricType.Weight;
+    List<string> _bodyTargets = new();
+
+    protected override void OnParametersSet()
+    {
+        _exerciseName = ExerciseDetail.Name;
+        _metricType = ExerciseDetail.MetricType;
+        _bodyTargets = ExerciseDetail.BodyTarget.ToList();
+
+        base.OnParametersSet();
+    }
+
+    void Closed(MudChip chip)
+    {
+        // react to chip closed
+    }
+
+    void HandleMetricTypeChange(MetricType metricType)
+    {
+        _metricType = metricType;
+        HandleUpdateExercise();
+    }
+
+    void HandleAddBodyTarget(string newBodyTarget)
+    {
+        _bodyTargets.Add(newBodyTarget);
+        HandleUpdateExercise();
+    }
+
+    void HandleUpdateExercise()
+    {
+        var updateDTO = ExerciseDetail with
+            {
+                Name = _exerciseName,
+                MetricType = _metricType,
+                BodyTarget = _bodyTargets.ToImmutableArray()
+            };
+
+        Dispatcher.Dispatch(new UpdateExerciseAction(updateDTO));
+    }
+}

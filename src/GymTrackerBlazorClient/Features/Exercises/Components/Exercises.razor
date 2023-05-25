@@ -1,0 +1,62 @@
+﻿@page "/exercises";
+@page "/exercises/{Id:guid}"
+
+@using GymTracker.BlazorClient.Features.Exercises.Store;
+
+@inherits FluxorComponent
+
+@inject NavigationManager NaviagationManager
+@inject IState<ExercisesState> State
+@inject IDispatcher Dispatcher
+
+<MudGrid>
+    <MudItem xs="2" Class="ma-2">
+        <MudPaper Class="pa-1">
+            <MudList 
+                Clickable="true"
+                SelectedValue="State.Value.SelectedExercise?.Id">
+                @foreach(var item in State.Value.Exercises)
+                {
+                    <MudListItem 
+                        OnClick="() => HandleExerciseSelected(item)"
+                        Value="item.Id">
+                        <MudText Typo="Typo.subtitle1">@item.Name</MudText>
+                    </MudListItem>
+                }
+            </MudList>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="4" Class="ma-2">
+            @if(State.Value.SelectedExercise is not null)
+            {
+                <Exercise ExerciseDetail="State.Value.SelectedExercise"></Exercise>
+            }
+    </MudItem>
+    <MudItem xs="4" Class="ma-2">
+        <MudPaper>
+            Records
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; } = null;
+
+    protected override void OnInitialized()
+    {
+        Dispatcher.Dispatch(new FetchExercisesAction());
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Id is not null)
+            Dispatcher.Dispatch(new FetchExerciseAction(Id.Value));
+
+        base.OnParametersSet();
+    }
+
+    void HandleExerciseSelected(ListItem item) =>
+    NaviagationManager.NavigateTo($"/exercises/{item.Id}");
+}

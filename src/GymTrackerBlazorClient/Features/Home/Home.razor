@@ -1,0 +1,14 @@
+﻿@page "/"
+@using GymTracker.BlazorClient.LocalStorage;
+
+@inject NavigationManager NavigationManager
+
+<h3>Home</h3>
+
+@code {
+    protected override void OnInitialized()
+    {
+        NavigationManager.NavigateTo("exercises");
+        base.OnInitialized();
+    }
+}
