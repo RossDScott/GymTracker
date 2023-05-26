@@ -1,51 +1,50 @@
 ﻿@using GymTracker.BlazorClient.Features.Exercises.Store;
 @inject IDispatcher Dispatcher
 
-<MudChip Color="Color.Info">
-    @if (!showAddTarget)
-    {
-        <MudIconButton 
-            Icon="@Icons.Material.Filled.AddCircle" 
-            Size="Size.Small"
-            Style="color: white"
-            @onclick="() => showAddTarget = true">
-        </MudIconButton>
-    }
-
-    @if (showAddTarget)
-    {
+@if (!_showAddTarget)
+{
+    <MudIconButton 
+        Icon="@Icons.Material.Filled.AddCircle" 
+        Size="Size.Medium"
+        Style="@($"color: {Theme.Palette.InfoContrastText}")"
+        @onclick="() => _showAddTarget = true">
+    </MudIconButton>
+} 
+else
+{
+    <MudChip Color="Color.Info">
         <input
             type="text" 
-            style="background: transparent;"
-            @bind="newBodyTarget" @bind:event="oninput" />
+            style="@($"background: transparent; border: solid 1px {Theme.Palette.LinesInputs}; color:{Theme.Palette.InfoContrastText}")"
+            @bind="_newBodyTarget" @bind:event="oninput" />
         <MudIconButton
             Class="ml-1"
             Style="color: white"
             Icon="@Icons.Material.Filled.CheckCircle"
             Size="Size.Small"
-            Disabled="string.IsNullOrWhiteSpace(newBodyTarget)"
+            Disabled="string.IsNullOrWhiteSpace(_newBodyTarget)"
             @onclick="HandleAddBodyTarget"></MudIconButton>
         <MudIconButton
             Class="ml-1"
             Style="color: white"
             Icon="@Icons.Material.Filled.Cancel"
             Size="Size.Small"
-            @onclick="() => showAddTarget = false">
+            @onclick="() => _showAddTarget = false">
         </MudIconButton>
-    }
-
-</MudChip>
+    </MudChip>
+}
 
 @code {
     [Parameter, EditorRequired]
     public EventCallback<string> OnAddBodyTarget { get; set; }
 
-    bool showAddTarget = false;
-    string newBodyTarget = "";
+    bool _showAddTarget = false;
+    string _newBodyTarget = "";
+    MudTheme Theme = new();
 
     void HandleAddBodyTarget(){
-        OnAddBodyTarget.InvokeAsync(newBodyTarget);
-        showAddTarget = false;
-        newBodyTarget = "";
+        OnAddBodyTarget.InvokeAsync(_newBodyTarget);
+        _showAddTarget = false;
+        _newBodyTarget = "";
     }
 }

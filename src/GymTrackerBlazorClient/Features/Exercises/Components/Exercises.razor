@@ -10,11 +10,18 @@
 @inject IDispatcher Dispatcher
 
 <MudGrid>
-    <MudItem xs="2" Class="ma-2">
+    <MudItem xs="3" Class="ma-2">
         <MudPaper Class="pa-1">
             <MudList 
                 Clickable="true"
                 SelectedValue="State.Value.SelectedExercise?.Id">
+                <MudListItem Class="pr-2 pt-0 pb-1">
+                    <div class="d-flex justify-end">
+                        <MudText Class="mr-1" Typo="Typo.subtitle1">Add Exercise</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.AddCircle"></MudIcon>
+                    </div>
+                </MudListItem>
+                <MudDivider />
                 @foreach(var item in State.Value.Exercises)
                 {
                     <MudListItem 
@@ -27,15 +34,18 @@
         </MudPaper>
     </MudItem>
     <MudItem xs="4" Class="ma-2">
-            @if(State.Value.SelectedExercise is not null)
-            {
-                <Exercise ExerciseDetail="State.Value.SelectedExercise"></Exercise>
-            }
+        @if(State.Value.SelectedExercise is not null)
+        {
+            <Exercise ExerciseDetail="State.Value.SelectedExercise"></Exercise>
+        }
     </MudItem>
     <MudItem xs="4" Class="ma-2">
-        <MudPaper>
-            Records
-        </MudPaper>
+        @if(State.Value.SelectedExercise is not null)
+        {
+            <MudPaper Class="pa-16 ma-2" Elevation="3">
+                This is where the records and charts will be
+            </MudPaper>            
+        }
     </MudItem>
 </MudGrid>
 

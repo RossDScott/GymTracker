@@ -13,7 +13,12 @@ public static class ExercisesReducers
             Exercises = action.Exercises
                 .OrderBy(x => x.Name)
                 .Select(ToListItem)
-                .ToImmutableList()
+                .ToImmutableList(),
+            SelectedExercise = state.SelectedExercise is not null
+                ? action.Exercises
+                        .Single(x => x.Id == state.SelectedExercise.Id)
+                        .ToDetailItem()
+                : null
         };
 
     [ReducerMethod]

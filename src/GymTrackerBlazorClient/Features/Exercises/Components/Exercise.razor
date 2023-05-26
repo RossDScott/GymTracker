@@ -35,7 +35,7 @@
             {
                 <MudChip 
                     Color="Color.Info"
-                    OnClose="Closed">
+                    OnClose="() => HandleRemoveBodyTarget(item)">
                     @item
                 </MudChip>
             }
@@ -65,11 +65,6 @@
         base.OnParametersSet();
     }
 
-    void Closed(MudChip chip)
-    {
-        // react to chip closed
-    }
-
     void HandleMetricTypeChange(MetricType metricType)
     {
         _metricType = metricType;
@@ -79,6 +74,12 @@
     void HandleAddBodyTarget(string newBodyTarget)
     {
         _bodyTargets.Add(newBodyTarget);
+        HandleUpdateExercise();
+    }
+
+    void HandleRemoveBodyTarget(string bodyTarget)
+    {
+        _bodyTargets.Remove(bodyTarget);
         HandleUpdateExercise();
     }
 
