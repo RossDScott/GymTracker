@@ -1,47 +1,55 @@
-﻿@using GymTracker.BlazorClient.Features.Exercises.Store;
+﻿@using FluentValidation;
+@using GymTracker.BlazorClient.Features.Exercises.Store;
 @using GymTracker.Domain.Models;
 @using System.Collections.Immutable;
 
 @inject IDispatcher Dispatcher
 
 <MudPaper Class="pa-2">
-    <MudStack>
-        <MudTextField 
-            @bind-Value="_exerciseName"
-            OnBlur="HandleUpdateExercise"
-            Label="Exercise Name"
-            Variant="Variant.Outlined">
-        </MudTextField>
+    <MudForm @ref="_form">
+        <MudStack>
+            <MudTextField 
+                @bind-Value="_exerciseName"
+                For="@(() => _exerciseName)"
+                Immediate="true"
+                DebounceInterval="500"
+                OnDebounceIntervalElapsed="HandleUpdateExercise"
+                Label="Exercise Name"
+                Variant="Variant.Outlined"
+                Required="true" 
+                RequiredError="Exercise Name required!">
+            </MudTextField>
 
-        <MudSelect 
-            Class="mt-6"
-            Label="Metric Type" 
-            Variant="Variant.Outlined" 
-            AnchorOrigin="Origin.BottomCenter"
-            Value="_metricType"
-            ValueChanged="(MetricType value) => HandleMetricTypeChange(value)">
+            <MudSelect 
+                Class="mt-6"
+                Label="Metric Type" 
+                Variant="Variant.Outlined" 
+                AnchorOrigin="Origin.BottomCenter"
+                Value="_metricType"
+                ValueChanged="(MetricType value) => HandleMetricTypeChange(value)">
 
-            @foreach (MetricType item in Enum.GetValues(typeof(MetricType)))
-            {
-                <MudSelectItem Value="item">@item</MudSelectItem>
-            }
-        </MudSelect>
+                @foreach (MetricType item in Enum.GetValues(typeof(MetricType)))
+                {
+                    <MudSelectItem Value="item">@item</MudSelectItem>
+                }
+            </MudSelect>
 
-        <MudField
-            Class="mt-6"
-            Label="Body Type" 
-            Variant="Variant.Outlined">
-            @foreach (var item in _bodyTargets)
-            {
-                <MudChip 
-                    Color="Color.Info"
-                    OnClose="() => HandleRemoveBodyTarget(item)">
-                    @item
-                </MudChip>
-            }
-            <AddBodyTarget OnAddBodyTarget="HandleAddBodyTarget"></AddBodyTarget>
-        </MudField>
-    </MudStack>
+            <MudField
+                Class="mt-6"
+                Label="Body Type" 
+                Variant="Variant.Outlined">
+                @foreach (var item in _bodyTargets)
+                {
+                    <MudChip 
+                        Color="Color.Info"
+                        OnClose="() => HandleRemoveBodyTarget(item)">
+                        @item
+                    </MudChip>
+                }
+                <AddBodyTarget OnAddBodyTarget="HandleAddBodyTarget"></AddBodyTarget>
+            </MudField>
+        </MudStack>
+    </MudForm>
 </MudPaper>
 
 @code {
@@ -51,6 +59,8 @@
 @code {
     [Parameter]
     public DetailItem ExerciseDetail { get; set; } = default!;
+
+    MudForm _form;
 
     string _exerciseName = string.Empty;
     MetricType _metricType = MetricType.Weight;
@@ -62,29 +72,36 @@
         _metricType = ExerciseDetail.MetricType;
         _bodyTargets = ExerciseDetail.BodyTarget.ToList();
 
+       _form?.ResetValidation();
+
         base.OnParametersSet();
     }
 
-    void HandleMetricTypeChange(MetricType metricType)
+    async Task HandleMetricTypeChange(MetricType metricType)
     {
         _metricType = metricType;
-        HandleUpdateExercise();
+        await HandleUpdateExercise();
     }
 
-    void HandleAddBodyTarget(string newBodyTarget)
+    async Task HandleAddBodyTarget(string newBodyTarget)
     {
         _bodyTargets.Add(newBodyTarget);
-        HandleUpdateExercise();
+        await HandleUpdateExercise();
     }
 
-    void HandleRemoveBodyTarget(string bodyTarget)
+    async Task HandleRemoveBodyTarget(string bodyTarget)
     {
         _bodyTargets.Remove(bodyTarget);
-        HandleUpdateExercise();
+        await HandleUpdateExercise();
     }
 
-    void HandleUpdateExercise()
+    async Task HandleUpdateExercise()
     {
+        await _form.Validate();
+
+        if (!_form.IsValid)
+            return;
+
         var updateDTO = ExerciseDetail with
             {
                 Name = _exerciseName,
@@ -93,5 +110,15 @@
             };
 
         Dispatcher.Dispatch(new UpdateExerciseAction(updateDTO));
+    }
+
+    public class OrderModelFluentValidator : AbstractValidator<DetailItem>
+    {
+        public OrderModelFluentValidator()
+        {
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .Length(1, 100);
+        }
     }
 }

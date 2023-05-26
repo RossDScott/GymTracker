@@ -4,14 +4,14 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
+<MudLayout Class="fullHeight">
     <MudAppBar Color="Color.Primary" Fixed="false">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
         <MudSpacer />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" />
     </MudAppBar>
-    <MudMainContent Class="pa-2">
-        <MudContainer MaxWidth="MaxWidth.Large" Class="ma-0 pa-0">
+    <MudMainContent Class="fullHeight mt-n16 pt-16">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="ma-0 pa-0 fullHeight">
             @Body
         </MudContainer>
     </MudMainContent>

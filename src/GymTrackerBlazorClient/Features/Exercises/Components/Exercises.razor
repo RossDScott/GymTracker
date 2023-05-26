@@ -9,10 +9,11 @@
 @inject IState<ExercisesState> State
 @inject IDispatcher Dispatcher
 
-<MudGrid>
-    <MudItem xs="3" Class="ma-2">
-        <MudPaper Class="pa-1">
-            <MudList 
+<MudGrid Class="fullHeight">
+    <MudItem xs="3" Class="ma-2 fullHeight">
+        <MudPaper Class="pa-1 fullHeight">
+            <MudList
+                
                 Clickable="true"
                 SelectedValue="State.Value.SelectedExercise?.Id">
                 <MudListItem Class="pr-2 pt-0 pb-1">
@@ -22,14 +23,15 @@
                     </div>
                 </MudListItem>
                 <MudDivider />
-                @foreach(var item in State.Value.Exercises)
-                {
-                    <MudListItem 
-                        OnClick="() => HandleExerciseSelected(item)"
-                        Value="item.Id">
-                        <MudText Typo="Typo.subtitle1">@item.Name</MudText>
-                    </MudListItem>
-                }
+                <div class="fullHeight">
+                    @foreach (var item in State.Value.Exercises)
+                    {
+                        <MudListItem OnClick="() => HandleExerciseSelected(item)"
+                                     Value="item.Id">
+                            <MudText Typo="Typo.subtitle1">@item.Name</MudText>
+                        </MudListItem>
+                    }
+                </div>
             </MudList>
         </MudPaper>
     </MudItem>
