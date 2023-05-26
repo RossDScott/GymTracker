@@ -11,11 +11,12 @@ public record ExercisesState
     public DetailItem? SelectedExercise { get; set; } = null;
 }
 
-public record ListItem(Guid Id, string Name);
+public record ListItem(Guid Id, string Name, bool IsAcitve);
 public record DetailItem
 {
     public Guid Id { get; init; }
     public string Name { get; init; } = default!;
     public MetricType MetricType { get; init; }
     public ImmutableArray<string> BodyTarget { get; init; } = ImmutableArray<string>.Empty;
+    public bool IsActive { get; set; } = true;
 }

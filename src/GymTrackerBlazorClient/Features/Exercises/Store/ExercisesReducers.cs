@@ -16,7 +16,7 @@ public static class ExercisesReducers
                 .ToImmutableList(),
             SelectedExercise = state.SelectedExercise is not null
                 ? action.Exercises
-                        .Single(x => x.Id == state.SelectedExercise.Id)
+                        .SingleOrDefault(x => x.Id == state.SelectedExercise.Id)?
                         .ToDetailItem()
                 : null
         };
@@ -26,19 +26,24 @@ public static class ExercisesReducers
         state with { SelectedExercise = action.Exercise.ToDetailItem() };
 
     [ReducerMethod]
-    public static ExercisesState OnUpdateExercise(ExercisesState state, UpdateExerciseAction action) =>
+    public static ExercisesState OnAddOrUpdateExercise(ExercisesState state, AddOrUpdateExerciseAction action) =>
         state with
         {
             SelectedExercise = state.SelectedExercise! with
             {
                 Name = action.Exercise.Name,
                 MetricType = action.Exercise.MetricType,
-                BodyTarget = action.Exercise.BodyTarget.ToImmutableArray()
+                BodyTarget = action.Exercise.BodyTarget.ToImmutableArray(),
+                IsActive = action.Exercise.IsActive
             }
         };
 
+    [ReducerMethod]
+    public static ExercisesState OnCreateNewExercise(ExercisesState state, CreateNewExerciseAction action) =>
+        state with { SelectedExercise = new DetailItem { Id = Guid.NewGuid(), MetricType = MetricType.Weight } };
+
     private static ListItem ToListItem(this Exercise exercise) =>
-        new ListItem(exercise.Id, exercise.Name);
+        new ListItem(exercise.Id, exercise.Name, exercise.IsAcitve);
 
     private static DetailItem ToDetailItem(this Exercise exercise) =>
         new DetailItem
@@ -46,6 +51,7 @@ public static class ExercisesReducers
             Id = exercise.Id,
             Name = exercise.Name,
             MetricType = exercise.MetricType,
-            BodyTarget = exercise.BodyTarget.ToImmutableArray()
+            BodyTarget = exercise.BodyTarget.ToImmutableArray(),
+            IsActive = exercise.IsAcitve
         };
 }

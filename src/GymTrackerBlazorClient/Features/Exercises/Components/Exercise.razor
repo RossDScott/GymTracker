@@ -3,8 +3,6 @@
 @using GymTracker.Domain.Models;
 @using System.Collections.Immutable;
 
-@inject IDispatcher Dispatcher
-
 <MudPaper Class="pa-2">
     <MudForm @ref="_form">
         <MudStack>
@@ -48,6 +46,12 @@
                 }
                 <AddBodyTarget OnAddBodyTarget="HandleAddBodyTarget"></AddBodyTarget>
             </MudField>
+
+            <MudSwitch 
+                Checked="_isActive" 
+                Label="Is Active" 
+                LabelPosition="LabelPosition.Start"
+                CheckedChanged="(bool isActive) => HandleIsActiveChanged(isActive)" />
         </MudStack>
     </MudForm>
 </MudPaper>
@@ -60,19 +64,24 @@
     [Parameter]
     public DetailItem ExerciseDetail { get; set; } = default!;
 
+    [Parameter, EditorRequired]
+    public EventCallback<DetailItem> OnExerciseUpdated { get; set; }
+
     MudForm _form;
 
     string _exerciseName = string.Empty;
     MetricType _metricType = MetricType.Weight;
     List<string> _bodyTargets = new();
+    bool _isActive = true;
 
     protected override void OnParametersSet()
     {
         _exerciseName = ExerciseDetail.Name;
         _metricType = ExerciseDetail.MetricType;
         _bodyTargets = ExerciseDetail.BodyTarget.ToList();
+        _isActive = ExerciseDetail.IsActive;
 
-       _form?.ResetValidation();
+        _form?.ResetValidation();
 
         base.OnParametersSet();
     }
@@ -95,6 +104,12 @@
         await HandleUpdateExercise();
     }
 
+    async Task HandleIsActiveChanged(bool isActive)
+    {
+        _isActive = isActive;
+        await HandleUpdateExercise();
+    }
+
     async Task HandleUpdateExercise()
     {
         await _form.Validate();
@@ -106,19 +121,10 @@
             {
                 Name = _exerciseName,
                 MetricType = _metricType,
-                BodyTarget = _bodyTargets.ToImmutableArray()
+                BodyTarget = _bodyTargets.ToImmutableArray(),
+                IsActive = _isActive
             };
 
-        Dispatcher.Dispatch(new UpdateExerciseAction(updateDTO));
-    }
-
-    public class OrderModelFluentValidator : AbstractValidator<DetailItem>
-    {
-        public OrderModelFluentValidator()
-        {
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .Length(1, 100);
-        }
+        await OnExerciseUpdated.InvokeAsync(updateDTO);
     }
 }

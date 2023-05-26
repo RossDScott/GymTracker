@@ -7,4 +7,6 @@ public record SetExercisesAction(IEnumerable<Exercise> Exercises);
 public record FetchExerciseAction(Guid Id);
 public record SetExerciseAction(Exercise Exercise);
 
-public record UpdateExerciseAction(DetailItem Exercise);
+public record AddOrUpdateExerciseAction(DetailItem Exercise);
+public record CreateNewExerciseAction();
+public record NavigateToNewExerciseAction(Guid Id);

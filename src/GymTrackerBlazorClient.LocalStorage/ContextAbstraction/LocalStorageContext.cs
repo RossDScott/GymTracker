@@ -36,11 +36,11 @@ public class KeyItem<T>
     }
 }
 
-public class KeyListItem<T> : KeyItem<IEnumerable<T>>
+public class KeyListItem<T> : KeyItem<ICollection<T>>
 {
     public KeyListItem(ILocalStorageService localStorage, string key) : base(localStorage, key) { }
 
-    public async ValueTask<IEnumerable<T>> GetOrDefaultAsync() => await GetAsync() ?? new List<T>();
+    public async ValueTask<ICollection<T>> GetOrDefaultAsync() => await GetAsync() ?? new List<T>();
 }
 
 public class KeySyncItem<T> : KeyItem<T>

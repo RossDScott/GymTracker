@@ -1,5 +1,6 @@
 ﻿@page "/exercises";
 @page "/exercises/{Id:guid}"
+@page "/exercises/new"
 
 @using GymTracker.BlazorClient.Features.Exercises.Store;
 
@@ -13,10 +14,11 @@
     <MudItem xs="3" Class="ma-2 fullHeight">
         <MudPaper Class="pa-1 fullHeight">
             <MudList
-                
                 Clickable="true"
                 SelectedValue="State.Value.SelectedExercise?.Id">
-                <MudListItem Class="pr-2 pt-0 pb-1">
+                <MudListItem 
+                    Class="pr-2 pt-0 pb-1"
+                    OnClick="HandleAddNewExercise">
                     <div class="d-flex justify-end">
                         <MudText Class="mr-1" Typo="Typo.subtitle1">Add Exercise</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.AddCircle"></MudIcon>
@@ -26,8 +28,10 @@
                 <div class="fullHeight">
                     @foreach (var item in State.Value.Exercises)
                     {
-                        <MudListItem OnClick="() => HandleExerciseSelected(item)"
-                                     Value="item.Id">
+                        <MudListItem 
+                            OnClick="() => HandleExerciseSelected(item)"
+                            Value="item.Id"
+                            Style="@(item.IsAcitve ? "" : $"color: {Theme.Palette.TextDisabled}")">
                             <MudText Typo="Typo.subtitle1">@item.Name</MudText>
                         </MudListItem>
                     }
@@ -38,7 +42,10 @@
     <MudItem xs="4" Class="ma-2">
         @if(State.Value.SelectedExercise is not null)
         {
-            <Exercise ExerciseDetail="State.Value.SelectedExercise"></Exercise>
+            <Exercise 
+                ExerciseDetail="State.Value.SelectedExercise"
+                OnExerciseUpdated="HandleUpdateExercise">
+            </Exercise>
         }
     </MudItem>
     <MudItem xs="4" Class="ma-2">
@@ -55,8 +62,15 @@
     [Parameter]
     public Guid? Id { get; set; } = null;
 
+    MudTheme Theme = new();
+
     protected override void OnInitialized()
     {
+        NaviagationManager.LocationChanged += HandleLocationChanged;
+
+        SubscribeToAction<NavigateToNewExerciseAction>(action =>
+            NaviagationManager.NavigateTo($"/exercises/{action.Id}"));
+
         Dispatcher.Dispatch(new FetchExercisesAction());
         base.OnInitialized();
     }
@@ -69,6 +83,23 @@
         base.OnParametersSet();
     }
 
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (e.Location.EndsWith("new"))
+            Dispatcher.Dispatch(new CreateNewExerciseAction());
+    }
+
     void HandleExerciseSelected(ListItem item) =>
-    NaviagationManager.NavigateTo($"/exercises/{item.Id}");
+        NaviagationManager.NavigateTo($"/exercises/{item.Id}");
+
+    void HandleAddNewExercise() =>
+        NaviagationManager.NavigateTo($"/exercises/new");
+
+    void HandleUpdateExercise(DetailItem updateDTO) =>
+        Dispatcher.Dispatch(new AddOrUpdateExerciseAction(updateDTO));
+
+    public void Dispose()
+    {
+        NaviagationManager.LocationChanged -= HandleLocationChanged;
+    }
 }

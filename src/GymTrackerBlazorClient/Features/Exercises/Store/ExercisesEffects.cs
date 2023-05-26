@@ -1,5 +1,6 @@
 ﻿using Fluxor;
 using GymTracker.Domain.LocalStorage;
+using GymTracker.Domain.Models;
 
 namespace GymTracker.BlazorClient.Features.Exercises.Store;
 
@@ -28,17 +29,29 @@ public class ExercisesEffects
     }
 
     [EffectMethod]
-    public async Task OnUpdateExercise(UpdateExerciseAction action, IDispatcher dispatcher)
+    public async Task OnAddOrUpdateExercise(AddOrUpdateExerciseAction action, IDispatcher dispatcher)
     {
         var updateDTO = action.Exercise;
         var exercises = await _localStorageContext.Exercises.GetOrDefaultAsync();
-        var exercise = exercises.Single(x => x.Id == action.Exercise.Id);
+        var exercise = exercises.SingleOrDefault(x => x.Id == action.Exercise.Id);
+
+        var isNew = false;
+        if(exercise is null)
+        {
+            exercise = new Exercise();
+            exercises.Add(exercise);
+            isNew = true;
+        }
         
         exercise.Name = updateDTO.Name;
         exercise.MetricType = updateDTO.MetricType;
         exercise.BodyTarget = updateDTO.BodyTarget.ToArray();
+        exercise.IsAcitve = updateDTO.IsActive;
 
         await _localStorageContext.Exercises.SetAsync(exercises);
         dispatcher.Dispatch(new SetExercisesAction(exercises));
+
+        if(isNew)
+            dispatcher.Dispatch(new NavigateToNewExerciseAction(exercise.Id));
     }
 }
