@@ -13,17 +13,19 @@
 <MudGrid Class="fullHeight">
     <MudItem xs="3" Class="ma-2 fullHeight">
         <MudPaper Class="pa-1 fullHeight">
+            <MudToolBar Class="mx-0 px-1">
+                <MudIconButton 
+                    Icon="@Icons.Material.Filled.FilterList" 
+                    Color="Color.Inherit" 
+                    Class="" />
+                <MudSpacer />
+                <MudIconButton 
+                    Icon="@Icons.Material.Filled.AddCircle"
+                    OnClick="HandleAddNewExercise" />
+            </MudToolBar>
             <MudList
                 Clickable="true"
                 SelectedValue="State.Value.SelectedExercise?.Id">
-                <MudListItem 
-                    Class="pr-2 pt-0 pb-1"
-                    OnClick="HandleAddNewExercise">
-                    <div class="d-flex justify-end">
-                        <MudText Class="mr-1" Typo="Typo.subtitle1">Add Exercise</MudText>
-                        <MudIcon Icon="@Icons.Material.Filled.AddCircle"></MudIcon>
-                    </div>
-                </MudListItem>
                 <MudDivider />
                 <div class="fullHeight">
                     @foreach (var item in State.Value.Exercises)

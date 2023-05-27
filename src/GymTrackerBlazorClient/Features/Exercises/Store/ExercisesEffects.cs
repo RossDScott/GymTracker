@@ -38,7 +38,7 @@ public class ExercisesEffects
         var isNew = false;
         if(exercise is null)
         {
-            exercise = new Exercise();
+            exercise = new Exercise { Id = updateDTO.Id };
             exercises.Add(exercise);
             isNew = true;
         }
