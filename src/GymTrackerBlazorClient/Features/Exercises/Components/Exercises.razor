@@ -10,35 +10,44 @@
 @inject IState<ExercisesState> State
 @inject IDispatcher Dispatcher
 
-<MudGrid Class="fullHeight">
-    <MudItem xs="3" Class="ma-2 fullHeight">
-        <MudPaper Class="pa-1 fullHeight">
-            <MudToolBar Class="mx-0 px-1">
-                <MudIconButton 
-                    Icon="@Icons.Material.Filled.FilterList" 
-                    Color="Color.Inherit" 
+<MudGrid Class="fullHeight ma-0">
+    <MudItem xs="3" Class=" mb-0 fullHeight">
+        <MudPaper Class="pa-0 fullHeight" style="overflow-y: auto; position: relative;">
+            <MudToolBar 
+                Class="px-2 z-10" 
+                Style="@($"position: sticky; top: 0; background-color: {Theme.PaletteDark.AppbarBackground}")">
+                <MudTextField @bind-Value="Search"
+                    Label="Search"
+                    Variant="Variant.Text"
+                    Adornment="Adornment.End"
+                    AdornmentIcon="@Icons.Material.Filled.Search"
+                    Margin="Margin.Dense" />
+                    <MudIconButton Icon="@Icons.Material.Filled.FilterList"
+                    Color="Color.Inherit"
                     Class="" />
-                <MudSpacer />
-                <MudIconButton 
-                    Icon="@Icons.Material.Filled.AddCircle"
-                    OnClick="HandleAddNewExercise" />
             </MudToolBar>
-            <MudList
+
+            <MudList 
+                Class="z-0"
+                Color="Color.Surface"
                 Clickable="true"
                 SelectedValue="State.Value.SelectedExercise?.Id">
-                <MudDivider />
-                <div class="fullHeight">
-                    @foreach (var item in State.Value.Exercises)
-                    {
-                        <MudListItem 
-                            OnClick="() => HandleExerciseSelected(item)"
-                            Value="item.Id"
-                            Style="@(item.IsAcitve ? "" : $"color: {Theme.Palette.TextDisabled}")">
-                            <MudText Typo="Typo.subtitle1">@item.Name</MudText>
-                        </MudListItem>
-                    }
-                </div>
+                @foreach (var item in State.Value.Exercises)
+                {
+                    <MudListItem 
+                        OnClick="() => HandleExerciseSelected(item)"
+                        Value="item.Id"
+                        Style="@(item.IsAcitve ? "" : $"color: {Theme.PaletteDark.TextDisabled}")">
+                        <MudText Typo="Typo.subtitle1">@item.Name</MudText>
+                    </MudListItem>
+                }
             </MudList>
+            <div class="d-flex flex-row-reverse" Style="position: sticky; bottom: 5px">
+                <MudFab 
+                    Color="Color.Dark"
+                    StartIcon="@Icons.Material.Filled.Add"
+                    OnClick="HandleAddNewExercise" />
+            </div>
         </MudPaper>
     </MudItem>
     <MudItem xs="4" Class="ma-2">
@@ -65,6 +74,8 @@
     public Guid? Id { get; set; } = null;
 
     MudTheme Theme = new();
+
+    string Search = "";
 
     protected override void OnInitialized()
     {
