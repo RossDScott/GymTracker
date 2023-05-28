@@ -1,0 +1,33 @@
+﻿@using GymTracker.BlazorClient.Features.Exercises.Store;
+<MudToolBar 
+    Class="px-2 z-10"
+    Style="@toolBarStyle">
+    <MudTextField 
+        Value="FilterOptions.SearchTerm"
+        ValueChanged="(string newText) => HandleSearchTermChanged(newText)"
+        Label="Search"
+        Variant="Variant.Text"
+        Adornment="Adornment.End"
+        AdornmentIcon="@Icons.Material.Filled.Search"
+        Margin="Margin.Dense"
+        Immediate="true" />
+    <MudIconButton 
+        Icon="@Icons.Material.Filled.FilterList"
+        Color="Color.Inherit"
+        Class="pb-0" />
+</MudToolBar>
+
+@code {
+    [Parameter, EditorRequired]
+    public EventCallback<ExercisesFilterOptions> OnFilter { get; set; }
+
+    [Parameter]
+    public ExercisesFilterOptions FilterOptions { get; set; } = default!;
+
+    MudTheme Theme = new();
+    string toolBarStyle => $"position: sticky; top: 0; background-color: {Theme.PaletteDark.AppbarBackground}";
+
+    Task HandleSearchTermChanged(string term) =>
+        OnFilter.InvokeAsync(FilterOptions with { SearchTerm = term });
+
+}

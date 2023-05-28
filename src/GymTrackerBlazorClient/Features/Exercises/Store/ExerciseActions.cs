@@ -10,3 +10,5 @@ public record SetExerciseAction(Exercise Exercise);
 public record AddOrUpdateExerciseAction(DetailItem Exercise);
 public record CreateNewExerciseAction();
 public record NavigateToNewExerciseAction(Guid Id);
+
+public record FilterAction(ExercisesFilterOptions FilterOptions);

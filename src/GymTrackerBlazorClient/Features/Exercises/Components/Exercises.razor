@@ -11,28 +11,18 @@
 @inject IDispatcher Dispatcher
 
 <MudGrid Class="fullHeight ma-0">
-    <MudItem xs="3" Class=" mb-0 fullHeight">
+    <MudItem xs="3" Class=" mb-0 fullHeight" Style="position: relative">
         <MudPaper Class="pa-0 fullHeight" style="overflow-y: auto; position: relative;">
-            <MudToolBar 
-                Class="px-2 z-10" 
-                Style="@($"position: sticky; top: 0; background-color: {Theme.PaletteDark.AppbarBackground}")">
-                <MudTextField @bind-Value="Search"
-                    Label="Search"
-                    Variant="Variant.Text"
-                    Adornment="Adornment.End"
-                    AdornmentIcon="@Icons.Material.Filled.Search"
-                    Margin="Margin.Dense" />
-                    <MudIconButton Icon="@Icons.Material.Filled.FilterList"
-                    Color="Color.Inherit"
-                    Class="" />
-            </MudToolBar>
-
+            <ExercisesFilter 
+                FilterOptions="State.Value.Filter.FilterOptions"
+                OnFilter="HandleFilterExercises">
+            </ExercisesFilter>
             <MudList 
                 Class="z-0"
                 Color="Color.Surface"
                 Clickable="true"
                 SelectedValue="State.Value.SelectedExercise?.Id">
-                @foreach (var item in State.Value.Exercises)
+                @foreach (var item in State.Value.DisplayList)
                 {
                     <MudListItem 
                         OnClick="() => HandleExerciseSelected(item)"
@@ -42,13 +32,12 @@
                     </MudListItem>
                 }
             </MudList>
-            <div class="d-flex flex-row-reverse" Style="position: sticky; bottom: 5px">
-                <MudFab 
-                    Color="Color.Dark"
+        </MudPaper>
+        <div class="d-flex flex-row-reverse" style="position: absolute; bottom: 15px; right: 15px">
+            <MudFab Color="Color.Dark"
                     StartIcon="@Icons.Material.Filled.Add"
                     OnClick="HandleAddNewExercise" />
-            </div>
-        </MudPaper>
+        </div>
     </MudItem>
     <MudItem xs="4" Class="ma-2">
         @if(State.Value.SelectedExercise is not null)
@@ -110,6 +99,9 @@
 
     void HandleUpdateExercise(DetailItem updateDTO) =>
         Dispatcher.Dispatch(new AddOrUpdateExerciseAction(updateDTO));
+
+    void HandleFilterExercises(ExercisesFilterOptions filterOptions) =>
+        Dispatcher.Dispatch(new FilterAction(filterOptions));
 
     public void Dispose()
     {
