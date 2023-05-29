@@ -10,7 +10,7 @@
 @inject IState<ExercisesState> State
 @inject IDispatcher Dispatcher
 
-<MudGrid Class="fullHeight ma-0">
+<MudGrid Class="fullHeight ma-0" Justify="Justify.SpaceEvenly" Style="width: 100%">
     <MudItem xs="4" Class=" mb-0 fullHeight" Style="position: relative">
         <MudPaper Class="pa-0 fullHeight" style="overflow-y: auto; position: relative;">
             <ExercisesFilter 
@@ -39,7 +39,7 @@
                     OnClick="HandleAddNewExercise" />
         </div>
     </MudItem>
-    <MudItem xs="4" Class="ma-2">
+    <MudItem xs="4" Class="">
         @if(State.Value.SelectedExercise is not null)
         {
             <Exercise 
@@ -48,10 +48,10 @@
             </Exercise>
         }
     </MudItem>
-    <MudItem xs="4" Class="ma-2">
+    <MudItem xs="4" Class="">
         @if(State.Value.SelectedExercise is not null)
         {
-            <MudPaper Class="pa-16 ma-2" Elevation="3">
+            <MudPaper Class="pa-16" Elevation="3">
                 This is where the records and charts will be
             </MudPaper>            
         }
