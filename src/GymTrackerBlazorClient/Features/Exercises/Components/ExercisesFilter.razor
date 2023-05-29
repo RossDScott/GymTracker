@@ -1,7 +1,8 @@
 ﻿@using GymTracker.BlazorClient.Features.Exercises.Store;
 <MudToolBar 
     Class="px-2 z-10"
-    Style="@toolBarStyle">
+    Style="@toolBarStyle"
+            WrapContent="false">
     <MudTextField 
         Value="FilterOptions.SearchTerm"
         ValueChanged="(string newText) => HandleSearchTermChanged(newText)"
