@@ -5,10 +5,16 @@
 
 <h3>Home</h3>
 
+<MudButton 
+    Variant="Variant.Filled" 
+    Color="Color.Primary"
+    OnClick="HandleManageExercises">Manage Exercises</MudButton>
+
 @code {
     protected override void OnInitialized()
     {
-        NavigationManager.NavigateTo("exercises");
         base.OnInitialized();
     }
+
+    void HandleManageExercises() => NavigationManager.NavigateTo("exercises");
 }
