@@ -1,20 +1,11 @@
 ﻿@inherits LayoutComponentBase
 
-@inject NavigationManager NavigationManager
 <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout Class="fullHeight">
-    <MudAppBar Color="Color.Surface" Fixed="false">
-        <MudIconButton 
-            Icon="@Icons.Material.Filled.Home" 
-            Color="Color.Inherit" 
-            Edge="Edge.Start"
-            OnClick="HandleNavigateHome"/>
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" />
-    </MudAppBar>
+    <AppBar></AppBar>
     <MudMainContent Class="fullHeight mt-n16 pt-16">
         <MudContainer MaxWidth="MaxWidth.Large" Class="ma-0 pa-0 fullHeight">
             @Body
@@ -35,6 +26,4 @@
             StateHasChanged();
         }
     }
-
-    void HandleNavigateHome() => NavigationManager.NavigateTo("/");
 }

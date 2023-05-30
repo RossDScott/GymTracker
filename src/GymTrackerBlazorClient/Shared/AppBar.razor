@@ -1,0 +1,21 @@
+﻿@inject NavigationManager NavigationManager
+
+<MudAppBar 
+    Color="Color.Surface" 
+    Fixed="false">
+    <MudIconButton 
+        Icon="@Icons.Material.Filled.Home"
+        Color="Color.Inherit"
+        Edge="Edge.Start"
+        OnClick="HandleNavigateHome" />
+    <MudSpacer />
+    <MudMenu 
+        Icon="@Icons.Material.Filled.MoreVert">
+        <MudMenuItem OnClick="HandleNavigateToSettings">Settings</MudMenuItem>
+    </MudMenu>
+</MudAppBar>
+
+@code {
+    void HandleNavigateHome() => NavigationManager.NavigateTo("/");
+    void HandleNavigateToSettings() => NavigationManager.NavigateTo("/settings");
+}
