@@ -1,29 +1,29 @@
 ﻿using Fluxor;
-using GymTracker.Domain.LocalStorage;
+using GymTracker.Domain.Abstractions.Services.ClientStorage;
 using GymTracker.Domain.Models;
 
 namespace GymTracker.BlazorClient.Features.Exercises.Store;
 
 public class ExercisesEffects
 {
-    private readonly GymTrackerLocalStorageContext _localStorageContext;
+    private readonly IClientStorage _clientStorage;
 
-    public ExercisesEffects(GymTrackerLocalStorageContext localStorageContext)
+    public ExercisesEffects(IClientStorage clientStorage)
 	{
-        _localStorageContext = localStorageContext;
+        _clientStorage = clientStorage;
     }
 
     [EffectMethod]
     public async Task OnFetchExercises(FetchExercisesAction action, IDispatcher dispatcher)
     {
-        var exercises = await _localStorageContext.Exercises.GetOrDefaultAsync();
+        var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
         dispatcher.Dispatch(new SetExercisesAction(exercises));
     }
 
     [EffectMethod]
     public async Task OnFetchExercise(FetchExerciseAction action, IDispatcher dispatcher)
     {
-        var exercises = await _localStorageContext.Exercises.GetOrDefaultAsync();
+        var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
         var exercise = exercises.Single(x => x.Id == action.Id);
         dispatcher.Dispatch(new SetExerciseAction(exercise));
     }
@@ -32,7 +32,7 @@ public class ExercisesEffects
     public async Task OnAddOrUpdateExercise(AddOrUpdateExerciseAction action, IDispatcher dispatcher)
     {
         var updateDTO = action.Exercise;
-        var exercises = await _localStorageContext.Exercises.GetOrDefaultAsync();
+        var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
         var exercise = exercises.SingleOrDefault(x => x.Id == action.Exercise.Id);
 
         var isNew = false;
@@ -48,7 +48,7 @@ public class ExercisesEffects
         exercise.BodyTarget = updateDTO.BodyTarget.ToArray();
         exercise.IsAcitve = updateDTO.IsActive;
 
-        await _localStorageContext.Exercises.SetAsync(exercises);
+        await _clientStorage.Exercises.SetAsync(exercises);
         dispatcher.Dispatch(new SetExercisesAction(exercises));
 
         if(isNew)

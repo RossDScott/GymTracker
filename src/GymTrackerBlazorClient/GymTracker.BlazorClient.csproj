@@ -17,8 +17,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\GymTracker.AzureBlobStorage\GymTracker.AzureBlobStorage.csproj" />
 	  <ProjectReference Include="..\GymTracker.Domain\GymTracker.Domain.csproj" />
-	  <ProjectReference Include="..\GymTrackerBlazorClient.LocalStorage\GymTracker.BlazorClient.LocalStorage.csproj" />
+	  <ProjectReference Include="..\GymTrackerBlazorClient.LocalStorage\GymTracker.LocalStorage.csproj" />
 	</ItemGroup>
 	
 	<ItemGroup>

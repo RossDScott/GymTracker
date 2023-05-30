@@ -1,5 +1,4 @@
 ﻿@page "/"
-@using GymTracker.BlazorClient.LocalStorage;
 
 @inject NavigationManager NavigationManager
 
@@ -10,6 +9,10 @@
     Color="Color.Primary"
     OnClick="HandleManageExercises">Manage Exercises</MudButton>
 
+<MudButton
+    Variant="Variant.Filled"
+    Color="Color.Primary"
+    OnClick="HandleBackup">Backup </MudButton>
 @code {
     protected override void OnInitialized()
     {
@@ -17,4 +20,12 @@
     }
 
     void HandleManageExercises() => NavigationManager.NavigateTo("exercises");
+
+    async void HandleBackup()
+    {
+        //var backupService = new BlobBackupService();
+        //var data = await LocalStorageContext.Exercises.GetAsync();
+
+        //await backupService.BackupData(data!, "Exercises");
+    }
 }

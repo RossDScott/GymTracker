@@ -16,4 +16,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.11" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GymTracker.Domain\GymTracker.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
