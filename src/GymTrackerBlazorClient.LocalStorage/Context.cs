@@ -7,5 +7,10 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
 {
     public IKeyItem<bool> HasInitialisedDefaultData { get; init; } = default!;
     public IKeyListItem<Exercise> Exercises { get; init; } = default!;
-    public IKeyItem<string> AzureBlobBackupContainerSASURI { get; init; } = default!;
+    public IKeyItem<AppSettings> AppSettings { get; init; } = default!;
+
+    internal override void Configure()
+    {
+        AppSettings.ConfigureDefault(() => new AppSettings());
+    }
 }

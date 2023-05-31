@@ -1,0 +1,46 @@
+﻿@page "/settings"
+@using GymTracker.BlazorClient.Features.AppSettings.Store;
+
+@inherits FluxorComponent
+
+@inject IState<AppSettingsState> State
+@inject IDispatcher Dispatcher
+
+<MudContainer Class="pa-3 ma-0">
+    <MudCard Style="width:100%">
+        <MudCardContent>
+            <MudText>Backup</MudText>
+            <MudTextField 
+                Value="State.Value.Settings?.AzureBlobBackupContainerSASURI"
+                ValueChanged="(string value) => HandleAzureBlobBackupContainerSASURIChanged(value)"
+                Label="Outlined" 
+                Variant="Variant.Outlined">
+            </MudTextField>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="HandleBackupAll">
+                Backup All
+            </MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="HandleRestoreAll">
+                Restore All
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Dispatcher.Dispatch(new FetchSettingsAction());
+        base.OnInitialized();
+    }
+
+    void HandleAzureBlobBackupContainerSASURIChanged(string value) =>
+        Dispatcher.Dispatch(new UpdateSettingsAction(State.Value.Settings with 
+                {
+                    AzureBlobBackupContainerSASURI = value
+                }));
+
+    void HandleBackupAll() => Dispatcher.Dispatch(new BackupAllAction());
+    void HandleRestoreAll() => Dispatcher.Dispatch(new RestoreAllAction());
+}

@@ -20,6 +20,9 @@ public class DefaultDataBuilderService
     {
         await BuildExercises();
 
+        var settings = new AppSettings();
+        await _clientStorage.AppSettings.SetAsync(settings);
+
         await _clientStorage.HasInitialisedDefaultData.SetAsync(true);
     }
 

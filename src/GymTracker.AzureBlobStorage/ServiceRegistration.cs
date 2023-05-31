@@ -18,11 +18,12 @@ public static class ServiceRegistration
         var backupService = serviceProvider.GetRequiredService<BlobBackupService>();
         var clientStorage = serviceProvider.GetRequiredService<IClientStorage>();
 
-        var settings = new AzureBlobBackupSettings
+        var appSettings = await clientStorage.AppSettings.GetOrDefaultAsync();
+        var blobSettings = new AzureBlobBackupSettings
         {
-            ContainerSASURI = await clientStorage.AzureBlobBackupContainerSASURI.GetAsync()
+            ContainerSASURI = appSettings!.AzureBlobBackupContainerSASURI
         };
 
-        backupService.Configure(settings);
+        backupService.Configure(blobSettings);
     }
 }

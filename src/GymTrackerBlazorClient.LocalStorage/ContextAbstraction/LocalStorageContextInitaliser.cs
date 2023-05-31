@@ -17,6 +17,8 @@ public static class LocalStorageContextExtensions
 
         InitialiseKeys(context, typeof(IKeyItem<>), typeof(KeyItem<>), localStorageService, dataBackupService);
         InitialiseKeys(context, typeof(IKeyListItem<>), typeof(KeyListItem<>), localStorageService, dataBackupService);
+
+        context.Configure();
     }
 
     private static void InitialiseKeys<T>(

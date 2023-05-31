@@ -4,6 +4,9 @@ public interface IKeyItem<T>
 {
     ValueTask<T?> GetAsync();
     ValueTask<T> GetOrDefaultAsync(Func<T> defaultConstructor);
+    ValueTask<T> GetOrDefaultAsync();
     ValueTask SetAsync(T item);
     void SubscribeToChanges(Action<T> callback);
+
+    IKeyItem<T> ConfigureDefault(Func<T> defaultConstructor);
 }
