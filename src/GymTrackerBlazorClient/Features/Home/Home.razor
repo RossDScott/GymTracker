@@ -1,6 +1,9 @@
 ﻿@page "/"
+@using Fluxor
+@using GymTracker.BlazorClient.Features.AppBar.Store;
 
 @inject NavigationManager NavigationManager
+@inject IDispatcher Dispatcher
 
 <h3>Home</h3>
 
@@ -16,6 +19,7 @@
 @code {
     protected override void OnInitialized()
     {
+        Dispatcher.Dispatch(new ResetBreadcrumbsToHomeAction());
         base.OnInitialized();
     }
 

@@ -1,5 +1,7 @@
 ﻿@page "/settings"
+@using GymTracker.BlazorClient.Features.AppBar.Store;
 @using GymTracker.BlazorClient.Features.AppSettings.Store;
+@using System.Collections.Immutable;
 
 @inherits FluxorComponent
 
@@ -32,6 +34,10 @@
     protected override void OnInitialized()
     {
         Dispatcher.Dispatch(new FetchSettingsAction());
+        Dispatcher.Dispatch(new SetBreadcrumbAction(new []
+        {
+            new BreadcrumbItem("App Settings", "/settings", false, Icons.Material.Filled.Settings)
+        }));
         base.OnInitialized();
     }
 

@@ -1,13 +1,14 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using GymTracker.BlazorClient.Features.AppBar.Store;
+@inject NavigationManager NavigationManager
+
+@inherits FluxorComponent
+
+@inject IState<AppBarState> State
 
 <MudAppBar 
     Color="Color.Surface" 
     Fixed="false">
-    <MudIconButton 
-        Icon="@Icons.Material.Filled.Home"
-        Color="Color.Inherit"
-        Edge="Edge.Start"
-        OnClick="HandleNavigateHome" />
+    <MudBreadcrumbs Items="State.Value.Breadcrumbs.ToList()"></MudBreadcrumbs>
     <MudSpacer />
     <MudMenu 
         Icon="@Icons.Material.Filled.MoreVert">

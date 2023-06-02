@@ -1,4 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using GymTracker.BlazorClient.Features.AppBar.Components
+@inherits LayoutComponentBase
+
+@inject ISnackbar Snackbar
 
 <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
 <MudDialogProvider />
@@ -23,6 +26,11 @@
         if (firstRender)
         {
             _isDarkMode = await _mudThemeProvider.GetSystemPreference();
+
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+            Snackbar.Configuration.ClearAfterNavigation = true;
+            Snackbar.Configuration.VisibleStateDuration = 3000;
+
             StateHasChanged();
         }
     }
