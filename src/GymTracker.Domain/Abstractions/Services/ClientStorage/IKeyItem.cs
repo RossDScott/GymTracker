@@ -1,6 +1,17 @@
-﻿namespace GymTracker.Domain.Abstractions.Services.ClientStorage;
+﻿using System.Collections;
 
-public interface IKeyItem<T>
+namespace GymTracker.Domain.Abstractions.Services.ClientStorage;
+
+public interface IKeyItem
+{
+    bool AutoBackup { get; }
+
+    string KeyName { get; }
+    ValueTask<string?> DataAsJson();
+    ValueTask SetDataFromJson(string jsonString);
+}
+
+public interface IKeyItem<T> : IKeyItem
 {
     ValueTask<T?> GetAsync();
     ValueTask<T> GetOrDefaultAsync(Func<T> defaultConstructor);
@@ -8,5 +19,5 @@ public interface IKeyItem<T>
     ValueTask SetAsync(T item);
     void SubscribeToChanges(Action<T> callback);
 
-    IKeyItem<T> ConfigureDefault(Func<T> defaultConstructor);
+    void Configure(Action<KeyConfig<T>> configureSettings);
 }

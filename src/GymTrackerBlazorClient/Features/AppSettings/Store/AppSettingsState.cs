@@ -6,5 +6,5 @@ namespace GymTracker.BlazorClient.Features.AppSettings.Store;
 [FeatureState]
 public record AppSettingsState
 {
-    public Models.AppSettings Settings { get; init; } = default!;
+    public Models.ClientStorage.AppSettings Settings { get; init; } = default!;
 }

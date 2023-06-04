@@ -6,7 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace GymTracker.LocalStorage;
 public static class ServiceRegistration
 {
-    public static void RegisterLocalStorageContext<TService, TImplementation>(this IServiceCollection services) 
+    public static void RegisterLocalStorageContext<TService, TImplementation>
+        (this IServiceCollection services) 
         where TImplementation : LocalStorageContext, TService, new()
         where TService : class
     {
@@ -14,11 +15,10 @@ public static class ServiceRegistration
         services.AddScoped<TService>(serviceProvider =>
         {
             var localStorage = serviceProvider.GetRequiredService<ILocalStorageService>();
-            var backupService = serviceProvider.GetService<IDataBackupService>();
 
             var context = new TImplementation();
 
-            context.Initialise(localStorage, backupService);
+            context.Initialise(localStorage);
 
             return context;
         });

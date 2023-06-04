@@ -1,5 +1,6 @@
 ﻿using GymTracker.Domain.Models;
 using GymTracker.Domain.Abstractions.Services.ClientStorage;
+using GymTracker.Domain.Models.ClientStorage;
 
 namespace GymTracker.Domain.Services;
 public class DefaultDataBuilderService
