@@ -9,6 +9,7 @@ public interface IKeyItem
     string KeyName { get; }
     ValueTask<string?> DataAsJson();
     ValueTask SetDataFromJson(string jsonString);
+    void SubscribeToChangesAsJson(Action<string> callback);
 }
 
 public interface IKeyItem<T> : IKeyItem

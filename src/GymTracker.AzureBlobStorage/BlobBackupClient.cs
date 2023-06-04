@@ -24,7 +24,7 @@ public class BlobBackupClient : IDataBackupClient
             : new BlobContainerClient(new Uri(sasUri));
     }
 
-    public async Task BackupAsync(string dataAsString, string key)
+    public async Task BackupAsync(string key, string dataAsString)
     {
         var containerClient =await BuildContainerClient();
         if (string.IsNullOrWhiteSpace(dataAsString) || containerClient is null)

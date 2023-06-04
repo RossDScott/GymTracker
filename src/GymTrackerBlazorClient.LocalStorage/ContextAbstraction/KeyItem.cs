@@ -49,6 +49,19 @@ public class KeyItem<T> : IKeyItem<T>
         };
     }
 
+    public void SubscribeToChangesAsJson(Action<string> callback)
+    {
+        LocalStorage.Changed += async (_, args) =>
+        {
+            if (args.Key == Key)
+            {
+                var json = await DataAsJson();
+                if(!string.IsNullOrEmpty(json))
+                    callback(json);
+            }
+        };
+    }
+
     public async ValueTask<string?> DataAsJson()
     {
         var data = await GetAsync();

@@ -7,41 +7,69 @@ public class BackupOrchestrator : IBackupOrchestrator
     private readonly IClientStorage _clientStorage;
     private readonly IDataBackupClient _dataBackupClient;
 
+    private readonly List<IKeyItem> _keyItemsToBackup;
+
+    private bool _isRestoring = false;
+
     public BackupOrchestrator(IClientStorage clientStorage, IDataBackupClient dataBackupClient)
     {
         _clientStorage = clientStorage;
         _dataBackupClient = dataBackupClient;
+
+        _keyItemsToBackup = _clientStorage.Keys
+            .Where(x => x.AutoBackup)
+            .ToList();
+
+        SetupAutoBackup();
     }
 
     public async Task Backup()
     {
-        var keysToBackup = _clientStorage.Keys
-            .Where(x => x.AutoBackup)
-            .ToList();
-
-        foreach (var keyItem in keysToBackup)
+        foreach (var keyItem in _keyItemsToBackup)
         {
             var json = await keyItem.DataAsJson();
             if (string.IsNullOrWhiteSpace(json))
                 continue;
 
-            await _dataBackupClient.BackupAsync(json, keyItem.KeyName);
+            await _dataBackupClient.BackupAsync(keyItem.KeyName, json);
         }
     }
 
     public async Task Restore()
     {
-        var keysToRestore = _clientStorage.Keys
-            .Where(x => x.AutoBackup)
-            .ToList();
-
-        foreach (var keyItem in keysToRestore)
+        _isRestoring = true;
+        try
         {
-            var json = await _dataBackupClient.DownloadBackupItem(keyItem.KeyName);
-            if (string.IsNullOrWhiteSpace(json))
-                continue;
+            foreach (var keyItem in _keyItemsToBackup)
+            {
+                var json = await _dataBackupClient.DownloadBackupItem(keyItem.KeyName);
+                if (string.IsNullOrWhiteSpace(json))
+                    continue;
 
-            await keyItem.SetDataFromJson(json);
+                await keyItem.SetDataFromJson(json);
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            _isRestoring = false;
+        }
+    }
+
+    private void SetupAutoBackup()
+    {
+        foreach (var keyItem in _keyItemsToBackup)
+        {
+            keyItem.SubscribeToChangesAsJson(async dataAsJson =>
+            {
+                if (_isRestoring)
+                    return;
+
+                await _dataBackupClient.BackupAsync(keyItem.KeyName, dataAsJson);
+            });
         }
     }
 }
