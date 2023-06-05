@@ -23,6 +23,6 @@ builder.Services.RegisterAzureBlobStorageServices();
 var serviceProvider = builder.Services.BuildServiceProvider();
 //await serviceProvider.ConfigureAzureBlobBackupSettings();
 
-builder.Services.AddFluxor(o => o.ScanAssemblies(typeof(Program).Assembly).UseReduxDevTools());
+builder.Services.AddFluxor(o => o.ScanAssemblies(typeof(Program).Assembly));
 
 await builder.Build().RunAsync();
