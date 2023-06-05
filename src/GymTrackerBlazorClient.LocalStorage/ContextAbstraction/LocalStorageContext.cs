@@ -18,8 +18,5 @@ public abstract class LocalStorageContext : ILocalStorageContext
         });
     }
 
-    internal virtual void InitializeData()
-    {
-
-    }
+    internal abstract Task InitializeData();
 }

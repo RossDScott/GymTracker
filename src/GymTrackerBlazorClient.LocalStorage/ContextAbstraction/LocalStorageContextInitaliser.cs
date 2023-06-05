@@ -19,6 +19,7 @@ public static class LocalStorageContextExtensions
 
         context.Keys = keys;
         context.Configure();
+        context.InitializeData();
     }
 
     private static IEnumerable<IKeyItem> InitialiseKeys<T>(

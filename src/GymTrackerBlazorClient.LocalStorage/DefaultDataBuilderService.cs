@@ -11,11 +11,6 @@ public class DefaultDataBuilderService
     {
         _clientStorage = localStorageContext;
     }
-    public async Task CheckAndBuildDefaultDataIfRequired()
-    {
-        if (!await _clientStorage.HasInitialisedDefaultData.GetAsync())
-            await BuildDefaultData();
-    }
 
     public async Task BuildDefaultData()
     {

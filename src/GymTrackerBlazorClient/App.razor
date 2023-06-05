@@ -1,7 +1,5 @@
 @using GymTracker.Domain.Services;
 
-@inject DefaultDataBuilderService DefaultDataBuilderService;
-
 <Fluxor.Blazor.Web.StoreInitializer />
 <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
@@ -16,8 +14,5 @@
 </Router>
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        await DefaultDataBuilderService.CheckAndBuildDefaultDataIfRequired();
-    }
+
 }

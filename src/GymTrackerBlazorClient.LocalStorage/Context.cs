@@ -1,6 +1,7 @@
 ﻿using GymTracker.Domain.Abstractions.Services.ClientStorage;
 using GymTracker.Domain.Models;
 using GymTracker.Domain.Models.ClientStorage;
+using GymTracker.Domain.Services;
 using GymTracker.LocalStorage.ContextAbstraction;
 
 namespace GymTracker.LocalStorage;
@@ -19,8 +20,12 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
         base.Configure();
     }
 
-    internal override void InitializeData()
+    internal override async Task InitializeData()
     {
-        
+        if (!await HasInitialisedDefaultData.GetAsync())
+        {
+            var defaultData = new DefaultDataBuilderService(this);
+            await defaultData.BuildDefaultData();
+        }
     }
 }
