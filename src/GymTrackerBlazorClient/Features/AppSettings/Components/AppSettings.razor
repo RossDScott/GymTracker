@@ -2,6 +2,7 @@
 @using GymTracker.BlazorClient.Features.AppBar.Store;
 @using GymTracker.BlazorClient.Features.AppSettings.Store;
 @using System.Collections.Immutable;
+@using GymTracker.BlazorClient.Features.Common.ListItemFieldEditor
 
 @inherits FluxorComponent
 
@@ -28,6 +29,25 @@
             </MudButton>
         </MudCardActions>
     </MudCard>
+
+    <MudCard Class="mt-4" Style="width:100%">
+        <MudCardContent>
+            <MudText>Exercise Lookups</MudText>
+            <ListEditor
+                Label="Target Body Part"
+                List="State.Value.BodyTargets"
+                OnAdd="HandleAddTargetBody"
+                OnRemove="HandleDeleteTargetBody"></ListEditor>
+        </MudCardContent>
+        <MudCardContent>
+            <ListEditor 
+                Label="Equipment"
+                List="State.Value.Equipment"
+                OnAdd="HandleAddEquipment"
+                OnRemove="HandleDeleteEquipment"></ListEditor>
+        </MudCardContent>
+
+    </MudCard>
 </MudContainer>
 
 @code {
@@ -37,7 +57,7 @@
         Dispatcher.Dispatch(new SetBreadcrumbAction(new []
         {
             new BreadcrumbItem("App Settings", "/settings", false, Icons.Material.Filled.Settings)
-        }));
+    }));
         base.OnInitialized();
     }
 
@@ -49,4 +69,9 @@
 
     void HandleBackupAll() => Dispatcher.Dispatch(new BackupAllAction());
     void HandleRestoreAll() => Dispatcher.Dispatch(new RestoreAllAction());
+
+    void HandleAddTargetBody(string targetBody) => Dispatcher.Dispatch(new AddTargetBodyAction(targetBody));
+    void HandleDeleteTargetBody(string targetBody) => Dispatcher.Dispatch(new DeleteTargetBodyAction(targetBody));
+    void HandleAddEquipment(string equipment) => Dispatcher.Dispatch(new AddEquipmentAction(equipment));
+    void HandleDeleteEquipment(string equipment) => Dispatcher.Dispatch(new DeleteEquipmentAction(equipment));
 }

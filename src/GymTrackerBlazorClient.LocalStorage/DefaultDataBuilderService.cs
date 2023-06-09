@@ -14,12 +14,36 @@ public class DefaultDataBuilderService
 
     public async Task BuildDefaultData()
     {
+        await BuildBodyTargets();
+        await BuildEquipment();
         await BuildExercises();
 
         var settings = new AppSettings();
         await _clientStorage.AppSettings.SetAsync(settings);
 
         await _clientStorage.HasInitialisedDefaultData.SetAsync(true);
+    }
+
+    private async Task BuildBodyTargets()
+    {
+        var bodyTargets = new List<string>
+        {
+            "Core", "Arms", "Back", "Chest", "Legs", "Shoulders"
+        };
+        bodyTargets = bodyTargets.OrderBy(x => x).ToList();
+        
+        await _clientStorage.TargetBodyParts.SetAsync(bodyTargets);
+    }
+
+    private async Task BuildEquipment()
+    {
+        var equipment = new List<string>
+        {
+            "Barbell", "Dumbbel", "Pulley", "Spin Bike", "Treadmill", "Floor"
+        };
+        equipment = equipment.OrderBy(x => x).ToList();
+
+        await _clientStorage.Equipment.SetAsync(equipment);
     }
 
     private async Task BuildExercises()

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GymTracker.BlazorClient", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GymTracker.Domain", "GymTracker.Domain\GymTracker.Domain.csproj", "{8CF4E45A-3C9F-475B-A470-F288257168B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymTracker.AzureBlobStorage", "GymTracker.AzureBlobStorage\GymTracker.AzureBlobStorage.csproj", "{078FC932-845E-4310-83B3-1A673C0C9A26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GymTracker.AzureBlobStorage", "GymTracker.AzureBlobStorage\GymTracker.AzureBlobStorage.csproj", "{078FC932-845E-4310-83B3-1A673C0C9A26}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GymTracker.LocalStorage", "GymTrackerBlazorClient.LocalStorage\GymTracker.LocalStorage.csproj", "{F3BEF91B-4AD7-4BB4-AD30-4F0CF1CDF2E0}"
 EndProject

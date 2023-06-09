@@ -1,0 +1,30 @@
+﻿@using System.Collections.Immutable;
+
+<MudField
+    Class="mt-6"
+    Label="@Label"
+    Variant="Variant.Outlined">
+    @foreach (var item in List)
+    {
+        <MudChip 
+            Color="Color.Info"
+            OnClose="() => OnRemove.InvokeAsync(item)">
+            @item
+        </MudChip>
+    }
+    <AddListItem OnAddItem="OnAdd"></AddListItem>
+</MudField>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = default!;
+
+    [Parameter]
+    public ImmutableList<string> List { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<string> OnAdd { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnRemove { get; set; }
+}

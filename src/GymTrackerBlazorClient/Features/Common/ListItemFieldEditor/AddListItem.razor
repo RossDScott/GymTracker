@@ -1,13 +1,10 @@
-﻿@using GymTracker.BlazorClient.Features.Exercises.Store;
-@inject IDispatcher Dispatcher
-
-@if (!_showAddTarget)
+﻿@if (!_showAddItem)
 {
     <MudIconButton 
         Icon="@Icons.Material.Filled.AddCircle" 
         Size="Size.Medium"
         Style="@($"color: {Theme.Palette.InfoContrastText}")"
-        @onclick="() => _showAddTarget = true">
+        @onclick="() => _showAddItem = true">
     </MudIconButton>
 } 
 else
@@ -16,35 +13,35 @@ else
         <input
             type="text" 
             style="@($"background: transparent; border: solid 1px {Theme.Palette.LinesInputs}; color:{Theme.Palette.InfoContrastText}")"
-            @bind="_newBodyTarget" @bind:event="oninput" />
+            @bind="_newItem" @bind:event="oninput" />
         <MudIconButton
             Class="ml-1"
             Style="color: white"
             Icon="@Icons.Material.Filled.CheckCircle"
             Size="Size.Small"
-            Disabled="string.IsNullOrWhiteSpace(_newBodyTarget)"
+            Disabled="string.IsNullOrWhiteSpace(_newItem)"
             @onclick="HandleAddBodyTarget"></MudIconButton>
         <MudIconButton
             Class="ml-1"
             Style="color: white"
             Icon="@Icons.Material.Filled.Cancel"
             Size="Size.Small"
-            @onclick="() => _showAddTarget = false">
+        @onclick="() => _showAddItem = false">
         </MudIconButton>
     </MudChip>
 }
 
 @code {
     [Parameter, EditorRequired]
-    public EventCallback<string> OnAddBodyTarget { get; set; }
+    public EventCallback<string> OnAddItem { get; set; }
 
-    bool _showAddTarget = false;
-    string _newBodyTarget = "";
+    bool _showAddItem = false;
+    string _newItem = "";
     MudTheme Theme = new();
 
     void HandleAddBodyTarget(){
-        OnAddBodyTarget.InvokeAsync(_newBodyTarget);
-        _showAddTarget = false;
-        _newBodyTarget = "";
+        OnAddItem.InvokeAsync(_newItem);
+        _showAddItem = false;
+        _newItem = string.Empty;
     }
 }

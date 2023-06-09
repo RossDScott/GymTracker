@@ -1,4 +1,5 @@
 ﻿@using FluentValidation;
+@using GymTracker.BlazorClient.Features.Common
 @using GymTracker.BlazorClient.Features.Exercises.Store;
 @using GymTracker.Domain.Models;
 @using System.Collections.Immutable;
@@ -34,17 +35,20 @@
 
             <MudField
                 Class="mt-6"
-                Label="Body Type" 
+                Label="Body Target" 
                 Variant="Variant.Outlined">
                 @foreach (var item in _bodyTargets)
                 {
                     <MudChip 
-                        Color="Color.Info"
+                        Color="Color.Default"
                         OnClose="() => HandleRemoveBodyTarget(item)">
                         @item
                     </MudChip>
                 }
-                <AddBodyTarget OnAddBodyTarget="HandleAddBodyTarget"></AddBodyTarget>
+                <AddFromList
+                    Label="Body Target"
+                    List="TargetBodyParts"
+                    OnAddItem="HandleAddBodyTarget"></AddFromList>
             </MudField>
 
             <MudSwitch 
@@ -61,6 +65,9 @@
 }
 
 @code {
+    [Parameter]
+    public ImmutableArray<string> TargetBodyParts { get; set; } = ImmutableArray<string>.Empty;
+
     [Parameter, EditorRequired]
     public DetailItem ExerciseDetail { get; set; } = default!;
 

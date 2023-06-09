@@ -8,7 +8,7 @@ namespace GymTracker.BlazorClient.Features.Exercises.Store;
 public static class ExercisesReducers
 {
     [ReducerMethod]
-    public static ExercisesState OnSetExercises(ExercisesState state, SetExercisesAction action)
+    public static ExercisesState OnSetInitialData(ExercisesState state, SetInitialDataAction action)
     {
         var bodyTargets = action.Exercises
                         .SelectMany(x => x.BodyTarget)
@@ -19,6 +19,8 @@ public static class ExercisesReducers
 
         var response = state with
         {
+            TargetBodyParts = action.TargetBodyParts.OrderBy(x => x).ToImmutableArray(),
+            Equipment = action.Equipment.OrderBy(x => x).ToImmutableArray(),
             OriginalList = action.Exercises.ToImmutableArray(),
             Exercises = action.Exercises
                 .OrderBy(x => x.Name)
@@ -41,6 +43,17 @@ public static class ExercisesReducers
 
         return response;
     }
+
+    [ReducerMethod]
+    public static ExercisesState OnSetExercises(ExercisesState state, SetExercisesAction action) =>
+        state with
+        {
+            OriginalList = action.Exercises.ToImmutableArray(),
+            Exercises = action.Exercises
+                .OrderBy(x => x.Name)
+                .Select(ToListItem)
+                .ToImmutableArray()
+        };
 
     [ReducerMethod]
     public static ExercisesState OnSetExercise(ExercisesState state, SetExerciseAction action) =>

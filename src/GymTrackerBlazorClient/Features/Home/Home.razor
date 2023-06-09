@@ -10,7 +10,18 @@
         Variant="Variant.Filled"
         Color="Color.Default"
         Style="height: 200px; width: 200px"
-        OnClick="HandleManageExercises">Manage Exercises</MudButton>
+        OnClick="HandleManageExercises">
+        Manage Exercises
+    </MudButton>
+
+    <MudButton 
+        Class="ml-2"
+        Variant="Variant.Filled"
+        Color="Color.Default"
+        Style="height: 200px; width: 200px"
+        OnClick="HandleManageSettings">
+        Settings
+    </MudButton>
 </MudContainer>
 
 
@@ -22,4 +33,5 @@
     }
 
     void HandleManageExercises() => NavigationManager.NavigateTo("exercises");
+    void HandleManageSettings() => NavigationManager.NavigateTo("settings");
 }

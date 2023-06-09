@@ -16,8 +16,14 @@ public class ExercisesEffects
     [EffectMethod]
     public async Task OnFetchExercises(FetchExercisesAction action, IDispatcher dispatcher)
     {
+        var targetBodyParts = await _clientStorage.TargetBodyParts.GetOrDefaultAsync();
+        var equipment = await _clientStorage.Equipment.GetOrDefaultAsync();
         var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
-        dispatcher.Dispatch(new SetExercisesAction(exercises));
+        
+        dispatcher.Dispatch(new SetInitialDataAction(
+            targetBodyParts,
+            equipment,
+            exercises));
     }
 
     [EffectMethod]

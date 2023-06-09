@@ -41,7 +41,8 @@
     <MudItem xs="4" Class="">
         @if(State.Value.SelectedExercise is not null)
         {
-            <Exercise 
+            <Exercise
+                TargetBodyParts="State.Value.TargetBodyParts"
                 ExerciseDetail="State.Value.SelectedExercise"
                 OnExerciseUpdated="HandleUpdateExercise">
             </Exercise>

@@ -7,6 +7,9 @@ namespace GymTracker.BlazorClient.Features.Exercises.Store;
 [FeatureState]
 public record ExercisesState
 {
+    public ImmutableArray<string> TargetBodyParts { get; set; } = ImmutableArray<string>.Empty;
+    public ImmutableArray<string> Equipment { get; set; } = ImmutableArray<string>.Empty;
+
     public ImmutableArray<Exercise> OriginalList { get; init; } = ImmutableArray<Exercise>.Empty;
     public ImmutableArray<ListItem> Exercises { get; init; } = ImmutableArray<ListItem>.Empty;
     public DetailItem? SelectedExercise { get; init; } = null;

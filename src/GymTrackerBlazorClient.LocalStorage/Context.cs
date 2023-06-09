@@ -7,6 +7,9 @@ using GymTracker.LocalStorage.ContextAbstraction;
 namespace GymTracker.LocalStorage;
 public class ClientStorageContext : LocalStorageContext, IClientStorage
 {
+    public IKeyListItem<string> TargetBodyParts { get; init; } = default!;
+    public IKeyListItem<string> Equipment { get; init; } = default!;
+
     public IKeyListItem<Exercise> Exercises { get; init; } = default!;
     public IKeyItem<AppSettings> AppSettings { get; init; } = default!;
 

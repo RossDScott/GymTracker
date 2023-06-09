@@ -1,0 +1,70 @@
+﻿@using GymTracker.BlazorClient.Features.Exercises.Store;
+@using System.Collections.Immutable;
+@inject IDispatcher Dispatcher
+
+@if (!_showAddItem)
+{
+    <MudIconButton 
+        Icon="@Icons.Material.Filled.AddCircle" 
+        Size="Size.Medium"
+        Style="@($"color: {Theme.Palette.InfoContrastText}")"
+        @onclick="() => _showAddItem = true">
+    </MudIconButton>
+} 
+else
+{
+    <MudChip Color="Color.Info">
+        <select @bind="_selectedNewItem">
+            @if (string.IsNullOrEmpty(_selectedNewItem))
+            {
+                <option value="@string.Empty">@Label</option>
+            }
+            @foreach(var item in List)
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+
+        <MudIconButton
+            Class="ml-1"
+            Style="color: white"
+            Icon="@Icons.Material.Filled.CheckCircle"
+            Size="Size.Small"
+            Disabled="string.IsNullOrWhiteSpace(_selectedNewItem)"
+            @onclick="HandleAddBodyTarget"></MudIconButton>
+        <MudIconButton
+            Class="ml-1"
+            Style="color: white"
+            Icon="@Icons.Material.Filled.Cancel"
+            Size="Size.Small"
+        @onclick="() => _showAddItem = false">
+        </MudIconButton>
+    </MudChip>
+}
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public ImmutableArray<string> List { get; set; } = ImmutableArray<string>.Empty;
+
+    [Parameter]
+    public ImmutableArray<string> AlreadySelected { get; set; } = ImmutableArray<string>.Empty;
+
+    [Parameter, EditorRequired]
+    public EventCallback<string> OnAddItem { get; set; }
+
+    bool _showAddItem = false;
+    string _selectedNewItem = string.Empty;
+    MudTheme Theme = new();
+
+    void HandleAddBodyTarget(){
+        if (string.IsNullOrWhiteSpace(_selectedNewItem))
+            return;
+
+        OnAddItem.InvokeAsync(_selectedNewItem);
+        _showAddItem = false;
+        _selectedNewItem = string.Empty;
+    }
+}
