@@ -12,7 +12,7 @@ public record ExercisesState
     public DetailItem? SelectedExercise { get; init; } = null;
     public ExercisesFilter Filter { get; init; } = new();
 
-    public ImmutableArray<ListItem> DisplayList => Filter.FilterOptions.HasFilter
+    public ImmutableArray<ListItem> DisplayList => Filter.HasFilter
         ? Filter.Results
         : Exercises;
 }
@@ -27,20 +27,25 @@ public record DetailItem
     public bool IsActive { get; set; } = true;
 }
 
+public enum ActiveFilterOption
+{
+    Active,
+    Inactive,
+    NotSet
+}
+
 public record ExercisesFilter
 {
-    public ImmutableArray<string> AvailableBodyTargets { get; init; } = ImmutableArray<string>.Empty;
-
-    public ExercisesFilterOptions FilterOptions { get; init; } = new();
+    public ActiveFilterOption ActiveOption { get; set; } = ActiveFilterOption.Active;
+    public string SearchTerm { get; init; } = string.Empty;
+    public ImmutableList<CheckItem> BodyTargets { get; init; } = ImmutableList<CheckItem>.Empty;
+    public ImmutableList<CheckItem> CheckedBodyTargets => BodyTargets.Where(x => x.IsChecked).ToImmutableList();
+    public bool HasFilter =>
+        ActiveOption != ActiveFilterOption.NotSet ||
+        !string.IsNullOrEmpty(SearchTerm) ||
+        BodyTargets.Count(x => x.IsChecked) > 0;
 
     public ImmutableArray<ListItem> Results { get; init; } = ImmutableArray<ListItem>.Empty;
 }
 
-public record ExercisesFilterOptions
-{
-    public string SearchTerm { get; init; } = string.Empty;
-    public ImmutableList<string> BodyTargets { get; init; } = ImmutableList<string>.Empty;
-    public bool HasFilter =>
-        !string.IsNullOrEmpty(SearchTerm) ||
-        BodyTargets.Count > 0;
-}
+public record CheckItem(string Name, bool IsChecked);

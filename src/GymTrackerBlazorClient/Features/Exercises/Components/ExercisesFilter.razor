@@ -1,34 +1,143 @@
 ﻿@using GymTracker.BlazorClient.Features.Exercises.Store;
+@using System.Collections.Immutable;
+@using GymTracker.BlazorClient.Shared.Store;
+@using Store = GymTracker.BlazorClient.Features.Exercises.Store
+
+@inherits FluxorComponent
+
+@inject IState<ExercisesState> State
+@inject IDispatcher Dispatcher
+
 <MudToolBar 
     Class="px-2 z-10"
     Style="@toolBarStyle"
-            WrapContent="false">
-    <MudTextField 
-        Value="FilterOptions.SearchTerm"
-        ValueChanged="(string newText) => HandleSearchTermChanged(newText)"
-        Label="Search"
-        Variant="Variant.Text"
-        Adornment="Adornment.End"
-        AdornmentIcon="@Icons.Material.Filled.Search"
-        Margin="Margin.Dense"
-        Immediate="true" />
-    <MudIconButton 
-        Icon="@Icons.Material.Filled.FilterList"
-        Color="Color.Inherit"
-        Class="pb-0" />
+    WrapContent="false">
+    <div class="d-flex" style="width:100%">
+        <MudTextField 
+            Class="mt-0"
+            Value="Filter.SearchTerm"
+            ValueChanged="(string newText) => HandleSearchTermChanged(newText)"
+            Label="Search"
+            Variant="Variant.Text"
+            Adornment="Adornment.End"
+            AdornmentIcon="@Icons.Material.Filled.Search"
+            Margin="Margin.Dense"
+            Immediate="true" />
+    
+        <div>
+            <MudIconButton 
+                Icon="@Icons.Material.Filled.FilterList"
+                Color="Color.Inherit"
+                Class="pb-0"
+                OnClick="ToggleShowingTargetBodyFilter" />
+
+            <MudPopover 
+                Open="@_showingTargetBodyFilter" 
+                @onclick:stopPropagation="true" 
+                Fixed="true" 
+                AnchorOrigin="Origin.BottomCenter" 
+                TransformOrigin="Origin.BottomCenter" 
+                Class="pa-4">
+                <MudText Typo="Typo.h5">Filter Exercises</MudText>
+                <MudDivider Class="mb-2"></MudDivider>
+                <MudGrid Class="ml-0 pl-0">
+                    <MudItem xs="4" Class="pl-0">
+                        <MudText Typo="Typo.subtitle1">Active Status</MudText>
+                        <MudRadioGroup 
+                            SelectedOption="Filter.ActiveOption"
+                            SelectedOptionChanged="(ActiveFilterOption option) => HandleSetActiveFilter(option)">
+                            <MudRadio Class="ml-n1" Color="Color.Primary" Option="@(ActiveFilterOption.Active)" Dense="true">Active</MudRadio>
+                            <MudRadio Class="ml-n1" Color="Color.Primary" Option="@(ActiveFilterOption.Inactive)" Dense="true">Inactive</MudRadio>
+                            <MudRadio Class="ml-n1" Color="Color.Primary" Option="@(ActiveFilterOption.NotSet)" Dense="true">NotSet</MudRadio>
+                        </MudRadioGroup>
+                    </MudItem>
+                    <MudItem>
+                        <MudText Typo="Typo.subtitle1">Body Target</MudText>
+                        <MudList Class="pt-0">
+                            @foreach (var item in Filter.BodyTargets)
+                            {
+                                <MudListItem Class="pa-0">
+                                    <MudCheckBox Class="ma-0"
+                                                 Checked="@item.IsChecked"
+                                                 CheckedChanged="(bool _) => HandleBodyTargetCheckChanged(item)"
+                                                 Dense="true" Size="Size.Small" Label="@item.Name" Color="Color.Default" />
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudItem>
+                </MudGrid>
+            </MudPopover>
+        </div>
+    </div>
+
+    @ShowFilterResults()
+
 </MudToolBar>
 
 @code {
-    [Parameter, EditorRequired]
-    public EventCallback<ExercisesFilterOptions> OnFilter { get; set; }
+    string ActiveStatus => Filter.ActiveOption switch
+    {
+        ActiveFilterOption.Active => "Active Only",
+        ActiveFilterOption.Inactive => "Inactive Only",
+        _ => ""
+    };
 
-    [Parameter]
-    public ExercisesFilterOptions FilterOptions { get; set; } = default!;
+    RenderFragment? ShowFilterResults()
+    {
+        if (Filter.ActiveOption == ActiveFilterOption.NotSet && Filter.CheckedBodyTargets.Count == 0)
+            return null;
+
+        return
+            @<div style="width: 100%">
+                @if(Filter.ActiveOption != ActiveFilterOption.NotSet)
+                {
+                    <MudChip 
+                        class="ml-0" 
+                        Color="Color.Default" 
+                        OnClose="HandleRemoveActiveFilter">
+                        @ActiveStatus</MudChip>
+                }
+                @foreach(var item in Filter.CheckedBodyTargets)
+                {
+                    <MudChip 
+                        class="ml-0" 
+                        Color="Color.Default" 
+                        OnClose="() => HandleBodyTargetCheckChanged(item)">
+                        @item.Name
+                    </MudChip>
+                }
+            </div>;
+    }
+}
+
+@code {
+    Store.ExercisesFilter Filter => State.Value.Filter;
 
     MudTheme Theme = new();
     string toolBarStyle => $"position: sticky; top: 0; background-color: {Theme.PaletteDark.AppbarBackground}";
 
-    Task HandleSearchTermChanged(string term) =>
-        OnFilter.InvokeAsync(FilterOptions with { SearchTerm = term });
+    protected override void OnInitialized()
+    {
+        SubscribeToAction<UnhandledClickAction>(x => _showingTargetBodyFilter = false);
+        base.OnInitialized();
+    }
 
+    void HandleSearchTermChanged(string term) =>
+        Dispatcher.Dispatch(new FilterBySearchTermAction(term));
+
+    void HandleBodyTargetCheckChanged(CheckItem item) =>
+        Dispatcher.Dispatch(new ToggleFilterByBodyTargetAction(item));
+
+    void HandleRemoveActiveFilter() =>
+        Dispatcher.Dispatch(new FilterByIsActiveAction(ActiveFilterOption.NotSet));
+
+    void HandleSetActiveFilter(ActiveFilterOption activeOption) =>
+        Dispatcher.Dispatch(new FilterByIsActiveAction(activeOption));
+
+    bool _showingTargetBodyFilter;
+
+    public void ToggleShowingTargetBodyFilter()
+    {
+        _showingTargetBodyFilter = !_showingTargetBodyFilter;
+    }
 }

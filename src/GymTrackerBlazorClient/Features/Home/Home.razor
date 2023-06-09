@@ -5,12 +5,14 @@
 @inject NavigationManager NavigationManager
 @inject IDispatcher Dispatcher
 
-<h3>Home</h3>
+<MudContainer Class="pa-3 ma-0">
+    <MudButton 
+        Variant="Variant.Filled"
+        Color="Color.Default"
+        Style="height: 200px; width: 200px"
+        OnClick="HandleManageExercises">Manage Exercises</MudButton>
+</MudContainer>
 
-<MudButton 
-    Variant="Variant.Filled" 
-    Color="Color.Primary"
-    OnClick="HandleManageExercises">Manage Exercises</MudButton>
 
 @code {
     protected override void OnInitialized()

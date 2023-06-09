@@ -8,21 +8,39 @@ namespace GymTracker.BlazorClient.Features.Exercises.Store;
 public static class ExercisesReducers
 {
     [ReducerMethod]
-    public static ExercisesState OnSetExercises(ExercisesState state, SetExercisesAction action) =>
-        state with
+    public static ExercisesState OnSetExercises(ExercisesState state, SetExercisesAction action)
+    {
+        var bodyTargets = action.Exercises
+                        .SelectMany(x => x.BodyTarget)
+                        .Distinct()
+                        .OrderBy(x => x)
+                        .Select(x => new CheckItem(x, false))
+                        .ToImmutableList();
+
+        var response = state with
         {
             OriginalList = action.Exercises.ToImmutableArray(),
             Exercises = action.Exercises
                 .OrderBy(x => x.Name)
                 .Select(ToListItem)
                 .ToImmutableArray(),
-            SelectedExercise = state.SelectedExercise is not null
-                ? action.Exercises
-                        .SingleOrDefault(x => x.Id == state.SelectedExercise.Id)?
-                        .ToDetailItem()
-                : null,
-            Filter = state.Filter.BuildResults(action.Exercises)
+            SelectedExercise = null,
+            Filter = new ExercisesFilter
+            {
+                ActiveOption = ActiveFilterOption.Active,
+                SearchTerm = string.Empty,
+                BodyTargets = bodyTargets,
+                Results = action.Exercises
+                                .Filter(
+                                    ActiveFilterOption.Active,
+                                    string.Empty,
+                                    bodyTargets)
+                                .ToImmutableArray()
+            }
         };
+
+        return response;
+    }
 
     [ReducerMethod]
     public static ExercisesState OnSetExercise(ExercisesState state, SetExerciseAction action) =>
@@ -46,26 +64,86 @@ public static class ExercisesReducers
         state with { SelectedExercise = new DetailItem { Id = Guid.NewGuid(), MetricType = MetricType.Weight } };
 
     [ReducerMethod]
-    public static ExercisesState OnFilter(ExercisesState state, FilterAction action) =>
+    public static ExercisesState OnFilterByIsActiveAction(ExercisesState state, FilterByIsActiveAction action) =>
         state with
         {
-            Filter = new ExercisesFilter
+            Filter = state.Filter with
             {
-                AvailableBodyTargets = state.Filter.AvailableBodyTargets,
-                FilterOptions = action.FilterOptions,
-            }.BuildResults(state.OriginalList)
+                ActiveOption = action.ActiveOption,
+                Results = state.OriginalList
+                    .Filter(
+                        action.ActiveOption,
+                        state.Filter.SearchTerm, 
+                        state.Filter.BodyTargets)
+                    .ToImmutableArray(),
+            }
         };
-    
 
-    private static ExercisesFilter BuildResults(this ExercisesFilter filterOptions, IEnumerable<Exercise> exerciseList) =>
-        filterOptions with
+    [ReducerMethod]
+    public static ExercisesState OnFilterBySearchTermAction(ExercisesState state, FilterBySearchTermAction action) =>
+        state with
         {
-            Results = exerciseList
-                        .Where(x => x.Name.Contains(filterOptions.FilterOptions.SearchTerm, StringComparison.InvariantCultureIgnoreCase))
-                        .Select(ToListItem)
-                        .ToImmutableArray()
+            Filter = state.Filter with
+            {
+                SearchTerm = action.SearchTerm,
+                Results = state.OriginalList
+                    .Filter(
+                        state.Filter.ActiveOption,
+                        action.SearchTerm,
+                        state.Filter.BodyTargets)
+                    .ToImmutableArray(),
+            }
         };
-    
+
+    [ReducerMethod]
+    public static ExercisesState OnToggleFilterByBodyTarget(ExercisesState state, ToggleFilterByBodyTargetAction action)
+    {
+        var existing = action.BodyTargetItem;
+        var newTargetItem = existing with { IsChecked = !existing.IsChecked };
+        var newList = state.Filter.BodyTargets.Replace(existing, newTargetItem);
+
+        return state with
+        {
+            Filter = state.Filter with
+            {
+                BodyTargets = newList,
+                Results = state.OriginalList
+                .Filter(
+                    state.Filter.ActiveOption,
+                    state.Filter.SearchTerm, 
+                    newList)
+                .ToImmutableArray()
+            }
+        };
+    }
+
+    private static IEnumerable<ListItem> Filter(
+        this IEnumerable<Exercise> exerciseList,
+        ActiveFilterOption activeOption,
+        string searchTerm,
+        IEnumerable<CheckItem> bodyTargets)
+    {
+        var selectedBodyTargets = bodyTargets
+            .Where(bt => bt.IsChecked)
+            .Select(x => x.Name)
+            .ToList();
+
+        var hasBodyTargetsFilter =
+            selectedBodyTargets.Count > 0 &&
+            selectedBodyTargets.Count != bodyTargets.Count();
+
+        return exerciseList
+            .Where(x => activeOption switch
+            {
+                ActiveFilterOption.Active => x.IsAcitve,
+                ActiveFilterOption.Inactive => !x.IsAcitve,
+                _ => true
+            })
+            .Where(x => searchTerm is null || x.Name.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
+            .Where(x => !hasBodyTargetsFilter || x.BodyTarget.Intersect(selectedBodyTargets).Any())
+            .Select(ToListItem);
+    }
+
     private static ListItem ToListItem(this Exercise exercise) =>
         new ListItem(exercise.Id, exercise.Name, exercise.IsAcitve);
 
