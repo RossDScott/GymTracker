@@ -7,12 +7,20 @@
     @foreach (var item in List)
     {
         <MudChip 
-            Color="Color.Info"
+            Color="Color.Default"
             OnClose="() => OnRemove.InvokeAsync(item)">
             @item
         </MudChip>
     }
-    <AddListItem OnAddItem="OnAdd"></AddListItem>
+    @if (AddPickList == null)
+    {
+        <AddListItem OnAddItem="OnAdd"></AddListItem>
+    }
+    else
+    {
+        <AddFromList OnAddItem="OnAdd" List="AddPickList.Value" Label="@Label"></AddFromList>
+    }
+    
 </MudField>
 
 @code {
@@ -20,7 +28,10 @@
     public string Label { get; set; } = default!;
 
     [Parameter]
-    public ImmutableList<string> List { get; set; } = default!;
+    public ImmutableArray<string>? AddPickList { get; set; } = null;
+
+    [Parameter]
+    public ImmutableArray<string> List { get; set; } = default!;
 
     [Parameter]
     public EventCallback<string> OnAdd { get; set; }

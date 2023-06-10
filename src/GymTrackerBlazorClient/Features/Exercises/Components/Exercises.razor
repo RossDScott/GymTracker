@@ -18,7 +18,7 @@
             </ExercisesFilter>
             <MudList 
                 Class="z-0"
-                Color="Color.Surface"
+                Color="Color.Info"
                 Clickable="true"
                 SelectedValue="State.Value.SelectedExercise?.Id">
                 @foreach (var item in State.Value.DisplayList)
@@ -43,6 +43,7 @@
         {
             <Exercise
                 TargetBodyParts="State.Value.TargetBodyParts"
+                Equipment="State.Value.Equipment"
                 ExerciseDetail="State.Value.SelectedExercise"
                 OnExerciseUpdated="HandleUpdateExercise">
             </Exercise>
@@ -73,7 +74,16 @@
         SubscribeToAction<NavigateToNewExerciseAction>(action =>
             NaviagationManager.NavigateTo($"/exercises/{action.Id}"));
 
-        Dispatcher.Dispatch(new FetchExercisesAction());
+        SubscribeToAction<SetExerciseAction>(action =>
+        {
+            Dispatcher.Dispatch(new SetBreadcrumbAction(new[]
+            {
+                new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
+                new BreadcrumbItem(action.Exercise.Name, $"/exercises/{action.Exercise.Id}", false, Icons.Material.Filled.Edit),
+            }));
+        });
+
+        Dispatcher.Dispatch(new FetchExercisesAction(Id));
         Dispatcher.Dispatch(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List)
@@ -112,16 +122,8 @@
         }
     }
 
-    void HandleExerciseSelected(ListItem item)
-    {
+    void HandleExerciseSelected(ListItem item) =>
         NaviagationManager.NavigateTo($"/exercises/{item.Id}");
-
-        Dispatcher.Dispatch(new SetBreadcrumbAction(new[]
-        {
-            new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
-            new BreadcrumbItem(item.Name, $"/exercises/{item.Id}", false, Icons.Material.Filled.Edit),
-        }));
-    }
     
     void HandleAddNewExercise() =>
         NaviagationManager.NavigateTo($"/exercises/new");

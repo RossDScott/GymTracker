@@ -9,6 +9,6 @@ public record AppSettingsState
 {
     public Models.ClientStorage.AppSettings Settings { get; init; } = default!;
 
-    public ImmutableList<string> BodyTargets { get; set; } = ImmutableList<string>.Empty!;
-    public ImmutableList<string> Equipment { get; set; } = ImmutableList<string>.Empty!;
+    public ImmutableArray<string> BodyTargets { get; set; } = ImmutableArray<string>.Empty!;
+    public ImmutableArray<string> Equipment { get; set; } = ImmutableArray<string>.Empty!;
 }

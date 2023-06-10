@@ -1,5 +1,6 @@
 ﻿@using FluentValidation;
 @using GymTracker.BlazorClient.Features.Common
+@using GymTracker.BlazorClient.Features.Common.ListItemFieldEditor
 @using GymTracker.BlazorClient.Features.Exercises.Store;
 @using GymTracker.Domain.Models;
 @using System.Collections.Immutable;
@@ -33,23 +34,19 @@
                 }
             </MudSelect>
 
-            <MudField
-                Class="mt-6"
-                Label="Body Target" 
-                Variant="Variant.Outlined">
-                @foreach (var item in _bodyTargets)
-                {
-                    <MudChip 
-                        Color="Color.Default"
-                        OnClose="() => HandleRemoveBodyTarget(item)">
-                        @item
-                    </MudChip>
-                }
-                <AddFromList
-                    Label="Body Target"
-                    List="TargetBodyParts"
-                    OnAddItem="HandleAddBodyTarget"></AddFromList>
-            </MudField>
+            <ListEditor
+                Label="Body Target"
+                List="_bodyTargets"
+                AddPickList="TargetBodyParts"
+                OnAdd="HandleAddBodyTarget"
+                OnRemove="HandleRemoveBodyTarget"></ListEditor>
+
+            <ListEditor 
+                Label="Equipment"
+                List="_equipment"
+                AddPickList="Equipment"
+                OnAdd="HandleAddEquipment"
+                OnRemove="HandleRemoveEquipment"></ListEditor>
 
             <MudSwitch 
                 Checked="_isActive" 
@@ -68,6 +65,9 @@
     [Parameter]
     public ImmutableArray<string> TargetBodyParts { get; set; } = ImmutableArray<string>.Empty;
 
+    [Parameter]
+    public ImmutableArray<string> Equipment { get; set; } = ImmutableArray<string>.Empty;
+
     [Parameter, EditorRequired]
     public DetailItem ExerciseDetail { get; set; } = default!;
 
@@ -78,14 +78,16 @@
 
     string _exerciseName = string.Empty;
     MetricType _metricType = MetricType.Weight;
-    List<string> _bodyTargets = new();
+    ImmutableArray<string> _bodyTargets = ImmutableArray<string>.Empty;
+    ImmutableArray<string> _equipment = ImmutableArray<string>.Empty;
     bool _isActive = true;
 
     protected override void OnParametersSet()
     {
         _exerciseName = ExerciseDetail.Name;
         _metricType = ExerciseDetail.MetricType;
-        _bodyTargets = ExerciseDetail.BodyTarget.ToList();
+        _bodyTargets = ExerciseDetail.BodyTarget;
+        _equipment = ExerciseDetail.Equipment;
         _isActive = ExerciseDetail.IsActive;
 
         _form?.ResetValidation();
@@ -101,13 +103,25 @@
 
     async Task HandleAddBodyTarget(string newBodyTarget)
     {
-        _bodyTargets.Add(newBodyTarget);
+        _bodyTargets = _bodyTargets.Add(newBodyTarget);
         await HandleUpdateExercise();
     }
 
     async Task HandleRemoveBodyTarget(string bodyTarget)
     {
-        _bodyTargets.Remove(bodyTarget);
+        _bodyTargets = _bodyTargets.Remove(bodyTarget);
+        await HandleUpdateExercise();
+    }
+
+    async Task HandleAddEquipment(string equipment)
+    {
+        _equipment = _equipment.Add(equipment);
+        await HandleUpdateExercise();
+    }
+
+    async Task HandleRemoveEquipment(string equipment)
+    {
+        _equipment = _equipment.Remove(equipment);
         await HandleUpdateExercise();
     }
 
@@ -128,7 +142,8 @@
             {
                 Name = _exerciseName,
                 MetricType = _metricType,
-                BodyTarget = _bodyTargets.ToImmutableArray(),
+                BodyTarget = _bodyTargets,
+                Equipment = _equipment,
                 IsActive = _isActive
             };
 

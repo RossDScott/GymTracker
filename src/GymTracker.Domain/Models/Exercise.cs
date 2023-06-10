@@ -18,5 +18,6 @@ public record Exercise
     public string Name { get; set; } = default!;
     public MetricType MetricType { get; set; }
     public string[] BodyTarget { get; set; } = Array.Empty<string>();
+    public string[] Equipment { get; set; } = Array.Empty<string>();
     public bool IsAcitve { get; set; } = true;
 }

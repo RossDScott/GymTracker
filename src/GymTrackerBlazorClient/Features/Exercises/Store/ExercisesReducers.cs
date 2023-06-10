@@ -41,6 +41,14 @@ public static class ExercisesReducers
             }
         };
 
+        if(action.SelectedId is not null)
+            response = response with
+            {
+                SelectedExercise = action.Exercises
+                    .Single(x => x.Id == action.SelectedId.Value)
+                    .ToDetailItem()
+            };
+        
         return response;
     }
 
@@ -67,7 +75,8 @@ public static class ExercisesReducers
             {
                 Name = action.Exercise.Name,
                 MetricType = action.Exercise.MetricType,
-                BodyTarget = action.Exercise.BodyTarget.ToImmutableArray(),
+                BodyTarget = action.Exercise.BodyTarget,
+                Equipment = action.Exercise.Equipment,
                 IsActive = action.Exercise.IsActive
             }
         };
@@ -167,6 +176,7 @@ public static class ExercisesReducers
             Name = exercise.Name,
             MetricType = exercise.MetricType,
             BodyTarget = exercise.BodyTarget.ToImmutableArray(),
+            Equipment = exercise.Equipment.ToImmutableArray(),
             IsActive = exercise.IsAcitve
         };
 }

@@ -10,8 +10,8 @@ public static class AppSettingsReducer
         state with 
         { 
             Settings = action.Settings,
-            BodyTargets = action.TargetBodyParts.OrderBy(x => x).ToImmutableList(),
-            Equipment = action.Equipment.OrderBy(x => x).ToImmutableList()
+            BodyTargets = action.TargetBodyParts.OrderBy(x => x).ToImmutableArray(),
+            Equipment = action.Equipment.OrderBy(x => x).ToImmutableArray()
         };
 
     [ReducerMethod]
@@ -20,10 +20,9 @@ public static class AppSettingsReducer
 
     [ReducerMethod]
     public static AppSettingsState OnSetTargetBody(AppSettingsState state, SetTargetBodyAction action) =>
-        state with { BodyTargets = action.TargetBodyParts.OrderBy(x => x).ToImmutableList() };
+        state with { BodyTargets = action.TargetBodyParts.OrderBy(x => x).ToImmutableArray() };
 
     [ReducerMethod]
     public static AppSettingsState OnSetExercises(AppSettingsState state, SetEquipmentAction action) =>
-        state with { Equipment = action.Equipment.OrderBy(x => x).ToImmutableList() };
-
+        state with { Equipment = action.Equipment.OrderBy(x => x).ToImmutableArray() };
 }

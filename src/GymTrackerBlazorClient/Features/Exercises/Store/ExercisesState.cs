@@ -27,6 +27,7 @@ public record DetailItem
     public string Name { get; init; } = default!;
     public MetricType MetricType { get; init; }
     public ImmutableArray<string> BodyTarget { get; init; } = ImmutableArray<string>.Empty;
+    public ImmutableArray<string> Equipment { get; init; } = ImmutableArray<string>.Empty;
     public bool IsActive { get; set; } = true;
 }
 

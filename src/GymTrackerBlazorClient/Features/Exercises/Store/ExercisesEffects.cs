@@ -21,6 +21,7 @@ public class ExercisesEffects
         var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
         
         dispatcher.Dispatch(new SetInitialDataAction(
+            action.SelectedId,
             targetBodyParts,
             equipment,
             exercises));
@@ -52,6 +53,7 @@ public class ExercisesEffects
         exercise.Name = updateDTO.Name;
         exercise.MetricType = updateDTO.MetricType;
         exercise.BodyTarget = updateDTO.BodyTarget.ToArray();
+        exercise.Equipment = updateDTO.Equipment.ToArray();
         exercise.IsAcitve = updateDTO.IsActive;
 
         await _clientStorage.Exercises.SetAsync(exercises);
