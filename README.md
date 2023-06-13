@@ -27,4 +27,12 @@ A live version can be viewed here: https://black-forest-08f9d5303.1.azurestatica
 
 ### POC 4 Blazor & Fluxor
 
-Initial release soon, currently experimenting...
+In POC 4 I've explored how to use the Fluxor library with my design
+
+No live version with this one
+
+### Main App
+
+Taking my learnings from POC 4, I'm now building the actual app
+
+Live version can be viewed here: https://victorious-pebble-0364f5d03.3.azurestaticapps.net/
