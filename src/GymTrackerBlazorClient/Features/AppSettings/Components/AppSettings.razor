@@ -14,7 +14,7 @@
         <MudCardContent>
             <MudText>Backup</MudText>
             <MudTextField 
-                Value="State.Value.Settings?.AzureBlobBackupContainerSASURI"
+                Value="State.Value?.AzureBlobBackupContainerSASURI"
                 ValueChanged="(string value) => HandleAzureBlobBackupContainerSASURIChanged(value)"
                 Label="Azure Blob Container SAS Uri" 
                 Variant="Variant.Outlined">
@@ -35,18 +35,24 @@
             <MudText>Exercise Lookups</MudText>
             <ListEditor
                 Label="Target Body Part"
-                List="State.Value.BodyTargets"
-                OnAdd="HandleAddTargetBody"
-                OnRemove="HandleDeleteTargetBody"></ListEditor>
+                List="State.Value.TargetBodyParts"
+                OnChange="HandleTargetBodyPartsChange">
+            </ListEditor>
         </MudCardContent>
         <MudCardContent>
             <ListEditor 
                 Label="Equipment"
                 List="State.Value.Equipment"
-                OnAdd="HandleAddEquipment"
-                OnRemove="HandleDeleteEquipment"></ListEditor>
+                OnChange="HandleEquipmentChange">
+            </ListEditor>
         </MudCardContent>
-
+        <MudCardContent>
+            <ListEditor 
+                Label="Set Types"
+                List="State.Value.SetType"
+                OnChange="HandleSetTypesChange">
+            </ListEditor>
+        </MudCardContent>
     </MudCard>
 </MudContainer>
 
@@ -62,16 +68,17 @@
     }
 
     void HandleAzureBlobBackupContainerSASURIChanged(string value) =>
-        Dispatcher.Dispatch(new UpdateSettingsAction(State.Value.Settings with 
-                {
-                    AzureBlobBackupContainerSASURI = value
-                }));
+        Dispatcher.Dispatch(new UpdateAzureBlobBackupContainerSASURIAction(value));
 
     void HandleBackupAll() => Dispatcher.Dispatch(new BackupAllAction());
     void HandleRestoreAll() => Dispatcher.Dispatch(new RestoreAllAction());
 
-    void HandleAddTargetBody(string targetBody) => Dispatcher.Dispatch(new AddTargetBodyAction(targetBody));
-    void HandleDeleteTargetBody(string targetBody) => Dispatcher.Dispatch(new DeleteTargetBodyAction(targetBody));
-    void HandleAddEquipment(string equipment) => Dispatcher.Dispatch(new AddEquipmentAction(equipment));
-    void HandleDeleteEquipment(string equipment) => Dispatcher.Dispatch(new DeleteEquipmentAction(equipment));
+    void HandleTargetBodyPartsChange(ImmutableArray<string> targetBodyParts) =>
+        Dispatcher.Dispatch(new UpdateTargetBodyAction(targetBodyParts));
+
+    void HandleEquipmentChange(ImmutableArray<string> equipment) =>
+        Dispatcher.Dispatch(new UpdateEquipmentAction(equipment));
+
+    void HandleSetTypesChange(ImmutableArray<string> setTypes) =>
+        Dispatcher.Dispatch(new UpdateSetTypesAction(setTypes));
 }

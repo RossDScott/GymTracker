@@ -19,6 +19,15 @@
         Variant="Variant.Outlined"
         Color="Color.Default"
         Style="height: 200px; width: 200px"
+        OnClick="HandleManageWorkoutPlans">
+        Workout Plans
+    </MudButton>
+
+    <MudButton 
+        Class="ml-2"
+        Variant="Variant.Outlined"
+        Color="Color.Default"
+        Style="height: 200px; width: 200px"
         OnClick="HandleManageSettings">
         Settings
     </MudButton>
@@ -33,5 +42,6 @@
     }
 
     void HandleManageExercises() => NavigationManager.NavigateTo("exercises");
+    void HandleManageWorkoutPlans() => NavigationManager.NavigateTo("workout-plans");
     void HandleManageSettings() => NavigationManager.NavigateTo("settings");
 }

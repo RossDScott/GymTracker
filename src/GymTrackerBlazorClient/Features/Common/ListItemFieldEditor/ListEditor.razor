@@ -8,17 +8,17 @@
     {
         <MudChip 
             Color="Color.Default"
-            OnClose="() => OnRemove.InvokeAsync(item)">
+            OnClose="() => HandleRemove(item)">
             @item
         </MudChip>
     }
     @if (AddPickList == null)
     {
-        <AddListItem OnAddItem="OnAdd"></AddListItem>
+        <AddListItem OnAddItem="HandleAdd"></AddListItem>
     }
     else
     {
-        <AddFromList OnAddItem="OnAdd" List="AddPickList.Value" Label="@Label"></AddFromList>
+        <AddFromList OnAddItem="HandleAdd" List="AddPickList.Value" Label="@Label"></AddFromList>
     }
     
 </MudField>
@@ -38,4 +38,21 @@
 
     [Parameter]
     public EventCallback<string> OnRemove { get; set; }
+
+    [Parameter]
+    public EventCallback<ImmutableArray<string>> OnChange { get; set; }
+
+    async Task HandleAdd(string item)
+    {
+        var newList = List.Add(item);
+        await OnAdd.InvokeAsync(item);
+        await OnChange.InvokeAsync(newList);
+    }
+
+    async Task HandleRemove(string item)
+    {
+        var newList = List.Remove(item);
+        await OnRemove.InvokeAsync(item);
+        await OnChange.InvokeAsync(newList);
+    }
 }

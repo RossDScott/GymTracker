@@ -1,6 +1,7 @@
 ﻿using GymTracker.Domain.Models;
 using GymTracker.Domain.Abstractions.Services.ClientStorage;
 using GymTracker.Domain.Models.ClientStorage;
+using System.Collections.Immutable;
 
 namespace GymTracker.Domain.Services;
 public class DefaultDataBuilderService
@@ -14,37 +15,37 @@ public class DefaultDataBuilderService
 
     public async Task BuildDefaultData()
     {
-        await BuildBodyTargets();
-        await BuildEquipment();
+        await BuildAppSettings();
         await BuildExercises();
-
-        var settings = new AppSettings();
-        await _clientStorage.AppSettings.SetAsync(settings);
 
         await _clientStorage.HasInitialisedDefaultData.SetAsync(true);
     }
 
-    private async Task BuildBodyTargets()
+    private async Task BuildAppSettings()
     {
-        var bodyTargets = new List<string>
+        var settings = new AppSettings
         {
-            "Core", "Arms", "Back", "Chest", "Legs", "Shoulders"
+            TargetBodyParts = BuildBodyTargets().ToImmutableArray(),
+            Equipment = BuildEquipment().ToImmutableArray(),
+            SetType = BuildSetTypes().ToImmutableArray()
         };
-        bodyTargets = bodyTargets.OrderBy(x => x).ToList();
-        
-        await _clientStorage.TargetBodyParts.SetAsync(bodyTargets);
+        await _clientStorage.AppSettings.SetAsync(settings);
     }
 
-    private async Task BuildEquipment()
+    private string[] BuildBodyTargets() => new string[]
     {
-        var equipment = new List<string>
-        {
-            "Barbell", "Dumbbel", "Pulley", "Spin Bike", "Treadmill", "Floor"
-        };
-        equipment = equipment.OrderBy(x => x).ToList();
+        "Core", "Arms", "Back", "Chest", "Legs", "Shoulders"
+    };
 
-        await _clientStorage.Equipment.SetAsync(equipment);
-    }
+    private string[] BuildEquipment() => new string[]
+    {
+        "Barbell", "Dumbbel", "Pulley", "Spin Bike", "Treadmill", "Floor"
+    };
+
+    private string[] BuildSetTypes() => new string[]
+    {
+        "Warm-up", "Set", "Drop-set"
+    };
 
     private async Task BuildExercises()
     {

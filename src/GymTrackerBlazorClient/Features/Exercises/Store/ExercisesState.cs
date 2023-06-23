@@ -1,4 +1,5 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Features.Common;
 using GymTracker.Domain.Models;
 using System.Collections.Immutable;
 
@@ -20,7 +21,7 @@ public record ExercisesState
         : Exercises;
 }
 
-public record ListItem(Guid Id, string Name, bool IsAcitve);
+
 public record DetailItem
 {
     public Guid Id { get; init; }

@@ -1,6 +1,7 @@
 ﻿using Fluxor;
 using GymTracker.Domain.Abstractions.Services.ClientStorage;
 using GymTracker.Domain.Services;
+using Models = GymTracker.Domain.Models;
 using MudBlazor;
 
 namespace GymTracker.BlazorClient.Features.AppSettings.Store;
@@ -27,17 +28,17 @@ public class AppSettingsEffects
     [EffectMethod]
     public async Task OnFetchSettings(FetchSettingsAction action, IDispatcher dispatcher)
     {
-        var settings = await _clientStorage.AppSettings.GetOrDefaultAsync();
-        var bodyTargets = await _clientStorage.TargetBodyParts.GetOrDefaultAsync();
-        var equipment = await _clientStorage.Equipment.GetOrDefaultAsync();
-
-        dispatcher.Dispatch(new SetSettingsAction(settings!, bodyTargets, equipment));
+        var settings = await GetSettings();
+        dispatcher.Dispatch(new SetSettingsAction(settings));
     }
 
     [EffectMethod]
-    public async Task OnUpdateSettings(UpdateSettingsAction action, IDispatcher dispatcher)
+    public async Task OnSetAzureBlobBackupContainerSASURI
+        (UpdateAzureBlobBackupContainerSASURIAction action, IDispatcher dispatcher)
     {
-        await _clientStorage.AppSettings.SetAsync(action.Settings);
+        var current = await GetSettings();
+        var updated = current with { AzureBlobBackupContainerSASURI = action.URI };
+        await _clientStorage.AppSettings.SetAsync(updated);
         _snackbar.Add("Backup SAS URI Updated", Severity.Success);
     }
 
@@ -56,38 +57,30 @@ public class AppSettingsEffects
     }
 
     [EffectMethod]
-    public async Task OnAddTargetBody(AddTargetBodyAction action, IDispatcher dispatcher)
-    {
-        var existing = await _clientStorage.TargetBodyParts.GetOrDefaultAsync();
-        existing.Add(action.TargetBody);
-        await _clientStorage.TargetBodyParts.SetAsync(existing);
-        dispatcher.Dispatch(new SetTargetBodyAction(existing));
-    }
+    public async Task OnTargetBodyPartsChange(UpdateTargetBodyAction action, IDispatcher dispatcher) =>
+        await UpdateSettings(settings =>
+            settings with { TargetBodyParts = action.TargetBodyParts }, dispatcher);
 
     [EffectMethod]
-    public async Task OnDeleteTargetBody(DeleteTargetBodyAction action, IDispatcher dispatcher)
-    {
-        var existing = await _clientStorage.TargetBodyParts.GetOrDefaultAsync();
-        existing.Remove(action.TargetBody);
-        await _clientStorage.TargetBodyParts.SetAsync(existing);
-        dispatcher.Dispatch(new SetTargetBodyAction(existing));
-    }
+    public async Task OnExercisesChange(UpdateEquipmentAction action, IDispatcher dispatcher) =>
+    await UpdateSettings(settings =>
+        settings with { Equipment = action.Equipment }, dispatcher);
 
     [EffectMethod]
-    public async Task OnAddExercise(AddEquipmentAction action, IDispatcher dispatcher)
+    public async Task OnSetTypesChange(UpdateSetTypesAction action, IDispatcher dispatcher) =>
+    await UpdateSettings(settings =>
+        settings with { SetType = action.SetTypes }, dispatcher);
+
+    private async Task UpdateSettings(
+        Func<Models.ClientStorage.AppSettings, Models.ClientStorage.AppSettings> updateFunc,
+        IDispatcher dispatcher)
     {
-        var existing = await _clientStorage.Equipment.GetOrDefaultAsync();
-        existing.Add(action.equipment);
-        await _clientStorage.Equipment.SetAsync(existing);
-        dispatcher.Dispatch(new SetEquipmentAction(existing));
+        var existing = await GetSettings();
+        var updated = updateFunc(existing);
+        await _clientStorage.AppSettings.SetAsync(updated);
+        dispatcher.Dispatch(new SetSettingsAction(updated));
     }
 
-    [EffectMethod]
-    public async Task OnDeleteEquipment(DeleteEquipmentAction action, IDispatcher dispatcher)
-    {
-        var existing = await _clientStorage.Equipment.GetOrDefaultAsync();
-        existing.Remove(action.equipment);
-        await _clientStorage.Equipment.SetAsync(existing);
-        dispatcher.Dispatch(new SetEquipmentAction(existing));
-    }
+    private ValueTask<Models.ClientStorage.AppSettings> GetSettings() => 
+        _clientStorage.AppSettings.GetOrDefaultAsync();
 }

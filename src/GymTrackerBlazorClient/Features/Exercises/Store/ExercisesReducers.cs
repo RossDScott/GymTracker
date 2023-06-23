@@ -1,7 +1,7 @@
 ﻿using Fluxor;
 using GymTracker.Domain.Models;
 using System.Collections.Immutable;
-using System.Runtime.CompilerServices;
+using GymTracker.BlazorClient.Features.Common;
 
 namespace GymTracker.BlazorClient.Features.Exercises.Store;
 
