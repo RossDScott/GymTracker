@@ -123,16 +123,25 @@
     }
 
     void HandleSearchTermChanged(string term) =>
-        Dispatcher.Dispatch(new FilterBySearchTermAction(term));
+        Dispatcher.Dispatch(new UpdateFilterAction(Filter with 
+            { SearchTerm = term }));
 
     void HandleBodyTargetCheckChanged(CheckItem item) =>
-        Dispatcher.Dispatch(new ToggleFilterByBodyTargetAction(item));
-
+        Dispatcher.Dispatch(new UpdateFilterAction(
+            Filter with
+                {
+                    BodyTargets = Filter.BodyTargets.Replace(item, item with 
+                        { IsChecked = !item.IsChecked })
+                }
+        ));
+    
     void HandleRemoveActiveFilter() =>
-        Dispatcher.Dispatch(new FilterByIsActiveAction(ActiveFilterOption.NotSet));
+        Dispatcher.Dispatch(new UpdateFilterAction(Filter with 
+            { ActiveOption = ActiveFilterOption.NotSet }));
 
     void HandleSetActiveFilter(ActiveFilterOption activeOption) =>
-        Dispatcher.Dispatch(new FilterByIsActiveAction(activeOption));
+        Dispatcher.Dispatch(new UpdateFilterAction(Filter with 
+            { ActiveOption = activeOption }));
 
     bool _showingTargetBodyFilter;
 

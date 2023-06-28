@@ -17,6 +17,4 @@ public record AddOrUpdateExerciseAction(DetailItem Exercise);
 public record CreateNewExerciseAction();
 public record NavigateToNewExerciseAction(Guid Id);
 
-public record FilterBySearchTermAction(string SearchTerm);
-public record ToggleFilterByBodyTargetAction(CheckItem BodyTargetItem);
-public record FilterByIsActiveAction(ActiveFilterOption ActiveOption);
+public record UpdateFilterAction(ExercisesFilter Filter);
