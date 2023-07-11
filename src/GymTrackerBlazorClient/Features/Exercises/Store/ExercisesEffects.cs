@@ -1,6 +1,7 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Features.AppBar.Store;
 using GymTracker.Domain.Abstractions.Services.ClientStorage;
+using GymTracker.Domain.Extensions;
 using GymTracker.Domain.Models;
 using MudBlazor;
 
@@ -40,9 +41,8 @@ public class ExercisesEffects
         var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
         var exercise = exercises.Single(x => x.Id == action.Id);
 
-        await Task.Delay(1);
-        dispatcher.Dispatch(new SetExerciseAction(exercise));
-        dispatcher.Dispatch(new SetBreadcrumbAction(new[]
+        await dispatcher.DispatchWithDelay(new SetExerciseAction(exercise));
+        await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
             new BreadcrumbItem(exercise.Name, $"/exercises/{exercise.Id}", false, Icons.Material.Filled.Edit),
@@ -54,9 +54,8 @@ public class ExercisesEffects
     {
         var newExercise = new Exercise { Id = Guid.NewGuid(), MetricType = MetricType.Weight };
 
-        await Task.Delay(1);
-        dispatcher.Dispatch(new SetExerciseAction(newExercise));
-        dispatcher.Dispatch(new SetBreadcrumbAction(new[]
+        await dispatcher.DispatchWithDelay(new SetExerciseAction(newExercise));
+        await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
             new BreadcrumbItem("New", "/exercises/new", false, Icons.Material.Filled.Add),
