@@ -61,65 +61,37 @@
         SubscribeToAction<NavigateToNewExerciseAction>(action =>
             NaviagationManager.NavigateTo($"/exercises/{action.Id}"));
 
-        SubscribeToAction<SetExerciseAction>(action =>
-        {
-            Dispatcher.Dispatch(new SetBreadcrumbAction(new[]
-            {
-                new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
-                new BreadcrumbItem(action.Exercise.Name, $"/exercises/{action.Exercise.Id}", false, Icons.Material.Filled.Edit),
-            }));
-        });
-
-        Dispatcher.Dispatch(new FetchExercisesAction(Id));
-        Dispatcher.Dispatch(new SetBreadcrumbAction(new[]
-        {
-            new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List)
-        }));
-
+        HandleSetupPageByLocation(NaviagationManager.Uri, true);
         base.OnInitialized();
     }
 
     protected override void OnParametersSet()
     {
-        if (Id is not null)
-            Dispatcher.Dispatch(new FetchExerciseAction(Id.Value));
-
+        HandleSetupPageByLocation(NaviagationManager.Uri);
         base.OnParametersSet();
     }
 
-    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        if (e.Location.EndsWith("new"))
-        {
-            Dispatcher.Dispatch(new CreateNewExerciseAction());
-            Dispatcher.Dispatch(new SetBreadcrumbAction(new[]
-            {
-                new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
-                new BreadcrumbItem("New", "/exercises/new", false, Icons.Material.Filled.Add),
-            }));
-        }
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e) =>
+        HandleSetupPageByLocation(e.Location);
 
-        if (e.Location.EndsWith("exercises"))
-        {
+    private void HandleSetupPageByLocation(string location, bool initialLoad = false)
+    {
+        if (location.EndsWith("exercises") || initialLoad)
             Dispatcher.Dispatch(new FetchExercisesAction());
-            Dispatcher.Dispatch(new SetBreadcrumbAction(new[]
-            {
-                new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List)
-            }));
-        }
+
+        if (Id is not null)
+            Dispatcher.Dispatch(new FetchExerciseAction(Id.Value));
+
+        if (location.EndsWith("new"))
+            Dispatcher.Dispatch(new CreateNewExerciseAction());
     }
 
     void HandleExerciseSelected(ListItem item) =>
         NaviagationManager.NavigateTo($"/exercises/{item.Id}");
-    
+
     void HandleAddNewExercise() =>
-        NaviagationManager.NavigateTo($"/exercises/new");
+        NaviagationManager.NavigateTo($"/exercises/new");  
 
     void HandleUpdateExercise(DetailItem updateDTO) =>
         Dispatcher.Dispatch(new AddOrUpdateExerciseAction(updateDTO));
-
-    public void Dispose()
-    {
-        NaviagationManager.LocationChanged -= HandleLocationChanged;
-    }
 }

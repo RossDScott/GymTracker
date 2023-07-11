@@ -6,10 +6,3 @@ public record ExerciseSet
 
 }
 
-public record ExerciseSetMetrics
-{
-    public int? Reps { get; init; }
-    public decimal? Weight { get; set; }
-    public decimal? Time { get; set; }
-    public decimal? Distance { get; set; }
-}

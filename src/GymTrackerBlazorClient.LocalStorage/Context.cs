@@ -9,6 +9,7 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
 {
     public IKeyListItem<Exercise> Exercises { get; init; } = default!;
     public IKeyItem<AppSettings> AppSettings { get; init; } = default!;
+    public IKeyListItem<WorkoutPlan> WorkoutPlans { get; init; } = default!;
 
     internal override void Configure()
     {

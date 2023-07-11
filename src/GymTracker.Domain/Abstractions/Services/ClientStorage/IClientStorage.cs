@@ -6,4 +6,5 @@ public interface IClientStorage : ILocalStorageContext
 {
     IKeyItem<AppSettings> AppSettings { get; init; }
     IKeyListItem<Exercise> Exercises { get; init; }
+    IKeyListItem<WorkoutPlan> WorkoutPlans { get; init; }
 }

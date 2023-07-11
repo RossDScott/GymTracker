@@ -20,22 +20,14 @@ public static class ExercisesReducers
             TargetBodyParts = targetBodyParts,
             Equipment = action.Equipment.OrderBy(x => x).ToImmutableArray(),
             OriginalList = action.Exercises.ToImmutableArray(),
-            SelectedExercise = null,
             Filter = new ExercisesFilter
             {
                 ActiveOption = ActiveFilterOption.Active,
                 SearchTerm = string.Empty,
                 BodyTargets = targetBodyParts.Select(x => new CheckItem(x, false)).ToImmutableList(),
-            }
+            },
+            SelectedExercise = null
         }.FilterExercises();
-
-        if(action.SelectedId is not null)
-            initialState = initialState with
-            {
-                SelectedExercise = action.Exercises
-                    .Single(x => x.Id == action.SelectedId.Value)
-                    .ToDetailItem()
-            };
         
         return initialState;
     }
@@ -48,7 +40,9 @@ public static class ExercisesReducers
     [ReducerMethod]
     public static ExercisesState OnSetExercise(ExercisesState state, SetExerciseAction action) =>
         state with 
-            { SelectedExercise = action.Exercise.ToDetailItem() };
+        { 
+            SelectedExercise = action.Exercise.ToDetailItem() 
+        };
 
     [ReducerMethod]
     public static ExercisesState OnAddOrUpdateExercise(ExercisesState state, AddOrUpdateExerciseAction action) =>

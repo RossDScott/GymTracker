@@ -9,4 +9,5 @@ public record KeyConfig<T>
 {
     public bool AutoBackup { get; set; } = true;
     public Func<T>? DefaultConstructor { get; set; } = null;
+    public bool CacheDataa { get; set; } = true;
 }
