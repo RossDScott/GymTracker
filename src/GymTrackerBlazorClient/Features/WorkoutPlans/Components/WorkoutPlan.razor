@@ -1,5 +1,84 @@
-﻿<h3>WorkoutPlan</h3>
+﻿@using GymTracker.BlazorClient.Features.Common.FullHeightList
+@using GymTracker.BlazorClient.Features.Common;
+@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+@using System.Collections.Immutable;
+<MudPaper Class="pa-2">
+    <MudForm @ref="_form">
+        <MudStack Class="fullHeight ma-0">
+            <MudTextField 
+                @bind-Value="_workoutPlanName"
+                For="@(() => _workoutPlanName)"
+                Immediate="true"
+                DebounceInterval="500"
+                OnDebounceIntervalElapsed="HandleUpdateWorkoutPlan"
+                Label="Workout Plan Name"
+                Variant="Variant.Outlined"
+                Required="true" 
+                RequiredError="Workout Plan Name required!">
+            </MudTextField>
+
+            <MudItem xs="4" Class="mb-0 fullHeight fullWidth" Style="position: relative">
+                <MudText Typo="Typo.overline">Planned Exercises</MudText>
+                <FullHeightList 
+                    List="_plannedExercises"
+                    SelectedId="SelectedExerciseId"
+                    OnItemClick="HandleExerciseSelected">
+                </FullHeightList>
+            </MudItem>
+
+        </MudStack>
+    </MudForm>
+</MudPaper>
 
 @code {
+    [Parameter, EditorRequired]
+    public WorkoutPlanDetail WorkoutPlanDetail { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<WorkoutPlanDetail> OnWorkoutPlanUpdated { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<Guid> OnExerciseSelected { get; set; }
+
+    [Parameter, EditorRequired]
+    public Guid? SelectedExerciseId { get; set; } = null;
+
+    MudForm _form;
+    string _workoutPlanName = string.Empty;
+    bool _isActive = true;
+
+    ImmutableArray<ListItem> _plannedExercises = ImmutableArray<ListItem>.Empty;
+
+    protected override void OnParametersSet()
+    {
+        _workoutPlanName = WorkoutPlanDetail.Name;
+        _plannedExercises = WorkoutPlanDetail.PlannedExercises;
+
+        _isActive = WorkoutPlanDetail.IsActive;
+
+        _form?.ResetValidation();
+
+        base.OnParametersSet();
+    }
+
+    async Task HandleUpdateWorkoutPlan()
+    {
+        await _form.Validate();
+
+        if (!_form.IsValid)
+            return;
+
+        var updateDTO = WorkoutPlanDetail with
+            {
+                Name = _workoutPlanName,
+
+                IsActive = _isActive
+            };
+
+        await OnWorkoutPlanUpdated.InvokeAsync(updateDTO);
+    }
+
+    void HandleExerciseSelected(ListItem item) => OnExerciseSelected.InvokeAsync(item.Id);
+
 
 }

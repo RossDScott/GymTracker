@@ -5,6 +5,8 @@ public record WorkoutPlan
     public string Name { get; set; } = string.Empty;
 
     public ICollection<PlannedExercise> PlannedExercises { get; set; } = new List<PlannedExercise>();
+
+    public bool IsAcitve { get; set; } = true;
 }
 
 public record PlannedExercise

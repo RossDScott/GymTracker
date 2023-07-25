@@ -10,12 +10,10 @@ namespace GymTracker.BlazorClient.Features.Exercises.Store;
 public class ExercisesEffects
 {
     private readonly IClientStorage _clientStorage;
-    private readonly IState<ExercisesState> _state;
 
-    public ExercisesEffects(IClientStorage clientStorage, IState<ExercisesState> state)
+    public ExercisesEffects(IClientStorage clientStorage)
 	{
         _clientStorage = clientStorage;
-        _state = state;
     }
 
     [EffectMethod]
@@ -66,8 +64,8 @@ public class ExercisesEffects
     public async Task OnAddOrUpdateExercise(AddOrUpdateExerciseAction action, IDispatcher dispatcher)
     {
         var updateDTO = action.Exercise;
-        var exercises = _state.Value.OriginalList.ToList();
-        var exercise = exercises.SingleOrDefault(x => x.Id == action.Exercise.Id);
+        var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
+        var exercise = exercises.SingleOrDefault(x => x.Id == updateDTO.Id);
 
         var isNew = false;
         if(exercise is null)
@@ -85,6 +83,7 @@ public class ExercisesEffects
 
         await _clientStorage.Exercises.SetAsync(exercises);
         dispatcher.Dispatch(new SetExercisesAction(exercises));
+        dispatcher.Dispatch(new SetExerciseAction(exercise));
 
         if(isNew)
             dispatcher.Dispatch(new NavigateToNewExerciseAction(exercise.Id));

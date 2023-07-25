@@ -1,3 +1,7 @@
 ﻿.fullHeight{
     height: 100%;
 }
+
+.fullWidth{
+    min-width: 100%;
+}

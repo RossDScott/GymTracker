@@ -94,4 +94,9 @@
 
     void HandleUpdateExercise(DetailItem updateDTO) =>
         Dispatcher.Dispatch(new AddOrUpdateExerciseAction(updateDTO));
+
+    public void Dispose()
+    {
+        NaviagationManager.LocationChanged -= HandleLocationChanged;
+    }
 }

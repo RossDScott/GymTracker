@@ -1,11 +1,37 @@
 ﻿@page "/workout-plans"
+@page "/workout-plans/{WorkoutPlanId:guid}"
+@page "/workout-plans/new"
+
+@using GymTracker.BlazorClient.Features.Common;
+@using GymTracker.BlazorClient.Features.Common.FullHeightList
+@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+
+@inherits FluxorComponent
+
+@inject NavigationManager NaviagationManager
+@inject IState<WorkoutPlansState> State
+@inject IDispatcher Dispatcher
 
 <MudGrid Class="fullHeight ma-0" Justify="Justify.SpaceEvenly" Style="width: 100%">
-    <MudItem xs="4" Class=" mb-0 fullHeight" Style="position: relative">
-        Plans
+    <MudItem xs="4" Class="mb-0 fullHeight" Style="position: relative">
+        <FullHeightList 
+            List="State.Value.WorkoutPlans"
+            SelectedId="State.Value.SelectedWorkoutPlan?.Id"
+            OnItemClick="HandleWorkoutPlanSelected"
+            OnAddItem="HandleAddNewWorkoutPlan">
+        </FullHeightList>
     </MudItem>
     <MudItem xs="4" Class="">
-        Exercises
+        @if(State.Value.SelectedWorkoutPlan is not null)
+        {
+            <WorkoutPlan
+                WorkoutPlanDetail="State.Value.SelectedWorkoutPlan"
+                OnWorkoutPlanUpdated="HandleUpdateWorkout"
+                SelectedExerciseId="_selectedExerciseId"
+                OnExerciseSelected="HandleSelectExercise">
+
+            </WorkoutPlan>
+        }
     </MudItem>
     <MudItem xs="4" Class="">
         Sets and config
@@ -13,5 +39,48 @@
 </MudGrid>
 
 @code {
+    [Parameter]
+    public Guid? WorkoutPlanId { get; set; }
 
+    Guid? _selectedExerciseId = null;
+
+    protected override void OnInitialized()
+    {
+        NaviagationManager.LocationChanged += HandleLocationChanged;
+
+        //SubscribeToAction<NavigateToNewExerciseAction>(action =>
+        //    NaviagationManager.NavigateTo($"/exercises/{action.Id}"));
+
+        HandleSetupPageByLocation(NaviagationManager.Uri, true);
+        base.OnInitialized();
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e) =>
+        HandleSetupPageByLocation(e.Location);
+
+    private void HandleSetupPageByLocation(string location, bool initialLoad = false)
+    {
+        if (location.EndsWith("plans") || initialLoad)
+            Dispatcher.Dispatch(new FetchWorkoutPlansInitialStateAction());
+
+        if (WorkoutPlanId is not null)
+            Dispatcher.Dispatch(new FetchWorkoutPlanAction(WorkoutPlanId.Value));
+
+        if (location.EndsWith("new"))
+            Dispatcher.Dispatch(new CreateNewWorkoutPlanAction());
+    }
+
+    void HandleWorkoutPlanSelected(ListItem item) =>
+        NaviagationManager.NavigateTo($"/workout-plans/{item.Id}");
+
+    void HandleAddNewWorkoutPlan() =>
+        NaviagationManager.NavigateTo($"/workout-plans/new");
+
+    void HandleUpdateWorkout(WorkoutPlanDetail updateDTO) =>
+        Dispatcher.Dispatch(new AddOrUpdateWorkoutPlanAction(updateDTO));
+
+    void HandleSelectExercise(Guid id)
+    {
+        _selectedExerciseId = id;
+    }
 }
