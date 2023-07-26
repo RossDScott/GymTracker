@@ -20,12 +20,14 @@
             }
         </MudList>
     </MudPaper>
-    <div class="d-flex flex-row-reverse" style="position: absolute; bottom: 15px; right: 15px">
-        <MudFab 
-            Color="Color.Dark"
-            StartIcon="@Icons.Material.Filled.Add"
-            OnClick="_ => OnAddItem.InvokeAsync()" />
-    </div>
+    @if (OnAddItem.HasDelegate)
+    {
+        <div class="d-flex flex-row-reverse" style="position: absolute; bottom: 15px; right: 15px">
+            <MudFab Color="Color.Dark"
+                    StartIcon="@Icons.Material.Filled.Add"
+                    OnClick="_ => OnAddItem.InvokeAsync()" />
+        </div>
+    }
 </div>
 
 
