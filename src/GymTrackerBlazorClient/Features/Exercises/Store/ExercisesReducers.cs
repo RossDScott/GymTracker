@@ -44,20 +44,6 @@ public static class ExercisesReducers
             SelectedExercise = action.Exercise.ToDetailItem() 
         };
 
-    //[ReducerMethod]
-    //public static ExercisesState OnAddOrUpdateExercise(ExercisesState state, AddOrUpdateExerciseAction action) =>
-    //    state with
-    //    {
-    //        SelectedExercise = state.SelectedExercise! with
-    //        {
-    //            Name = action.Exercise.Name,
-    //            MetricType = action.Exercise.MetricType,
-    //            BodyTarget = action.Exercise.BodyTarget,
-    //            Equipment = action.Exercise.Equipment,
-    //            IsActive = action.Exercise.IsActive
-    //        }
-    //    };
-
     [ReducerMethod]
     public static ExercisesState OnCreateNewExercise(ExercisesState state, CreateNewExerciseAction action) =>
         state with 
