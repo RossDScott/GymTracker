@@ -47,7 +47,12 @@ public class WorkoutPlansEffects
     public async Task OnAddExerciseToWorkoutPlan(AddExerciseToWorkoutPlan action, IDispatcher dispatcher)
     {
         var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
+        var exercise = await _clientStorage.Exercises.FindByIdAsync(action.ExerciseId);
 
+        workoutPlan.PlannedExercises.Add(new PlannedExercise(exercise));
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
+
+        dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
     }
 
     [EffectMethod]
