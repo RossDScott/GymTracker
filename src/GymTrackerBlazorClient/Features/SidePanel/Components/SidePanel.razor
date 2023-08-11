@@ -1,0 +1,70 @@
+﻿@using GymTracker.BlazorClient.Features.SidePanel.Models;
+@using GymTracker.BlazorClient.Features.SidePanel.Store.Actions;
+
+<MudDrawer 
+    @bind-Open="Open"
+    Elevation="1" 
+    Anchor="Anchor.End" 
+    Variant="DrawerVariant.Temporary"
+    Width="300px"
+    Class="fullHeight">
+    <MudDrawerContainer Class="fullHeight">
+        <CascadingValue Value="@_sidePanelReference">
+            @_childRender
+        </CascadingValue>
+    </MudDrawerContainer>
+</MudDrawer>
+
+@inherits FluxorComponent
+
+@code {
+    RenderFragment? _childRender { get; set; } = null;
+    bool _open = false;
+    public bool Open 
+    { 
+        get => _open; 
+        set
+        {
+            _open = value;
+            if(!_open)
+                HandleClosing();
+        } 
+    }
+    SidePanelReference? _sidePanelReference = null;
+
+    protected override void OnInitialized()
+    {
+        SubscribeToAction<ShowSidePanelAction>(HandleShowPanel);
+        SubscribeToAction<HideSidePanelAction>(HandleHidePanel);
+        base.OnInitialized();
+    }
+
+    void HandleShowPanel(ShowSidePanelAction action)
+    {
+        _childRender = CreateComponent(action.Type);
+        _open = true;
+        _sidePanelReference = action.SidePanelReference;
+    }
+
+    void HandleHidePanel(HideSidePanelAction action)
+    {
+        _childRender = null;
+        _open = false;
+        _sidePanelReference = null;
+    }
+
+    void HandleClosing()
+    {
+        if (_sidePanelReference is null)
+            return;
+
+
+        _sidePanelReference.Cancel();
+    }
+
+    private RenderFragment CreateComponent(Type type) => builder =>
+    {
+        builder.OpenComponent(0, type);
+        builder.CloseComponent();
+    };
+}

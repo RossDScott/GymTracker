@@ -15,6 +15,7 @@ public abstract class LocalStorageContext : ILocalStorageContext
         HasInitialisedDefaultData.Configure(settings =>
         {
             settings.AutoBackup = false;
+            settings.CacheData = false;
         });
     }
 

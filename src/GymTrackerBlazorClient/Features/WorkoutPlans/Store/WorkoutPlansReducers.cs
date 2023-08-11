@@ -34,7 +34,10 @@ public static class WorkoutPlansReducers
     {
         Id = plan.Id,
         Name = plan.Name,
-
+        PlannedExercises = plan.PlannedExercises.Select(x => x.ToListItem()).ToImmutableArray(),
         IsActive = plan.IsAcitve
     };
+
+    private static ListItem ToListItem(this PlannedExercise plannedExercise) =>
+        new ListItem(plannedExercise.Id, plannedExercise.Exercise.Name, true);
 }

@@ -7,26 +7,47 @@ namespace GymTracker.LocalStorage.ContextAbstraction;
 public class KeyItem<T> : IKeyItem<T>
 {
     protected readonly ILocalStorageService LocalStorage;
-    protected readonly string Key;
+    //protected readonly string Key;
     protected KeyConfig<T> Config = new();
+
+    private T? _cacheData = default;
 
     public KeyItem(ILocalStorageService localStorage, string key)
     {
         LocalStorage = localStorage;
-        Key = key;
+        Configure(settings => settings.Key = key);
     }
 
-    public string KeyName => Key;
+    protected async ValueTask<T?> FetchDataOrCacheAsync()
+    {
+        var fetchData = () => LocalStorage.GetItemAsync<T?>(Config.Key);
+
+        if (Config.CacheData)
+        {
+            if (_cacheData == null)
+                _cacheData = await fetchData();
+
+            return _cacheData;
+        }
+
+        return await fetchData();
+    }
+
+    protected ValueTask SetDataAndCacheAsync(T? data)
+    {
+        if (Config.CacheData)
+            _cacheData = data;
+
+        return LocalStorage.SetItemAsync(Config.Key, data);
+    }
+
+    public string KeyName => Config.Key;
     public bool AutoBackup => Config.AutoBackup;
 
     public void Configure(Action<KeyConfig<T>> configure) => configure(Config);
-    
-    public ValueTask<T?> GetAsync() => LocalStorage.GetItemAsync<T?>(Key);
-    public async ValueTask<T> GetOrDefaultAsync()
-    {
-        var data = await GetOrDefaultAsync(null);
-        return data;
-    }
+
+    public ValueTask<T?> GetAsync() => FetchDataOrCacheAsync();
+    public ValueTask<T> GetOrDefaultAsync() => GetOrDefaultAsync(null);
     public async ValueTask<T> GetOrDefaultAsync(Func<T>? defaultConstructor)
     {
         var constructor = 
@@ -34,17 +55,16 @@ public class KeyItem<T> : IKeyItem<T>
             Config?.DefaultConstructor ?? 
             throw new ArgumentNullException(nameof(defaultConstructor));
 
-        var val = await LocalStorage.GetItemAsync<T?>(Key);
-        return val ?? constructor();
+        return await GetAsync() ?? constructor();
     }
 
-    public ValueTask SetAsync(T item) => LocalStorage.SetItemAsync(Key, item);
+    public ValueTask SetAsync(T item) => SetDataAndCacheAsync(item);
 
     public void SubscribeToChanges(Action<T> callback)
     {
         LocalStorage.Changed += (_, args) =>
         {
-            if (args.Key == Key)
+            if (args.Key == Config.Key)
                 callback((T)args.NewValue);
         };
     }
@@ -53,7 +73,7 @@ public class KeyItem<T> : IKeyItem<T>
     {
         LocalStorage.Changed += async (_, args) =>
         {
-            if (args.Key == Key)
+            if (args.Key == Config.Key)
             {
                 var json = await DataAsJson();
                 if(!string.IsNullOrEmpty(json))

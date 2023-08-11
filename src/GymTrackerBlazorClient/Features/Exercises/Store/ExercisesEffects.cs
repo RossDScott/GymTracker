@@ -36,8 +36,7 @@ public class ExercisesEffects
     [EffectMethod]
     public async Task OnFetchExercise(FetchExerciseAction action, IDispatcher dispatcher)
     {
-        var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
-        var exercise = exercises.Single(x => x.Id == action.Id);
+        var exercise = await _clientStorage.Exercises.FindByIdAsync(action.Id);
 
         await dispatcher.DispatchWithDelay(new SetExerciseAction(exercise));
         await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
@@ -65,7 +64,7 @@ public class ExercisesEffects
     {
         var updateDTO = action.Exercise;
         var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
-        var exercise = exercises.SingleOrDefault(x => x.Id == updateDTO.Id);
+        var exercise = await _clientStorage.Exercises.FindOrDefaultByIdAsync(updateDTO.Id);
 
         var isNew = false;
         if(exercise is null)

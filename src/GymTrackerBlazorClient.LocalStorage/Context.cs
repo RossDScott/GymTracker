@@ -18,6 +18,7 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
             settings.DefaultConstructor = () => new AppSettings();
             settings.AutoBackup = false;
         });
+
         base.Configure();
     }
 

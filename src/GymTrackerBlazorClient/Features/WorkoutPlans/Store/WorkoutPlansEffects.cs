@@ -34,8 +34,7 @@ public class WorkoutPlansEffects
     [EffectMethod]
     public async Task OnFetchWorkoutPlan(FetchWorkoutPlanAction action, IDispatcher dispatcher)
     {
-        var workoutPlans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
-        var workoutPlan = workoutPlans.Single(x => x.Id == action.Id);
+        var workoutPlan =await _clientStorage.WorkoutPlans.FindByIdAsync(action.Id);
 
         await dispatcher.DispatchWithDelay(new SetWorkoutPlanAction(workoutPlan));
         await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
@@ -46,28 +45,35 @@ public class WorkoutPlansEffects
     }
 
     [EffectMethod]
+    public async Task OnAddExerciseToWorkoutPlan(AddExerciseToWorkoutPlan action, IDispatcher dispatcher)
+    {
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
+
+    }
+
+    [EffectMethod]
     public async Task OnAddOrUpdateWorkoutPlan(AddOrUpdateWorkoutPlanAction action, IDispatcher dispatcher)
     {
         var updateDTO = action.WorkoutPlan;
-        var plans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
-        var plan = plans.SingleOrDefault(x => x.Id == updateDTO.Id);
+        var workoutPlans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindOrDefaultByIdAsync(action.WorkoutPlan.Id);
 
         var isNew = false;
-        if (plan is null)
+        if (workoutPlan is null)
         {
-            plan = new WorkoutPlan { Id = updateDTO.Id };
-            plans.Add(plan);
+            workoutPlan = new WorkoutPlan { Id = updateDTO.Id };
+            workoutPlans.Add(workoutPlan);
             isNew = true;
         }
 
-        plan.Name = updateDTO.Name;
-        plan.IsAcitve = updateDTO.IsActive;
+        workoutPlan.Name = updateDTO.Name;
+        workoutPlan.IsAcitve = updateDTO.IsActive;
 
-        await _clientStorage.WorkoutPlans.SetAsync(plans);
-        dispatcher.Dispatch(new SetWorkoutPlansAction(plans));
-        dispatcher.Dispatch(new SetWorkoutPlanAction(plan));
+        await _clientStorage.WorkoutPlans.SetAsync(workoutPlans);
+        dispatcher.Dispatch(new SetWorkoutPlansAction(workoutPlans));
+        dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
 
         if (isNew)
-            dispatcher.Dispatch(new NavigateToNewWorkoutPlanAction(plan.Id));
+            dispatcher.Dispatch(new NavigateToNewWorkoutPlanAction(workoutPlan.Id));
     }
 }

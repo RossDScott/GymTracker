@@ -1,0 +1,48 @@
+﻿@using GymTracker.BlazorClient.Features.AppBar.Store;
+@using GymTracker.BlazorClient.Features.Common.FullHeightList;
+@using GymTracker.BlazorClient.Features.ExercisePicker.Store;
+@using GymTracker.BlazorClient.Features.Common;
+@using GymTracker.BlazorClient.Features.SidePanel.Models;
+
+@inherits FluxorComponent
+
+@inject NavigationManager NaviagationManager
+@inject IState<ExercisesState> State
+@inject IDispatcher Dispatcher
+
+<div class="fullWidth fullHeight">
+    <FullHeightList List="State.Value.Exercises"
+                    SelectedId="State.Value.SelectedExercise?.Id"
+                    OnItemClick="HandleExerciseSelected">
+        <Filter>
+            <ExercisesFilter></ExercisesFilter>
+        </Filter>
+    </FullHeightList>
+</div>
+
+
+@*<MudDialog DisableSidePadding="true" Style="overflow: hidden" Class="">
+    <DialogContent>
+        <MudGrid Class="fullHeight ma-0" Justify="Justify.SpaceEvenly" Style="width: 100%">
+            <MudItem xs="12" Class=" mb-0 fullHeight" Style="position: relative; width: 100%">
+
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+</MudDialog>*@
+
+
+
+@code {
+    [CascadingParameter]
+    public SidePanelReference SidePanelReference { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        Dispatcher.Dispatch(new FetchExercisesAction());
+
+        base.OnInitialized();
+    }
+
+    void HandleExerciseSelected(ListItem item) => SidePanelReference.SetResult(item);
+}

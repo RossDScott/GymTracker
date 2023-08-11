@@ -1,4 +1,5 @@
 ﻿@using GymTracker.BlazorClient.Features.AppBar.Components
+@using GymTracker.BlazorClient.Features.SidePanel.Components
 @using GymTracker.BlazorClient.Shared.Store;
 @inherits LayoutComponentBase
 
@@ -16,12 +17,17 @@
             @Body
         </MudContainer>
     </MudMainContent>
+
+
+    <SidePanel></SidePanel>
 </MudLayout>
 
 
 @code {
     private bool _isDarkMode;
     private MudThemeProvider _mudThemeProvider = new();
+
+    bool open = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

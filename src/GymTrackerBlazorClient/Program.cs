@@ -7,6 +7,7 @@ using Fluxor;
 using GymTracker.AzureBlobStorage;
 using GymTracker.LocalStorage;
 using GymTracker.Domain.Abstractions.Services.ClientStorage;
+using GymTracker.BlazorClient.Features.SidePanel;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -19,6 +20,8 @@ builder.Services.RegisterLocalStorageContext<IClientStorage, ClientStorageContex
 
 builder.Services.RegisterDomainServices();
 builder.Services.RegisterAzureBlobStorageServices();
+
+builder.Services.AddScoped<SidePanelService>();
 
 var serviceProvider = builder.Services.BuildServiceProvider();
 //await serviceProvider.ConfigureAzureBlobBackupSettings();

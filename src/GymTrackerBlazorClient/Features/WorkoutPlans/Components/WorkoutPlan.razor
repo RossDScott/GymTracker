@@ -1,7 +1,13 @@
 ﻿@using GymTracker.BlazorClient.Features.Common.FullHeightList
 @using GymTracker.BlazorClient.Features.Common;
+@using GymTracker.BlazorClient.Features.SidePanel;
 @using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+@using GymTracker.BlazorClient.Features.Common.ExercisePicker.Components;
 @using System.Collections.Immutable;
+
+@inject IDispatcher Dispatcher
+@inject SidePanelService SidePanelService
+
 <MudPaper Class="pa-2">
     <MudForm @ref="_form">
         <MudStack Class="fullHeight ma-0">
@@ -22,6 +28,7 @@
                 <FullHeightList 
                     List="_plannedExercises"
                     SelectedId="SelectedExerciseId"
+                    OnAddItem="HandleAddExercise"
                     OnItemClick="HandleExerciseSelected">
                 </FullHeightList>
             </MudItem>
@@ -80,5 +87,16 @@
 
     void HandleExerciseSelected(ListItem item) => OnExerciseSelected.InvokeAsync(item.Id);
 
+    async Task HandleAddExercise()
+    {
+        var response = SidePanelService.ShowSidePanel<ExercisePicker, ListItem>();
+        var result = await response.Result();
+
+        if(!result.Canceled)
+        {
+            var exerciseId = result.Data!.Id;
+            Dispatcher.Dispatch(new AddExerciseToWorkoutPlan(WorkoutPlanDetail.Id, exerciseId));
+        }
+    }
 
 }
