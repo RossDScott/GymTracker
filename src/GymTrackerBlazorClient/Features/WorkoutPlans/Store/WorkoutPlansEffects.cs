@@ -5,6 +5,7 @@ using GymTracker.BlazorClient.Features.Exercises.Store;
 using GymTracker.Domain.Abstractions.Services.ClientStorage;
 using GymTracker.Domain.Extensions;
 using GymTracker.Domain.Models;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace GymTracker.BlazorClient.Features.WorkoutPlans.Store;
@@ -21,9 +22,7 @@ public class WorkoutPlansEffects
     [EffectMethod]
     public async Task OnFetchWorkoutPlansInitialStateAction(FetchWorkoutPlansInitialStateAction action, IDispatcher dispatcher)
     {
-        var workoutPlans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
-
-        dispatcher.Dispatch(new SetWorkoutPlansAction(workoutPlans));
+        await LoadWorkoutPlans(dispatcher);
 
         dispatcher.Dispatch(new SetBreadcrumbAction(new[]
         {
@@ -55,25 +54,25 @@ public class WorkoutPlansEffects
     public async Task OnAddOrUpdateWorkoutPlan(AddOrUpdateWorkoutPlanAction action, IDispatcher dispatcher)
     {
         var updateDTO = action.WorkoutPlan;
-        var workoutPlans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
-        var workoutPlan = await _clientStorage.WorkoutPlans.FindOrDefaultByIdAsync(action.WorkoutPlan.Id);
-
-        var isNew = false;
-        if (workoutPlan is null)
-        {
-            workoutPlan = new WorkoutPlan { Id = updateDTO.Id };
-            workoutPlans.Add(workoutPlan);
-            isNew = true;
-        }
+        
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindOrDefaultByIdAsync(updateDTO.Id)
+            ?? new WorkoutPlan { Id = updateDTO.Id };
 
         workoutPlan.Name = updateDTO.Name;
         workoutPlan.IsAcitve = updateDTO.IsActive;
 
-        await _clientStorage.WorkoutPlans.SetAsync(workoutPlans);
-        dispatcher.Dispatch(new SetWorkoutPlansAction(workoutPlans));
+        var response = await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
         dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
 
-        if (isNew)
+        await LoadWorkoutPlans(dispatcher);
+
+        if (response == UpsertResponse.New)
             dispatcher.Dispatch(new NavigateToNewWorkoutPlanAction(workoutPlan.Id));
+    }
+
+    private async Task LoadWorkoutPlans(IDispatcher dispatcher)
+    {
+        var workoutPlans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
+        dispatcher.Dispatch(new SetWorkoutPlansAction(workoutPlans));
     }
 }

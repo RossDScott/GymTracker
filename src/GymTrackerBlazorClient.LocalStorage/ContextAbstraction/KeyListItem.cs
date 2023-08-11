@@ -21,6 +21,17 @@ public class KeyListItem<T> : KeyItem<ICollection<T>>, IKeyListItem<T> where T :
     public async Task<T?> FindOrDefaultByIdAsync(Guid id)
         => (await this.GetOrDefaultAsync()).FindOrDefaultById(id, ListConfig);
 
+    public async Task<UpsertResponse> UpsertAsync(T item)
+    {
+        var items = await this.GetOrDefaultAsync();
+        var existing = items.FindOrDefaultById(ListConfig.GetId(item), ListConfig);
+        if(existing == null)
+            items.Add(item);
+
+        await this.SetAsync(items);
+
+        return existing == null ? UpsertResponse.New : UpsertResponse.Existing;
+    }
     private void ConfigureDefaults()
     {
         this.Configure(x => x.DefaultConstructor = () => new List<T>());
@@ -31,7 +42,7 @@ public class KeyListItem<T> : KeyItem<ICollection<T>>, IKeyListItem<T> where T :
         {
             this.ConfigureList(settings =>
             {
-                settings.GetId = (item) => (Guid?)idProperty.GetValue(item);
+                settings.GetId = (item) => (Guid)idProperty.GetValue(item)!;
             });
         }
     }

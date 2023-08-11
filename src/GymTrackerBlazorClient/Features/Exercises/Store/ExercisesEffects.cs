@@ -64,15 +64,8 @@ public class ExercisesEffects
     {
         var updateDTO = action.Exercise;
         var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
-        var exercise = await _clientStorage.Exercises.FindOrDefaultByIdAsync(updateDTO.Id);
-
-        var isNew = false;
-        if(exercise is null)
-        {
-            exercise = new Exercise { Id = updateDTO.Id };
-            exercises.Add(exercise);
-            isNew = true;
-        }
+        var exercise = await _clientStorage.Exercises.FindOrDefaultByIdAsync(updateDTO.Id)
+            ?? new Exercise { Id = updateDTO.Id };
         
         exercise.Name = updateDTO.Name;
         exercise.MetricType = updateDTO.MetricType;
@@ -80,11 +73,13 @@ public class ExercisesEffects
         exercise.Equipment = updateDTO.Equipment.ToArray();
         exercise.IsAcitve = updateDTO.IsActive;
 
-        await _clientStorage.Exercises.SetAsync(exercises);
+        var response = await _clientStorage.Exercises.UpsertAsync(exercise);
         dispatcher.Dispatch(new SetExercisesAction(exercises));
         dispatcher.Dispatch(new SetExerciseAction(exercise));
 
-        if(isNew)
+        if(response == UpsertResponse.New)
             dispatcher.Dispatch(new NavigateToNewExerciseAction(exercise.Id));
     }
+
+
 }

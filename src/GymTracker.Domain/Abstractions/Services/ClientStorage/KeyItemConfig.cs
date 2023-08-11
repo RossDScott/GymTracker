@@ -15,5 +15,5 @@ public record KeyConfig<T>
 
 public record KeyListItemConfig<T, Item> where T : ICollection<Item>
 {
-    public Func<Item, Guid?> GetId { get; set; } = default!;
+    public Func<Item, Guid> GetId { get; set; } = default!;
 }
