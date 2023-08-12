@@ -1,5 +1,6 @@
 ﻿@using System.Collections.Immutable;
 @using GymTracker.BlazorClient.Features.Common;
+@using GymTracker.BlazorClient.Shared.Extensions;
 
 <div class="fullHeight" style="position: relative">
     <MudPaper Class="pa-0 fullHeight" style="overflow-y: auto; position: relative;">
@@ -9,13 +10,16 @@
             Color="Color.Info"
             Clickable="true"
             SelectedValue="SelectedId">
-            @foreach (var item in List)
+            @foreach (var (item, index) in List.LoopIndex())
             {
                 <MudListItem 
                     OnClick="() => OnItemClick.InvokeAsync(item)"
                     Value="item.Id"
                     Style="@(item.IsAcitve ? "" : $"color: {Theme.PaletteDark.TextDisabled}")">
-                    <MudText Typo="Typo.subtitle1">@item.Name</MudText>
+                    <div class="d-flex flex-row">
+                        <MudText Typo="Typo.subtitle1">@item.Name</MudText>
+                        @WhenEnabledShowReorderButtons(index)
+                    </div>
                 </MudListItem>
             }
         </MudList>
@@ -30,6 +34,21 @@
     }
 </div>
 
+@code {
+    RenderFragment? WhenEnabledShowReorderButtons(int index)
+    => CanReorder && List[index].Id == SelectedId
+        ? @<div class="d-flex flex-column" style="margin-left: auto">
+            <MudIconButton 
+                       Icon="@Icons.Material.Filled.ArrowDropUp"
+                       Size="Size.Small"
+                       Style="padding: 0"></MudIconButton>
+            <MudIconButton 
+                       Icon="@Icons.Material.Filled.ArrowDropDown"
+                       Size="Size.Small"
+                       Style="padding: 0"></MudIconButton>
+           </div>
+        : null;
+}
 
 
 @code {
@@ -47,6 +66,9 @@
 
     [Parameter]
     public EventCallback OnAddItem { get; set; }
+
+    [Parameter]
+    public bool CanReorder { get; set; } = false;
 
     MudTheme Theme = new();
 }

@@ -11,28 +11,26 @@
 <MudPaper Class="pa-2">
     <MudForm @ref="_form">
         <MudStack Class="fullHeight ma-0">
-            <MudTextField 
-                @bind-Value="_workoutPlanName"
-                For="@(() => _workoutPlanName)"
-                Immediate="true"
-                DebounceInterval="500"
-                OnDebounceIntervalElapsed="HandleUpdateWorkoutPlan"
-                Label="Workout Plan Name"
-                Variant="Variant.Outlined"
-                Required="true" 
-                RequiredError="Workout Plan Name required!">
+            <MudTextField @bind-Value="_workoutPlanName"
+                          For="@(() => _workoutPlanName)"
+                          Immediate="true"
+                          DebounceInterval="500"
+                          OnDebounceIntervalElapsed="HandleUpdateWorkoutPlan"
+                          Label="Workout Plan Name"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          RequiredError="Workout Plan Name required!">
             </MudTextField>
 
             <MudItem xs="4" Class="mb-0 fullHeight fullWidth" Style="position: relative">
                 <MudText Typo="Typo.overline">Planned Exercises</MudText>
-                <FullHeightList 
-                    List="_plannedExercises"
-                    SelectedId="SelectedExerciseId"
-                    OnAddItem="HandleAddExercise"
-                    OnItemClick="HandleExerciseSelected">
+                <FullHeightList CanReorder="true"
+                                List="_plannedExercises"
+                                SelectedId="SelectedExerciseId"
+                                OnAddItem="HandleAddExercise"
+                                OnItemClick="HandleExerciseSelected">
                 </FullHeightList>
             </MudItem>
-
         </MudStack>
     </MudForm>
 </MudPaper>
@@ -92,11 +90,10 @@
         var response = SidePanelService.ShowSidePanel<ExercisePicker, ListItem>();
         var result = await response.Result();
 
-        if(!result.Canceled)
+        if (!result.Canceled)
         {
             var exerciseId = result.Data!.Id;
             Dispatcher.Dispatch(new AddExerciseToWorkoutPlan(WorkoutPlanDetail.Id, exerciseId));
         }
     }
-
 }
