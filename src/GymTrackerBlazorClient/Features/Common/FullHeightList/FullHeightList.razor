@@ -1,6 +1,7 @@
 ﻿@using System.Collections.Immutable;
 @using GymTracker.BlazorClient.Features.Common;
 @using GymTracker.BlazorClient.Shared.Extensions;
+@using GymTracker.Domain.Models;
 
 <div class="fullHeight" style="position: relative">
     <MudPaper Class="pa-0 fullHeight" style="overflow-y: auto; position: relative;">
@@ -41,11 +42,13 @@
             <MudIconButton 
                        Icon="@Icons.Material.Filled.ArrowDropUp"
                        Size="Size.Small"
-                       Style="padding: 0"></MudIconButton>
+                       Style="padding: 0"
+                       OnClick="_ => OnChangeOrder.InvokeAsync((List[index], OrderDirection.Up))"></MudIconButton>
             <MudIconButton 
                        Icon="@Icons.Material.Filled.ArrowDropDown"
                        Size="Size.Small"
-                       Style="padding: 0"></MudIconButton>
+                       Style="padding: 0"
+                       OnClick="_ => OnChangeOrder.InvokeAsync((List[index], OrderDirection.Down))"></MudIconButton>
            </div>
         : null;
 }
@@ -59,9 +62,6 @@
     public ImmutableArray<ListItem> List { get; set; } = ImmutableArray<ListItem>.Empty;
 
     [Parameter]
-    public EventCallback<ListItem> OnItemClick { get; set; }
-
-    [Parameter]
     public Guid? SelectedId { get; set; } = null;
 
     [Parameter]
@@ -69,6 +69,12 @@
 
     [Parameter]
     public bool CanReorder { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<ListItem> OnItemClick { get; set; }
+
+    [Parameter]
+    public EventCallback<(ListItem, OrderDirection)> OnChangeOrder { get; set; }
 
     MudTheme Theme = new();
 }

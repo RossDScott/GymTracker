@@ -48,8 +48,9 @@ public class WorkoutPlansEffects
     {
         var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
         var exercise = await _clientStorage.Exercises.FindByIdAsync(action.ExerciseId);
+        var order = workoutPlan.PlannedExercises.Count();
 
-        workoutPlan.PlannedExercises.Add(new PlannedExercise(exercise));
+        workoutPlan.PlannedExercises.Add(new PlannedExercise(exercise) { Order = order });
         await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
 
         dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
@@ -82,6 +83,20 @@ public class WorkoutPlansEffects
         var exercise = workoutPlan.PlannedExercises.Single(x => x.Id == action.ExerciseId);
 
         dispatcher.Dispatch(new SetExerciseAction(exercise));
+    }
+
+    [EffectMethod]
+    public async Task OnChangeOrder(ChangeOrderAction action, IDispatcher dispatcher)
+    {
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
+        var exercises = workoutPlan.PlannedExercises;
+        var targetExercise = exercises.Single(x => x.Id == action.ExerciseId);
+
+        exercises.ChangeOrder(targetExercise, action.Direction);
+
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
+        dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
+        await dispatcher.DispatchWithDelay(new SetExerciseAction(targetExercise));
     }
 
     private async Task LoadWorkoutPlans(IDispatcher dispatcher)

@@ -9,7 +9,7 @@ public record WorkoutPlan
     public bool IsAcitve { get; set; } = true;
 }
 
-public record PlannedExercise
+public record PlannedExercise : IOrderable
 {
     public PlannedExercise() {}
 

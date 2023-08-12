@@ -4,6 +4,7 @@
 @using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
 @using GymTracker.BlazorClient.Features.Common.ExercisePicker.Components;
 @using System.Collections.Immutable;
+@using GymTracker.Domain.Models;
 
 @inject IDispatcher Dispatcher
 @inject SidePanelService SidePanelService
@@ -28,7 +29,9 @@
                                 List="_plannedExercises"
                                 SelectedId="SelectedExerciseId"
                                 OnAddItem="HandleAddExercise"
-                                OnItemClick="HandleExerciseSelected">
+                                OnItemClick="HandleExerciseSelected"
+                                OnChangeOrder="((ListItem item, OrderDirection direction)x) 
+                                    => HandleChangeOrder(x.item, x.direction)">
                 </FullHeightList>
             </MudItem>
         </MudStack>
@@ -95,5 +98,10 @@
             var exerciseId = result.Data!.Id;
             Dispatcher.Dispatch(new AddExerciseToWorkoutPlan(WorkoutPlanDetail.Id, exerciseId));
         }
+    }
+
+    void HandleChangeOrder(ListItem item, OrderDirection direction)
+    {
+        Dispatcher.Dispatch(new ChangeOrderAction(WorkoutPlanDetail.Id, item.Id, direction));
     }
 }

@@ -12,3 +12,4 @@ public record CreateNewWorkoutPlanAction();
 public record NavigateToNewWorkoutPlanAction(Guid Id);
 public record FetchExerciseAction(Guid WorkoutPlanId, Guid ExerciseId);
 public record SetExerciseAction(PlannedExercise Exercise);
+public record ChangeOrderAction(Guid WorkoutPlanId, Guid ExerciseId, OrderDirection Direction);
