@@ -11,6 +11,7 @@ public record WorkoutPlansState
     public ImmutableArray<Models.WorkoutPlan> OriginialList { get; init; } = ImmutableArray<Models.WorkoutPlan>.Empty;
     public ImmutableArray<ListItem> WorkoutPlans { get; init; } = ImmutableArray<ListItem>.Empty;
     public WorkoutPlanDetail? SelectedWorkoutPlan { get; init; } = null;
+    public PlannedExerciseDetail? SelectedExercise { get; set; } = null;
 }
 
 public record WorkoutPlanDetail

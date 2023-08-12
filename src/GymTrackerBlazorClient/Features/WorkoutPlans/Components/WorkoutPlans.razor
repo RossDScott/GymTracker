@@ -1,6 +1,7 @@
 ﻿@page "/workout-plans"
-@page "/workout-plans/{WorkoutPlanId:guid}"
+@page "/workout-plans/{SelectedWorkoutPlanId:guid}"
 @page "/workout-plans/new"
+@page "/workout-plans/{SelectedWorkoutPlanId:guid}/{SelectedExerciseId:guid}"
 
 @using GymTracker.BlazorClient.Features.Common;
 @using GymTracker.BlazorClient.Features.Common.FullHeightList
@@ -27,22 +28,28 @@
             <WorkoutPlan
                 WorkoutPlanDetail="State.Value.SelectedWorkoutPlan"
                 OnWorkoutPlanUpdated="HandleUpdateWorkout"
-                SelectedExerciseId="_selectedExerciseId"
+                SelectedExerciseId="State.Value.SelectedExercise?.Id"
                 OnExerciseSelected="HandleSelectExercise">
-
             </WorkoutPlan>
         }
     </MudItem>
     <MudItem xs="4" Class="">
-        Sets and config
+        @if(State.Value.SelectedExercise is not null)
+        {
+            <PlannedExercise
+                PlannedExerciseDetail="State.Value.SelectedExercise">
+
+            </PlannedExercise>
+        }
     </MudItem>
 </MudGrid>
 
 @code {
     [Parameter]
-    public Guid? WorkoutPlanId { get; set; }
+    public Guid? SelectedWorkoutPlanId { get; set; }
 
-    Guid? _selectedExerciseId = null;
+    [Parameter]
+    public Guid? SelectedExerciseId { get; set; }
 
     protected override void OnInitialized()
     {
@@ -63,8 +70,10 @@
         if (location.EndsWith("plans") || initialLoad)
             Dispatcher.Dispatch(new FetchWorkoutPlansInitialStateAction());
 
-        if (WorkoutPlanId is not null)
-            Dispatcher.Dispatch(new FetchWorkoutPlanAction(WorkoutPlanId.Value));
+        if (SelectedExerciseId is not null)
+            Dispatcher.Dispatch(new FetchExerciseAction(SelectedWorkoutPlanId.Value, SelectedExerciseId.Value));
+        else if (SelectedWorkoutPlanId is not null)
+            Dispatcher.Dispatch(new FetchWorkoutPlanAction(SelectedWorkoutPlanId.Value));
 
         if (location.EndsWith("new"))
             Dispatcher.Dispatch(new CreateNewWorkoutPlanAction());
@@ -79,8 +88,7 @@
     void HandleUpdateWorkout(WorkoutPlanDetail updateDTO) =>
         Dispatcher.Dispatch(new AddOrUpdateWorkoutPlanAction(updateDTO));
 
-    void HandleSelectExercise(Guid id)
-    {
-        _selectedExerciseId = id;
-    }
+    void HandleSelectExercise(ListItem item) =>
+        NaviagationManager.NavigateTo($"/workout-plans/{SelectedWorkoutPlanId}/{item.Id}");
+
 }

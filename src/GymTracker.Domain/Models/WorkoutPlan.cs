@@ -19,6 +19,7 @@ public record PlannedExercise
         RestInterval = exercise.DefaultRestInterval;
     }
     public Guid Id { get; init; } = Guid.NewGuid();
+    public int Order { get; set; }
     public Exercise Exercise { get; set; } = default!;
     public ICollection<PlannedExerciseSet> PlannedSets { get; set; } = new List<PlannedExerciseSet>();
     public TimeSpan RestInterval { get; set; }
@@ -28,6 +29,7 @@ public record PlannedExercise
 public record PlannedExerciseSet
 {
     public Guid Id { get; init; } = Guid.NewGuid();
+    public int Order { get; set; }
     public string SetType { get; set; } = default!;
     public ExerciseSetMetrics TargetMetrics { get; set; } = default!;
 }

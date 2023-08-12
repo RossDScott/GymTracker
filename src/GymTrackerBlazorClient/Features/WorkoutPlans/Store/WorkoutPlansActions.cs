@@ -10,3 +10,5 @@ public record AddOrUpdateWorkoutPlanAction(WorkoutPlanDetail WorkoutPlan);
 public record AddExerciseToWorkoutPlan(Guid WorkoutPlanId, Guid ExerciseId);
 public record CreateNewWorkoutPlanAction();
 public record NavigateToNewWorkoutPlanAction(Guid Id);
+public record FetchExerciseAction(Guid WorkoutPlanId, Guid ExerciseId);
+public record SetExerciseAction(PlannedExercise Exercise);

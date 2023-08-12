@@ -75,6 +75,15 @@ public class WorkoutPlansEffects
             dispatcher.Dispatch(new NavigateToNewWorkoutPlanAction(workoutPlan.Id));
     }
 
+    [EffectMethod]
+    public async Task OnFetchExercise(FetchExerciseAction action, IDispatcher dispatcher)
+    {
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
+        var exercise = workoutPlan.PlannedExercises.Single(x => x.Id == action.ExerciseId);
+
+        dispatcher.Dispatch(new SetExerciseAction(exercise));
+    }
+
     private async Task LoadWorkoutPlans(IDispatcher dispatcher)
     {
         var workoutPlans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();

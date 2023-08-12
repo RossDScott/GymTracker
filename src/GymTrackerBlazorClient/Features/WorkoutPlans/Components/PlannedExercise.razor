@@ -1,0 +1,69 @@
+﻿@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+
+@inject IDispatcher Dispatcher
+
+<MudPaper Class="pa-2">
+    <MudForm @ref="_form">
+        <MudStack Class="fullHeight ma-0">
+            @PlannedExerciseDetail.Name
+
+            <MudField Variant="Variant.Outlined" Label="Rest Interval" InnerPadding="false">
+                <div Class="d-flex flex-row">
+                    <MudSelect DisableUnderLine="true"
+                               Dense="true" 
+                               T="int" 
+                               Label="Minutes" 
+                               Variant="Variant.Text"
+                               Value="_restInterval.Minutes"
+                               ValueChanged="x => 
+                                    _restInterval = new TimeSpan(0,0,x,_restInterval.Seconds)">
+                        @for (int i = 0; i < 10; i++)
+                        {
+                            <MudSelectItem Value="@i" />
+                        }
+                    </MudSelect>
+                    <MudSelect DisableUnderLine="true"
+                               Dense="true"
+                               T="int"
+                               Label="Seconds"
+                               Variant="Variant.Text"
+                               Value="_restInterval.Seconds"
+                               ValueChanged="x =>
+                                    _restInterval = new TimeSpan(0,0,_restInterval.Minutes, x)">
+                        @for (int i = 0; i < 61; i++)
+                        {
+                            <MudSelectItem Value="@i" />
+                        }
+                    </MudSelect>
+                </div>
+            </MudField>
+
+            <MudSwitch @bind-Checked="@_autoTriggerRestTimer"
+                       Label="Auto Start Rest TImer" LabelPosition="LabelPosition.Start" />
+
+            @_restInterval
+        </MudStack>
+    </MudForm>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public PlannedExerciseDetail PlannedExerciseDetail { get; set; } = default!;
+
+    MudForm _form;
+    bool _autoTriggerRestTimer;
+    TimeSpan _restInterval;
+
+    protected override void OnParametersSet()
+    {
+        _autoTriggerRestTimer = PlannedExerciseDetail.AutoTriggerRestTimer;
+        _restInterval = PlannedExerciseDetail.RestInterval;
+
+        _form?.ResetValidation();
+
+        base.OnParametersSet();
+    }
+
+
+
+}

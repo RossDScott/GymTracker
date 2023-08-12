@@ -45,7 +45,7 @@
     public EventCallback<WorkoutPlanDetail> OnWorkoutPlanUpdated { get; set; }
 
     [Parameter, EditorRequired]
-    public EventCallback<Guid> OnExerciseSelected { get; set; }
+    public EventCallback<ListItem> OnExerciseSelected { get; set; }
 
     [Parameter, EditorRequired]
     public Guid? SelectedExerciseId { get; set; } = null;
@@ -85,7 +85,7 @@
         await OnWorkoutPlanUpdated.InvokeAsync(updateDTO);
     }
 
-    void HandleExerciseSelected(ListItem item) => OnExerciseSelected.InvokeAsync(item.Id);
+    void HandleExerciseSelected(ListItem item) => OnExerciseSelected.InvokeAsync(item);
 
     async Task HandleAddExercise()
     {
