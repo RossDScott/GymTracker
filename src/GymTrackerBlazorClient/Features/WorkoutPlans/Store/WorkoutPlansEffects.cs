@@ -49,8 +49,37 @@ public class WorkoutPlansEffects
         var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
         var exercise = await _clientStorage.Exercises.FindByIdAsync(action.ExerciseId);
         var order = workoutPlan.PlannedExercises.Count();
+   
+        var plannedExercise = new PlannedExercise(exercise) 
+        { 
+            Order = order,
+            RestInterval = TimeSpan.FromSeconds(150)
+        };
 
-        workoutPlan.PlannedExercises.Add(new PlannedExercise(exercise) { Order = order });
+        var plannedSets = order == 0
+                ? new List<PlannedExerciseSet>
+                    {
+                        new PlannedExerciseSet{ Order = 0, OrderForSetType = 1, SetType = "Warm-up",
+                            TargetMetrics = new ExerciseSetMetrics{ Reps = 10 }},
+                        new PlannedExerciseSet{Order = 1, OrderForSetType = 2, SetType = "Warm-up",
+                            TargetMetrics = new ExerciseSetMetrics{ Reps = 10 }}
+                    }
+                : new List<PlannedExerciseSet>();
+
+        var setStartPos = order == 0 ? 2 : 0;
+        var defaultSets = new List<PlannedExerciseSet>
+        {
+            new PlannedExerciseSet{ Order = setStartPos, OrderForSetType = 1, SetType = "Set",
+                TargetMetrics = new ExerciseSetMetrics{ Reps = 8 }},
+            new PlannedExerciseSet{ Order = setStartPos + 1, OrderForSetType = 2, SetType = "Set",
+                TargetMetrics = new ExerciseSetMetrics{ Reps = 8 }},
+            new PlannedExerciseSet{ Order = setStartPos + 2, OrderForSetType = 3, SetType = "Set",
+                TargetMetrics = new ExerciseSetMetrics{ Reps = 8 }}
+        };
+        plannedSets.AddRange(defaultSets);
+        plannedExercise.PlannedSets = plannedSets;
+
+        workoutPlan.PlannedExercises.Add(plannedExercise);
         await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
 
         dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));

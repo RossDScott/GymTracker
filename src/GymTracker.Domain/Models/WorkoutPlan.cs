@@ -31,5 +31,6 @@ public record PlannedExerciseSet
     public Guid Id { get; init; } = Guid.NewGuid();
     public int Order { get; set; }
     public string SetType { get; set; } = default!;
+    public int OrderForSetType { get; set; }
     public ExerciseSetMetrics TargetMetrics { get; set; } = default!;
 }

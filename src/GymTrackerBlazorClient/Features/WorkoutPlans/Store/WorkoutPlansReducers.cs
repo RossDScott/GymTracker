@@ -67,6 +67,16 @@ public static class WorkoutPlansReducers
     private static ListItem ToListItem(this PlannedExercise plannedExercise) 
         => new ListItem(plannedExercise.Id, plannedExercise.Exercise.Name, true);
 
-    private static ListItem ToListItem(this PlannedExerciseSet set)
-        => new ListItem(set.Id, set.SetType, true);
+    private static PlannedSetDetail ToListItem(this PlannedExerciseSet set)
+        => new PlannedSetDetail 
+        { 
+            Id = set.Id, 
+            Order = set.Order,
+            SetType = set.SetType ,
+            OrderForSetType = set.OrderForSetType,
+            Distance = set.TargetMetrics.Distance,
+            Reps = set.TargetMetrics.Reps,
+            Time = set.TargetMetrics.Time,
+            Weight = set.TargetMetrics.Weight
+        };
 }

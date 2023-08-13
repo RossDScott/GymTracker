@@ -1,5 +1,75 @@
-﻿<h3>PlannedSets</h3>
+﻿@using System.Collections.Immutable;
+@using GymTracker.BlazorClient.Features.WorkoutPlans.Components.SetMetrics
+@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+@using GymTracker.BlazorClient.Shared.Extensions;
+@using GymTracker.Domain.Models;
+
+<MudField Label="Planned Sets" Variant="Variant.Outlined">
+    <div class="fullHeight" style="position: relative">
+        <MudList>
+            @foreach (var (item, index) in _sets.LoopIndex())
+            {
+                <MudListItem>
+                    <MudGrid>
+                        <MudItem xs="1" Class="d-flex align-content-end">
+                            <div Class="align-self-end" style="margin-bottom:7px">
+                                <MudText Typo="Typo.body1">@item.OrderForSetType</MudText>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudSelect Value="item.SetType"
+                                       Dense="true"
+                                       DisableUnderLine="true"
+                                       Class="mt-0">
+                                @foreach (var set in _setTypes)
+                                {
+                                    <MudSelectItem T="string" Value="set" />
+                                }
+                            </MudSelect>
+                        </MudItem>
+
+                        @RenderSetMetrics(item)
+
+                        <MudItem xs="2">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Class="pb-0 mb-n6"></MudIconButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudListItem>
+            }
+        </MudList>
+
+        <div class="d-flex flex-row-reverse" style="position: absolute; bottom: 5px; right: 5px">
+            <MudFab Color="Color.Dark"
+                    Size="Size.Small"
+                    StartIcon="@Icons.Material.Filled.Add" />
+        </div>
+    </div>
+</MudField>
 
 @code {
-
+    RenderFragment RenderSetMetrics(PlannedSetDetail set) => MetricType switch
+    {
+        MetricType.Weight => @<WeightSet Set="set"></WeightSet>,
+        _ => throw new ArgumentOutOfRangeException(nameof(MetricType))
+    };
 }
+
+@code {
+    [Parameter]
+    public ImmutableArray<PlannedSetDetail> Sets { get; set; } = ImmutableArray<PlannedSetDetail>.Empty;
+
+    [Parameter]
+    public MetricType MetricType { get; set; }
+
+    List<PlannedSetDetail> _sets = new();
+
+    string[] _setTypes = { "Warm-up", "Set", "Drop-set" };
+
+    protected override void OnParametersSet()
+    {
+        _sets = Sets.ToList();
+
+        base.OnParametersSet();
+    }
+}
+

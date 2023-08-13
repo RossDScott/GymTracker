@@ -41,7 +41,7 @@
             <MudSwitch @bind-Checked="@_autoTriggerRestTimer"
                        Label="Auto Start Rest TImer" LabelPosition="LabelPosition.Start" />
 
-            @_restInterval
+            <PlannedSets Sets="PlannedExerciseDetail.PlannedSets"></PlannedSets>
         </MudStack>
     </MudForm>
 </MudPaper>

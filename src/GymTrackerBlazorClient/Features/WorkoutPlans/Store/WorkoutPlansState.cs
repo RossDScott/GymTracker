@@ -30,7 +30,7 @@ public record PlannedExerciseDetail
     public Guid Id { get; init; } = Guid.NewGuid();
     public string Name { get; init; } = string.Empty;
 
-    public ImmutableArray<ListItem> PlannedSets { get; init; } = ImmutableArray<ListItem>.Empty;
+    public ImmutableArray<PlannedSetDetail> PlannedSets { get; init; } = ImmutableArray<PlannedSetDetail>.Empty;
 
     public TimeSpan RestInterval { get; init; }
     public bool AutoTriggerRestTimer { get; init; } = true;
@@ -39,5 +39,11 @@ public record PlannedExerciseDetail
 public record PlannedSetDetail
 {
     public Guid Id { get; init; } = Guid.NewGuid();
+    public int Order { get; set; }
     public string SetType { get; init; } = default!;
+    public int OrderForSetType { get; set; }
+    public int? Reps { get; set; }
+    public decimal? Weight { get; set; }
+    public decimal? Time { get; set; }
+    public decimal? Distance { get; set; }
 }

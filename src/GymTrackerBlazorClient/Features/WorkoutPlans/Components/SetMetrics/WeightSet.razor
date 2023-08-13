@@ -1,0 +1,14 @@
+﻿@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+
+<MudItem xs="3">
+    <MudTextField 
+        @bind-Value="Set.Reps" Label="Reps" Variant="Variant.Text" Margin="Margin.Dense"></MudTextField>
+</MudItem>
+<MudItem xs="3">
+    <MudTextField @bind-Value="Set.Weight" Label="Weight" Variant="Variant.Text" Margin="Margin.Dense"></MudTextField>
+</MudItem>
+
+@code {
+    [Parameter, EditorRequired]
+    public PlannedSetDetail Set { get; set; } = default!;
+}
