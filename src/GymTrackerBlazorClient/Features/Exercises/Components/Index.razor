@@ -1,6 +1,4 @@
 ﻿@page "/exercises";
-@page "/exercises/{Id:guid}"
-@page "/exercises/new"
 
 @using GymTracker.BlazorClient.Features.AppBar.Store;
 @using GymTracker.BlazorClient.Features.Common.FullHeightList;
@@ -47,9 +45,6 @@
 </MudGrid>
 
 @code {
-    [Parameter]
-    public Guid? Id { get; set; } = null;
-
     MudTheme Theme = new();
 
     string Search = "";

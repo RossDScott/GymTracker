@@ -42,7 +42,7 @@ public class ExercisesEffects
         await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
-            new BreadcrumbItem(exercise.Name, $"/exercises/{exercise.Id}", false, Icons.Material.Filled.Edit),
+            new BreadcrumbItem(exercise.Name, $"/exercises", false, Icons.Material.Filled.Edit),
         }));
     }
 
@@ -55,7 +55,7 @@ public class ExercisesEffects
         await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
-            new BreadcrumbItem("New", "/exercises/new", false, Icons.Material.Filled.Add),
+            new BreadcrumbItem("New", "/exercises", false, Icons.Material.Filled.Add),
         }));
     }
 

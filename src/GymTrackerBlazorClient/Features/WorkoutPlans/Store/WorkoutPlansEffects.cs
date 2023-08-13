@@ -39,7 +39,7 @@ public class WorkoutPlansEffects
         await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("WorkoutPlans", "/workout-plans", false, Icons.Material.Filled.List),
-            new BreadcrumbItem(workoutPlan.Name, $"/workout-plans/{workoutPlan.Id}", false, Icons.Material.Filled.Edit),
+            new BreadcrumbItem(workoutPlan.Name, $"/workout-plans", false, Icons.Material.Filled.Edit),
         }));
     }
 
@@ -57,7 +57,7 @@ public class WorkoutPlansEffects
     }
 
     [EffectMethod]
-    public async Task OnAddOrUpdateWorkoutPlan(AddOrUpdateWorkoutPlanAction action, IDispatcher dispatcher)
+    public async Task OnUpsertWorkoutPlan(UpsertWorkoutPlanAction action, IDispatcher dispatcher)
     {
         var updateDTO = action.WorkoutPlan;
         
@@ -71,9 +71,6 @@ public class WorkoutPlansEffects
         dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
 
         await LoadWorkoutPlans(dispatcher);
-
-        if (response == UpsertResponse.New)
-            dispatcher.Dispatch(new NavigateToNewWorkoutPlanAction(workoutPlan.Id));
     }
 
     [EffectMethod]

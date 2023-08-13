@@ -1,7 +1,4 @@
 ﻿@page "/workout-plans"
-@page "/workout-plans/{SelectedWorkoutPlanId:guid}"
-@page "/workout-plans/new"
-@page "/workout-plans/{SelectedWorkoutPlanId:guid}/{SelectedExerciseId:guid}"
 
 @using GymTracker.BlazorClient.Features.Common;
 @using GymTracker.BlazorClient.Features.Common.FullHeightList
@@ -46,38 +43,11 @@
 </MudGrid>
 
 @code {
-    [Parameter]
-    public Guid? SelectedWorkoutPlanId { get; set; }
-
-    [Parameter]
-    public Guid? SelectedExerciseId { get; set; }
-
     protected override void OnInitialized()
     {
-        NaviagationManager.LocationChanged += HandleLocationChanged;
+        Dispatcher.Dispatch(new FetchWorkoutPlansInitialStateAction());
 
-        //SubscribeToAction<NavigateToNewExerciseAction>(action =>
-        //    NaviagationManager.NavigateTo($"/exercises/{action.Id}"));
-
-        HandleSetupPageByLocation(NaviagationManager.Uri, true);
         base.OnInitialized();
-    }
-
-    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e) =>
-        HandleSetupPageByLocation(e.Location);
-
-    private void HandleSetupPageByLocation(string location, bool initialLoad = false)
-    {
-        if (location.EndsWith("plans") || initialLoad)
-            Dispatcher.Dispatch(new FetchWorkoutPlansInitialStateAction());
-
-        if (SelectedExerciseId is not null)
-            Dispatcher.Dispatch(new FetchExerciseAction(SelectedWorkoutPlanId.Value, SelectedExerciseId.Value));
-        else if (SelectedWorkoutPlanId is not null)
-            Dispatcher.Dispatch(new FetchWorkoutPlanAction(SelectedWorkoutPlanId.Value));
-
-        if (location.EndsWith("new"))
-            Dispatcher.Dispatch(new CreateNewWorkoutPlanAction());
     }
 
     void HandleWorkoutPlanSelected(ListItem item)
@@ -85,16 +55,16 @@
         if (item.Id == State.Value.SelectedWorkoutPlan?.Id)
             Dispatcher.Dispatch(new SetWorkoutPlanAction(null));
         else
-            NaviagationManager.NavigateTo($"/workout-plans/{item.Id}");
+            Dispatcher.Dispatch(new FetchWorkoutPlanAction(item.Id));
     }
 
     void HandleAddNewWorkoutPlan() =>
-        NaviagationManager.NavigateTo($"/workout-plans/new");
+        Dispatcher.Dispatch(new CreateNewWorkoutPlanAction());
 
     void HandleUpdateWorkout(WorkoutPlanDetail updateDTO) =>
-        Dispatcher.Dispatch(new AddOrUpdateWorkoutPlanAction(updateDTO));
+        Dispatcher.Dispatch(new UpsertWorkoutPlanAction(updateDTO));
 
-    void HandleSelectExercise(ListItem item) =>
-        NaviagationManager.NavigateTo($"/workout-plans/{SelectedWorkoutPlanId}/{item.Id}");
+    void HandleSelectExercise(ListItem item) => Dispatcher.Dispatch(
+            new FetchExerciseAction(State.Value.SelectedWorkoutPlan!.Id, item.Id));
 
 }
