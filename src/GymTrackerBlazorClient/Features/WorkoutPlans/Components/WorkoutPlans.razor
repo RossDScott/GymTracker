@@ -14,7 +14,7 @@
 @inject IDispatcher Dispatcher
 
 <MudGrid Class="fullHeight ma-0" Justify="Justify.FlexStart" Spacing="1" Style="width: 100%">
-    <MudItem xs="@(State.Value.SelectedWorkoutPlan == null ? 4 : 1)" Class="mb-0 fullHeight" Style="position: relative">
+    <MudItem xs="@(State.Value.SelectedWorkoutPlan == null ? 4 : 2)" Class="mb-0 fullHeight" Style="position: relative">
         <FullHeightList 
             List="State.Value.WorkoutPlans"
             SelectedId="State.Value.SelectedWorkoutPlan?.Id"
@@ -23,7 +23,7 @@
             OnAddItem="HandleAddNewWorkoutPlan">
         </FullHeightList>
     </MudItem>
-    <MudItem xs="4" Class="">
+    <MudItem xs="3" Class="">
         @if(State.Value.SelectedWorkoutPlan is not null)
         {
             <WorkoutPlan
@@ -34,7 +34,7 @@
             </WorkoutPlan>
         }
     </MudItem>
-    <MudItem xs="4" Class="">
+    <MudItem xs="5" Class="">
         @if(State.Value.SelectedExercise is not null)
         {
             <PlannedExercise
