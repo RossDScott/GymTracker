@@ -7,8 +7,7 @@ public record SetInitialDataAction(
     IEnumerable<string> TargetBodyParts,
     IEnumerable<string> Equipment,
     IEnumerable<Exercise> Exercises);
-public record SetExercisesAction(
-    IEnumerable<Exercise> Exercises);
+public record SetExercisesAction(IEnumerable<Exercise> Exercises);
 public record FetchExerciseAction(Guid Id);
 public record SetExerciseAction(Exercise Exercise);
 public record UpsertExerciseAction(DetailItem Exercise);
