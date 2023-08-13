@@ -13,11 +13,12 @@
 @inject IState<WorkoutPlansState> State
 @inject IDispatcher Dispatcher
 
-<MudGrid Class="fullHeight ma-0" Justify="Justify.SpaceEvenly" Style="width: 100%">
-    <MudItem xs="4" Class="mb-0 fullHeight" Style="position: relative">
+<MudGrid Class="fullHeight ma-0" Justify="Justify.FlexStart" Spacing="1" Style="width: 100%">
+    <MudItem xs="@(State.Value.SelectedWorkoutPlan == null ? 4 : 1)" Class="mb-0 fullHeight" Style="position: relative">
         <FullHeightList 
             List="State.Value.WorkoutPlans"
             SelectedId="State.Value.SelectedWorkoutPlan?.Id"
+            AutoCollapseOnSelection="true"
             OnItemClick="HandleWorkoutPlanSelected"
             OnAddItem="HandleAddNewWorkoutPlan">
         </FullHeightList>
@@ -79,8 +80,13 @@
             Dispatcher.Dispatch(new CreateNewWorkoutPlanAction());
     }
 
-    void HandleWorkoutPlanSelected(ListItem item) =>
-        NaviagationManager.NavigateTo($"/workout-plans/{item.Id}");
+    void HandleWorkoutPlanSelected(ListItem item)
+    {
+        if (item.Id == State.Value.SelectedWorkoutPlan?.Id)
+            Dispatcher.Dispatch(new SetWorkoutPlanAction(null));
+        else
+            NaviagationManager.NavigateTo($"/workout-plans/{item.Id}");
+    }
 
     void HandleAddNewWorkoutPlan() =>
         NaviagationManager.NavigateTo($"/workout-plans/new");

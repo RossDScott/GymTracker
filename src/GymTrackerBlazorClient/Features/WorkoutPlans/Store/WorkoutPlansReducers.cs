@@ -27,7 +27,7 @@ public static class WorkoutPlansReducers
     public static WorkoutPlansState OnSetWorkoutPlan(WorkoutPlansState state, SetWorkoutPlanAction action) =>
         state with
         {
-            SelectedWorkoutPlan = action.WorkoutPlan.ToDetailItem(),
+            SelectedWorkoutPlan = action.WorkoutPlan?.ToDetailItem(),
             SelectedExercise = null
 
         };

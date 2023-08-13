@@ -13,21 +13,13 @@
             SelectedValue="SelectedId">
             @foreach (var (item, index) in List.LoopIndex())
             {
-                <MudListItem 
-                    OnClick="() => OnItemClick.InvokeAsync(item)"
-                    Value="item.Id"
-                    Style="@(item.IsAcitve ? "" : $"color: {Theme.PaletteDark.TextDisabled}")">
-                    <div class="d-flex flex-row">
-                        <MudText Typo="Typo.subtitle1">@item.Name</MudText>
-                        @WhenEnabledShowReorderButtons(index)
-                    </div>
-                </MudListItem>
+                @RenderListItem(item, index)
             }
         </MudList>
     </MudPaper>
     @if (OnAddItem.HasDelegate)
     {
-        <div class="d-flex flex-row-reverse" style="position: absolute; bottom: 15px; right: 15px">
+        <div class="d-flex flex-row-reverse" style="position: absolute; bottom: 5px; right: 5px">
             <MudFab Color="Color.Dark"
                     StartIcon="@Icons.Material.Filled.Add"
                     OnClick="_ => OnAddItem.InvokeAsync()" />
@@ -36,23 +28,38 @@
 </div>
 
 @code {
-    RenderFragment? WhenEnabledShowReorderButtons(int index)
-    => CanReorder && List[index].Id == SelectedId
+    RenderFragment? WhenEnabledShowReorderButtons(ListItem item, int index)
+    => CanReorder && item.Id == SelectedId && !AutoCollapseOnSelection
         ? @<div class="d-flex flex-column" style="margin-left: auto">
             <MudIconButton 
                        Icon="@Icons.Material.Filled.ArrowDropUp"
                        Size="Size.Small"
                        Style="padding: 0"
-                       OnClick="_ => OnChangeOrder.InvokeAsync((List[index], OrderDirection.Up))"></MudIconButton>
+                       OnClick="_ => OnChangeOrder.InvokeAsync((item, OrderDirection.Up))"></MudIconButton>
             <MudIconButton 
                        Icon="@Icons.Material.Filled.ArrowDropDown"
                        Size="Size.Small"
                        Style="padding: 0"
-                       OnClick="_ => OnChangeOrder.InvokeAsync((List[index], OrderDirection.Down))"></MudIconButton>
+                       OnClick="_ => OnChangeOrder.InvokeAsync((item, OrderDirection.Down))"></MudIconButton>
            </div>
         : null;
-}
 
+    RenderFragment RenderListItem(ListItem item, int index)
+        => AutoCollapseOnSelection && SelectedId is not null
+        ? @<MudListItem OnClick="() => OnItemClick.InvokeAsync(item)"
+                        Value="item.Id"
+                        Style="@(item.IsAcitve ? "" : $"color: {Theme.PaletteDark.TextDisabled}")">
+                <MudText Typo="Typo.subtitle2">@item.Name</MudText>
+           </MudListItem>
+        : @<MudListItem OnClick="() => OnItemClick.InvokeAsync(item)"
+                        Value="item.Id"
+                        Style="@(item.IsAcitve ? "" : $"color: {Theme.PaletteDark.TextDisabled}")">
+            <div class="d-flex flex-row">
+                <MudText Typo="Typo.subtitle1">@item.Name</MudText>
+            @WhenEnabledShowReorderButtons(item, index)
+            </div>
+        </MudListItem>;
+}
 
 @code {
     [Parameter]
@@ -69,6 +76,9 @@
 
     [Parameter]
     public bool CanReorder { get; set; } = false;
+
+    [Parameter]
+    public bool AutoCollapseOnSelection { get; set; } = false;
 
     [Parameter]
     public EventCallback<ListItem> OnItemClick { get; set; }
