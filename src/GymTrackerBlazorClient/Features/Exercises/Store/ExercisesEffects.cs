@@ -60,7 +60,7 @@ public class ExercisesEffects
     }
 
     [EffectMethod]
-    public async Task OnAddOrUpdateExercise(AddOrUpdateExerciseAction action, IDispatcher dispatcher)
+    public async Task OnUpsertExercise(UpsertExerciseAction action, IDispatcher dispatcher)
     {
         var updateDTO = action.Exercise;
         var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
@@ -76,10 +76,5 @@ public class ExercisesEffects
         var response = await _clientStorage.Exercises.UpsertAsync(exercise);
         dispatcher.Dispatch(new SetExercisesAction(exercises));
         dispatcher.Dispatch(new SetExerciseAction(exercise));
-
-        if(response == UpsertResponse.New)
-            dispatcher.Dispatch(new NavigateToNewExerciseAction(exercise.Id));
     }
-
-
 }

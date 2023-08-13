@@ -56,47 +56,17 @@
 
     protected override void OnInitialized()
     {
-        NaviagationManager.LocationChanged += HandleLocationChanged;
+        Dispatcher.Dispatch(new FetchExercisesAction());
 
-        SubscribeToAction<NavigateToNewExerciseAction>(action =>
-            NaviagationManager.NavigateTo($"/exercises/{action.Id}"));
-
-        HandleSetupPageByLocation(NaviagationManager.Uri, true);
         base.OnInitialized();
     }
 
-    protected override void OnParametersSet()
-    {
-        HandleSetupPageByLocation(NaviagationManager.Uri);
-        base.OnParametersSet();
-    }
-
-    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e) =>
-        HandleSetupPageByLocation(e.Location);
-
-    private void HandleSetupPageByLocation(string location, bool initialLoad = false)
-    {
-        if (location.EndsWith("exercises") || initialLoad)
-            Dispatcher.Dispatch(new FetchExercisesAction());
-
-        if (Id is not null)
-            Dispatcher.Dispatch(new FetchExerciseAction(Id.Value));
-
-        if (location.EndsWith("new"))
-            Dispatcher.Dispatch(new CreateNewExerciseAction());
-    }
-
-    void HandleExerciseSelected(ListItem item) =>
-        NaviagationManager.NavigateTo($"/exercises/{item.Id}");
+    void HandleExerciseSelected(ListItem item) 
+        => Dispatcher.Dispatch(new FetchExerciseAction(item.Id));
 
     void HandleAddNewExercise() =>
-        NaviagationManager.NavigateTo($"/exercises/new");  
+        Dispatcher.Dispatch(new CreateNewExerciseAction());
 
     void HandleUpdateExercise(DetailItem updateDTO) =>
-        Dispatcher.Dispatch(new AddOrUpdateExerciseAction(updateDTO));
-
-    public void Dispose()
-    {
-        NaviagationManager.LocationChanged -= HandleLocationChanged;
-    }
+        Dispatcher.Dispatch(new UpsertExerciseAction(updateDTO));
 }
