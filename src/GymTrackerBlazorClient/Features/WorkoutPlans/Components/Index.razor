@@ -35,7 +35,8 @@
         @if(State.Value.SelectedExercise is not null)
         {
             <PlannedExercise
-                PlannedExerciseDetail="State.Value.SelectedExercise">
+                PlannedExerciseDetail="State.Value.SelectedExercise"
+                OnPlannedExerciseUpdated="HandleUpdatePlannedExercise">
 
             </PlannedExercise>
         }
@@ -66,5 +67,11 @@
 
     void HandleSelectExercise(ListItem item) => Dispatcher.Dispatch(
             new FetchExerciseAction(State.Value.SelectedWorkoutPlan!.Id, item.Id));
+
+    void HandleUpdatePlannedExercise(PlannedExerciseDetail exerciseDetail)
+    {
+        var x = exerciseDetail;
+        var sets = x.PlannedSets.ToList();
+    }
 
 }

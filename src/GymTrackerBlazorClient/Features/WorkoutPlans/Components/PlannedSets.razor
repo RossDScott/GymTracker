@@ -9,36 +9,13 @@
         <MudList>
             @foreach (var (item, index) in _sets.LoopIndex())
             {
-                <MudListItem>
-                    <MudGrid>
-                        <MudItem xs="1" Class="d-flex align-content-end">
-                            <div Class="align-self-end" style="margin-bottom:7px">
-                                <MudText Typo="Typo.body1">@item.OrderForSetType</MudText>
-                            </div>
-                        </MudItem>
-                        <MudItem xs="3">
-                            <MudSelect Value="item.SetType"
-                                       Dense="true"
-                                       DisableUnderLine="true"
-                                       Class="mt-0">
-                                @foreach (var set in _setTypes)
-                                {
-                                    <MudSelectItem T="string" Value="set" />
-                                }
-                            </MudSelect>
-                        </MudItem>
-
-                        @RenderSetMetrics(item)
-
-                        <MudItem xs="2">
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Class="pb-0 mb-n6"></MudIconButton>
-                        </MudItem>
-                    </MudGrid>
-                </MudListItem>
+                <PlannedSet Set="item" 
+                            MetricType="MetricType"
+                            OnUpdateSet="HandleChange"></PlannedSet>
             }
         </MudList>
 
-        <div class="d-flex flex-row-reverse" style="position: absolute; bottom: 5px; right: 5px">
+        <div class="d-flex flex-row-reverse">
             <MudFab Color="Color.Dark"
                     Size="Size.Small"
                     StartIcon="@Icons.Material.Filled.Add" />
@@ -47,23 +24,16 @@
 </MudField>
 
 @code {
-    RenderFragment RenderSetMetrics(PlannedSetDetail set) => MetricType switch
-    {
-        MetricType.Weight => @<WeightSet Set="set"></WeightSet>,
-        _ => throw new ArgumentOutOfRangeException(nameof(MetricType))
-    };
-}
-
-@code {
     [Parameter]
     public ImmutableArray<PlannedSetDetail> Sets { get; set; } = ImmutableArray<PlannedSetDetail>.Empty;
 
     [Parameter]
     public MetricType MetricType { get; set; }
 
-    List<PlannedSetDetail> _sets = new();
+    [Parameter]
+    public EventCallback<ImmutableArray<PlannedSetDetail>> OnUpdateSets { get; set; }
 
-    string[] _setTypes = { "Warm-up", "Set", "Drop-set" };
+    List<PlannedSetDetail> _sets = new();
 
     protected override void OnParametersSet()
     {
@@ -71,5 +41,7 @@
 
         base.OnParametersSet();
     }
+
+    void HandleChange() => OnUpdateSets.InvokeAsync(_sets.ToImmutableArray());
 }
 

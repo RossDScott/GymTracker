@@ -1,4 +1,5 @@
 ﻿@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+@using System.Collections.Immutable;
 
 @inject IDispatcher Dispatcher
 
@@ -41,7 +42,8 @@
             <MudSwitch @bind-Checked="@_autoTriggerRestTimer"
                        Label="Auto Start Rest TImer" LabelPosition="LabelPosition.Start" />
 
-            <PlannedSets Sets="PlannedExerciseDetail.PlannedSets"></PlannedSets>
+            <PlannedSets Sets="PlannedExerciseDetail.PlannedSets"
+                         OnUpdateSets="HandleSetsUpdated"></PlannedSets>
         </MudStack>
     </MudForm>
 </MudPaper>
@@ -49,6 +51,9 @@
 @code {
     [Parameter, EditorRequired]
     public PlannedExerciseDetail PlannedExerciseDetail { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<PlannedExerciseDetail> OnPlannedExerciseUpdated { get; set; }
 
     MudForm _form;
     bool _autoTriggerRestTimer;
@@ -64,6 +69,15 @@
         base.OnParametersSet();
     }
 
+    public void HandleSetsUpdated(ImmutableArray<PlannedSetDetail> sets)
+    {
+        var updateDTO = PlannedExerciseDetail with
+            {
+                PlannedSets = sets
+            };
+
+        OnPlannedExerciseUpdated.InvokeAsync(updateDTO);
+    }
 
 
 }

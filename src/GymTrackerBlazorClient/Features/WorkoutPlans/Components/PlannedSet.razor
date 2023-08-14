@@ -1,0 +1,57 @@
+﻿@using GymTracker.BlazorClient.Features.WorkoutPlans.Components.SetMetrics
+@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+@using GymTracker.Domain.Models;
+<MudListItem>
+    <MudGrid>
+        <MudItem xs="1" Class="d-flex align-content-end">
+            <div Class="align-self-end" style="margin-bottom:7px">
+                <MudText Typo="Typo.body1">@Set.OrderForSetType</MudText>
+            </div>
+        </MudItem>
+        <MudItem xs="3">
+            <MudSelect Value="Set.SetType"
+                       ValueChanged="(string value) => HandleSetTypeChanged(value)"
+                       Dense="true"
+                       DisableUnderLine="true"
+                       Class="mt-0">
+                @foreach (var set in _setTypes)
+                {
+                    <MudSelectItem T="string" Value="set" />
+                }
+            </MudSelect>
+        </MudItem>
+
+        @RenderSetMetrics(Set)
+
+        <MudItem xs="2">
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Class="pb-0 mb-n6"></MudIconButton>
+        </MudItem>
+    </MudGrid>
+</MudListItem>
+
+@code {
+    RenderFragment RenderSetMetrics(PlannedSetDetail set) => MetricType switch
+    {
+        MetricType.Weight => @<WeightSet Set="set"></WeightSet>,
+        _ => throw new ArgumentOutOfRangeException(nameof(MetricType))
+    };
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public PlannedSetDetail Set { get; set; } = default!;
+
+    [Parameter]
+    public MetricType MetricType { get; set; }
+
+    [Parameter]
+    public EventCallback OnUpdateSet { get; set; }
+
+    string[] _setTypes = { "Warm-up", "Set", "Drop-set" };
+
+    void HandleSetTypeChanged(string type)
+    {
+        Set.SetType = type;
+        OnUpdateSet.InvokeAsync();
+    }
+}
