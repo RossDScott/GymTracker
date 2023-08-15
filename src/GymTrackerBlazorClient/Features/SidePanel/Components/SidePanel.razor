@@ -10,7 +10,10 @@
     Class="fullHeight">
     <MudDrawerContainer Class="fullHeight">
         <CascadingValue Value="@_sidePanelReference">
-            @_childRender
+            @if(_componentType != null)
+            {
+                <DynamicComponent Type="_componentType"></DynamicComponent>
+            }
         </CascadingValue>
     </MudDrawerContainer>
 </MudDrawer>
@@ -18,7 +21,6 @@
 @inherits FluxorComponent
 
 @code {
-    RenderFragment? _childRender { get; set; } = null;
     bool _open = false;
     public bool Open 
     { 
@@ -31,6 +33,7 @@
         } 
     }
     SidePanelReference? _sidePanelReference = null;
+    Type? _componentType = null;
 
     protected override void OnInitialized()
     {
@@ -41,14 +44,14 @@
 
     void HandleShowPanel(ShowSidePanelAction action)
     {
-        _childRender = CreateComponent(action.Type);
+        _componentType = action.Type;
         _open = true;
         _sidePanelReference = action.SidePanelReference;
     }
 
     void HandleHidePanel(HideSidePanelAction action)
     {
-        _childRender = null;
+        _componentType = null;
         _open = false;
         _sidePanelReference = null;
     }
@@ -58,13 +61,6 @@
         if (_sidePanelReference is null)
             return;
 
-
         _sidePanelReference.Cancel();
     }
-
-    private RenderFragment CreateComponent(Type type) => builder =>
-    {
-        builder.OpenComponent(0, type);
-        builder.CloseComponent();
-    };
 }
