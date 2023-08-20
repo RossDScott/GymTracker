@@ -7,6 +7,7 @@ using GymTracker.Domain.Extensions;
 using GymTracker.Domain.Models;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.WorkoutPlans.Store;
 
@@ -44,7 +45,7 @@ public class WorkoutPlansEffects
     }
 
     [EffectMethod]
-    public async Task OnAddExerciseToWorkoutPlan(AddExerciseToWorkoutPlan action, IDispatcher dispatcher)
+    public async Task OnAddExerciseToWorkoutPlan(AddExerciseToWorkoutPlanAction action, IDispatcher dispatcher)
     {
         var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
         var exercise = await _clientStorage.Exercises.FindByIdAsync(action.ExerciseId);
@@ -78,11 +79,31 @@ public class WorkoutPlansEffects
         };
         plannedSets.AddRange(defaultSets);
         plannedExercise.PlannedSets = plannedSets;
-
         workoutPlan.PlannedExercises.Add(plannedExercise);
-        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
 
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
         dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
+    }
+
+    [EffectMethod]
+    public async Task OnUpdateExerciseForWorkoutPlan(UpdateExerciseForWorkoutPlanAction action, IDispatcher dispatcher)
+    {
+        var dto = action.ExerciseDetail;
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
+        var exercises = workoutPlan.PlannedExercises.ToList();
+        var plannedExerciseToUpdate = exercises.Single(x => x.Id == action.ExerciseDetail.Id);
+        var sourceExercise = await _clientStorage.Exercises.FindByIdAsync(plannedExerciseToUpdate.Exercise.Id);
+
+        plannedExerciseToUpdate.RestInterval = dto.RestInterval;
+        plannedExerciseToUpdate.AutoTriggerRestTimer = dto.AutoTriggerRestTimer;
+        plannedExerciseToUpdate.PlannedSets = dto.PlannedSets
+                                                 .Select(x => x.ToModel())
+                                                 .ToList();
+        plannedExerciseToUpdate.Exercise = sourceExercise;
+        workoutPlan.PlannedExercises = exercises;
+
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
+        dispatcher.Dispatch(new SetExerciseAction(plannedExerciseToUpdate));
     }
 
     [EffectMethod]

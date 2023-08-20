@@ -38,45 +38,4 @@ public static class WorkoutPlansReducers
         {
             SelectedExercise = action.Exercise.ToDetailItem()
         };
-
-    private static WorkoutPlanDetail ToDetailItem(this WorkoutPlan plan) 
-        => new WorkoutPlanDetail
-        {
-            Id = plan.Id,
-            Name = plan.Name,
-            PlannedExercises = plan.PlannedExercises
-                                    .OrderBy(x => x.Order)                        
-                                    .Select(x => x.ToListItem())
-                                    .ToImmutableArray(),
-            IsActive = plan.IsAcitve
-        };
-
-    private static PlannedExerciseDetail ToDetailItem(this PlannedExercise exercise)
-        => new PlannedExerciseDetail
-        {
-            Id = exercise.Id,
-            Name = exercise.Exercise.Name,
-            AutoTriggerRestTimer = exercise.AutoTriggerRestTimer,
-            RestInterval = exercise.RestInterval,
-            PlannedSets = exercise.PlannedSets
-                                    .OrderBy(x => x.Order)
-                                    .Select(x => x.ToListItem())
-                                    .ToImmutableArray()
-        };
-
-    private static ListItem ToListItem(this PlannedExercise plannedExercise) 
-        => new ListItem(plannedExercise.Id, plannedExercise.Exercise.Name, true);
-
-    private static PlannedSetDetail ToListItem(this PlannedExerciseSet set)
-        => new PlannedSetDetail 
-        { 
-            Id = set.Id, 
-            Order = set.Order,
-            SetType = set.SetType ,
-            OrderForSetType = set.OrderForSetType,
-            Distance = set.TargetMetrics.Distance,
-            Reps = set.TargetMetrics.Reps,
-            Time = set.TargetMetrics.Time,
-            Weight = set.TargetMetrics.Weight
-        };
 }

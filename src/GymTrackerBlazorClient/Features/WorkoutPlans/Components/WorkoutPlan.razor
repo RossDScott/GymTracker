@@ -96,7 +96,7 @@
         if (!result.Canceled)
         {
             var exerciseId = result.Data!.Id;
-            Dispatcher.Dispatch(new AddExerciseToWorkoutPlan(WorkoutPlanDetail.Id, exerciseId));
+            Dispatcher.Dispatch(new AddExerciseToWorkoutPlanAction(WorkoutPlanDetail.Id, exerciseId));
         }
     }
 

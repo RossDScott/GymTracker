@@ -12,32 +12,28 @@
 
 <MudGrid Class="fullHeight ma-0" Justify="Justify.FlexStart" Spacing="1" Style="width: 100%">
     <MudItem xs="@(State.Value.SelectedWorkoutPlan == null ? 4 : 2)" Class="mb-0 fullHeight" Style="position: relative">
-        <FullHeightList 
-            List="State.Value.WorkoutPlans"
-            SelectedId="State.Value.SelectedWorkoutPlan?.Id"
-            AutoCollapseOnSelection="true"
-            OnItemClick="HandleWorkoutPlanSelected"
-            OnAddItem="HandleAddNewWorkoutPlan">
+        <FullHeightList List="State.Value.WorkoutPlans"
+                        SelectedId="State.Value.SelectedWorkoutPlan?.Id"
+                        AutoCollapseOnSelection="true"
+                        OnItemClick="HandleWorkoutPlanSelected"
+                        OnAddItem="HandleAddNewWorkoutPlan">
         </FullHeightList>
     </MudItem>
     <MudItem xs="3" Class="">
-        @if(State.Value.SelectedWorkoutPlan is not null)
+        @if (State.Value.SelectedWorkoutPlan is not null)
         {
-            <WorkoutPlan
-                WorkoutPlanDetail="State.Value.SelectedWorkoutPlan"
-                OnWorkoutPlanUpdated="HandleUpdateWorkout"
-                SelectedExerciseId="State.Value.SelectedExercise?.Id"
-                OnExerciseSelected="HandleSelectExercise">
+            <WorkoutPlan WorkoutPlanDetail="State.Value.SelectedWorkoutPlan"
+                         OnWorkoutPlanUpdated="HandleUpdateWorkout"
+                         SelectedExerciseId="State.Value.SelectedExercise?.Id"
+                         OnExerciseSelected="HandleSelectExercise">
             </WorkoutPlan>
         }
     </MudItem>
     <MudItem xs="5" Class="">
-        @if(State.Value.SelectedExercise is not null)
+        @if (State.Value.SelectedExercise is not null)
         {
-            <PlannedExercise
-                PlannedExerciseDetail="State.Value.SelectedExercise"
-                OnPlannedExerciseUpdated="HandleUpdatePlannedExercise">
-
+            <PlannedExercise PlannedExerciseDetail="State.Value.SelectedExercise"
+                             OnPlannedExerciseUpdated="HandleUpdatePlannedExercise">
             </PlannedExercise>
         }
     </MudItem>
@@ -68,10 +64,9 @@
     void HandleSelectExercise(ListItem item) => Dispatcher.Dispatch(
             new FetchExerciseAction(State.Value.SelectedWorkoutPlan!.Id, item.Id));
 
-    void HandleUpdatePlannedExercise(PlannedExerciseDetail exerciseDetail)
-    {
-        var x = exerciseDetail;
-        var sets = x.PlannedSets.ToList();
-    }
-
+    void HandleUpdatePlannedExercise(PlannedExerciseDetail exerciseDetail) =>
+        Dispatcher.Dispatch(new UpdateExerciseForWorkoutPlanAction(
+            State.Value.SelectedWorkoutPlan!.Id, 
+            exerciseDetail));
+    
 }

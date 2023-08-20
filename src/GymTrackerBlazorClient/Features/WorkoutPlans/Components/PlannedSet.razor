@@ -32,7 +32,8 @@
 @code {
     RenderFragment RenderSetMetrics(PlannedSetDetail set) => MetricType switch
     {
-        MetricType.Weight => @<WeightSet Set="set"></WeightSet>,
+        MetricType.Weight => @<WeightSet Set="set" OnUpdateSet="OnUpdateSet"></WeightSet>,
+        MetricType.Time => @<TimedSet Set="set" OnUpdateSet="OnUpdateSet"></TimedSet>,
         _ => throw new ArgumentOutOfRangeException(nameof(MetricType))
     };
 }
@@ -46,6 +47,9 @@
 
     [Parameter]
     public EventCallback OnUpdateSet { get; set; }
+
+    [Parameter]
+    public EventCallback OnDeleteSet { get; set; }
 
     string[] _setTypes = { "Warm-up", "Set", "Drop-set" };
 
