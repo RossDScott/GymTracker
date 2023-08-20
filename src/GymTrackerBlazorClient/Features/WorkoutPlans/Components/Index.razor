@@ -32,9 +32,7 @@
     <MudItem xs="5" Class="">
         @if (State.Value.SelectedExercise is not null)
         {
-            <PlannedExercise PlannedExerciseDetail="State.Value.SelectedExercise"
-                             OnPlannedExerciseUpdated="HandleUpdatePlannedExercise">
-            </PlannedExercise>
+            <PlannedExercise></PlannedExercise>
         }
     </MudItem>
 </MudGrid>
@@ -64,9 +62,5 @@
     void HandleSelectExercise(ListItem item) => Dispatcher.Dispatch(
             new FetchExerciseAction(State.Value.SelectedWorkoutPlan!.Id, item.Id));
 
-    void HandleUpdatePlannedExercise(PlannedExerciseDetail exerciseDetail) =>
-        Dispatcher.Dispatch(new UpdateExerciseForWorkoutPlanAction(
-            State.Value.SelectedWorkoutPlan!.Id, 
-            exerciseDetail));
-    
+
 }

@@ -1,6 +1,7 @@
 ﻿@using GymTracker.BlazorClient.Features.WorkoutPlans.Components.SetMetrics
 @using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
 @using GymTracker.Domain.Models;
+
 <MudListItem>
     <MudGrid>
         <MudItem xs="1" Class="d-flex align-content-end">
@@ -24,7 +25,9 @@
         @RenderSetMetrics(Set)
 
         <MudItem xs="2">
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Class="pb-0 mb-n6"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                           OnClick="OnDeleteSet"
+                           Class="pb-0 mb-n6"></MudIconButton>
         </MudItem>
     </MudGrid>
 </MudListItem>

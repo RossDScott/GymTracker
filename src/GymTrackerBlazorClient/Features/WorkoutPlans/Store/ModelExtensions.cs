@@ -62,4 +62,20 @@ public static class ModelExtensions
                 Weight = set.Weight
             }
         };
+
+    public static IList<PlannedExerciseSet> OrderSetTypes(this IList<PlannedExerciseSet> exerciseSets)
+    {
+        var dic = new Dictionary<string, int>();
+
+        foreach (var exerciseSet in exerciseSets)
+        {
+            if(!dic.ContainsKey(exerciseSet.SetType))
+                dic.Add(exerciseSet.SetType, 0);
+
+            dic[exerciseSet.SetType] += 1;
+            exerciseSet.OrderForSetType = dic[exerciseSet.SetType];
+        }
+
+        return exerciseSets;
+    }
 }

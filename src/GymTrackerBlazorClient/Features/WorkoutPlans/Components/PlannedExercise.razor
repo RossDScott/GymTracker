@@ -1,12 +1,15 @@
 ﻿@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
 @using System.Collections.Immutable;
 
+@inherits FluxorComponent
+
+@inject IState<WorkoutPlansState> State
 @inject IDispatcher Dispatcher
 
 <MudPaper Class="pa-2">
     <MudForm @ref="_form">
         <MudStack Class="fullHeight ma-0">
-            @PlannedExerciseDetail.Name
+            @_model.Name
 
             <MudField Variant="Variant.Outlined" Label="Rest Interval" InnerPadding="false">
                 <div Class="d-flex flex-row">
@@ -15,9 +18,8 @@
                                T="int" 
                                Label="Minutes" 
                                Variant="Variant.Text"
-                               Value="_restInterval.Minutes"
-                               ValueChanged="x => 
-                                    _restInterval = new TimeSpan(0,0,x,_restInterval.Seconds)">
+                               Value="_model.RestInterval.Minutes"
+                               ValueChanged="HandleSetRestIntervalMinutes">
                         @for (int i = 0; i < 10; i++)
                         {
                             <MudSelectItem Value="@i" />
@@ -28,9 +30,8 @@
                                T="int"
                                Label="Seconds"
                                Variant="Variant.Text"
-                               Value="_restInterval.Seconds"
-                               ValueChanged="x =>
-                                    _restInterval = new TimeSpan(0,0,_restInterval.Minutes, x)">
+                               Value="_model.RestInterval.Seconds"
+                               ValueChanged="HandleSetRestIntervalSeconds">
                         @for (int i = 0; i < 61; i++)
                         {
                             <MudSelectItem Value="@i" />
@@ -39,45 +40,35 @@
                 </div>
             </MudField>
 
-            <MudSwitch @bind-Checked="@_autoTriggerRestTimer"
+            <MudSwitch Checked="_model.AutoTriggerRestTimer"
+                       CheckedChanged="(bool x) => HandleAutoTriggerChange(x)"
                        Label="Auto Start Rest TImer" LabelPosition="LabelPosition.Start" />
 
-            <PlannedSets Sets="PlannedExerciseDetail.PlannedSets"
-                         OnUpdateSets="HandleSetsUpdated"></PlannedSets>
+            <PlannedSets Sets="_model.PlannedSets"
+                         OnUpdateSets="HandleSetsUpdated"
+                         OnAddSet="HandleAddExerciseSet"></PlannedSets>
         </MudStack>
     </MudForm>
 </MudPaper>
 
 @code {
-    [Parameter, EditorRequired]
-    public PlannedExerciseDetail PlannedExerciseDetail { get; set; } = default!;
-
-    [Parameter]
-    public EventCallback<PlannedExerciseDetail> OnPlannedExerciseUpdated { get; set; }
-
     MudForm _form;
-    bool _autoTriggerRestTimer;
-    TimeSpan _restInterval;
+    PlannedExerciseDetail _model => State.Value.SelectedExercise!;
 
-    protected override void OnParametersSet()
-    {
-        _autoTriggerRestTimer = PlannedExerciseDetail.AutoTriggerRestTimer;
-        _restInterval = PlannedExerciseDetail.RestInterval;
+    public void HandleAutoTriggerChange(bool value) => 
+        HandleUpdatePlannedExercise(_model with { AutoTriggerRestTimer = value });
+    public void HandleSetRestIntervalSeconds(int seconds) => HandleSetRestInterval(_model.RestInterval.Minutes, seconds);
+    public void HandleSetRestIntervalMinutes(int minutes) => HandleSetRestInterval(minutes, _model.RestInterval.Seconds);
 
-        _form?.ResetValidation();
+    public void HandleSetRestInterval(int minutes, int seconds) => 
+        HandleUpdatePlannedExercise(_model with { RestInterval = new TimeSpan(0, 0, minutes, seconds) });
 
-        base.OnParametersSet();
-    }
+    public void HandleSetsUpdated(ImmutableArray<PlannedSetDetail> sets) =>
+        HandleUpdatePlannedExercise(_model with { PlannedSets = sets });
 
-    public void HandleSetsUpdated(ImmutableArray<PlannedSetDetail> sets)
-    {
-        var updateDTO = PlannedExerciseDetail with
-            {
-                PlannedSets = sets
-            };
+    void HandleUpdatePlannedExercise(PlannedExerciseDetail editItem) =>
+        Dispatcher.Dispatch(new UpdateExerciseForWorkoutPlanAction(State.Value.SelectedWorkoutPlan!.Id, editItem));
 
-        OnPlannedExerciseUpdated.InvokeAsync(updateDTO);
-    }
-
-
+    void HandleAddExerciseSet() =>
+        Dispatcher.Dispatch(new AddSetToExerciseAction(State.Value.SelectedWorkoutPlan!.Id, _model));
 }

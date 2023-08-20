@@ -98,7 +98,8 @@ public class WorkoutPlansEffects
         plannedExerciseToUpdate.AutoTriggerRestTimer = dto.AutoTriggerRestTimer;
         plannedExerciseToUpdate.PlannedSets = dto.PlannedSets
                                                  .Select(x => x.ToModel())
-                                                 .ToList();
+                                                 .ToList()
+                                                 .OrderSetTypes();
         plannedExerciseToUpdate.Exercise = sourceExercise;
         workoutPlan.PlannedExercises = exercises;
 
@@ -144,6 +145,28 @@ public class WorkoutPlansEffects
         await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
         dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
         await dispatcher.DispatchWithDelay(new SetExerciseAction(targetExercise));
+    }
+
+    [EffectMethod]
+    public async Task OnAddSetToExercise(AddSetToExerciseAction action, IDispatcher dispatcher)
+    {
+        var dto = action.ExerciseDetail;
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
+        var exercises = workoutPlan.PlannedExercises;
+        var exercise = exercises.Single(x => x.Id == dto.Id);
+        var lastSet = exercise.PlannedSets.LastOrDefault() ?? new PlannedExerciseSet { SetType = "Warm-Up" };
+
+        var newSet = new PlannedExerciseSet
+        {
+            Order = exercise.PlannedSets.Count(),
+            OrderForSetType = exercise.PlannedSets.Count(x => x.SetType == lastSet.SetType) + 1,
+            SetType = lastSet.SetType,
+            TargetMetrics = lastSet.TargetMetrics
+        };
+        exercise.PlannedSets.Add(newSet);
+
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
+        dispatcher.Dispatch(new SetExerciseAction(exercise));
     }
 
     private async Task LoadWorkoutPlans(IDispatcher dispatcher)

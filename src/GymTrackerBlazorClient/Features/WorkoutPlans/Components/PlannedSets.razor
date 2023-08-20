@@ -11,14 +11,16 @@
             {
                 <PlannedSet Set="item" 
                             MetricType="MetricType"
-                            OnUpdateSet="HandleChange"></PlannedSet>
+                            OnUpdateSet="HandleChange"
+                            OnDeleteSet="() => HandleDeleteSet(item)"></PlannedSet>
             }
         </MudList>
 
         <div class="d-flex flex-row-reverse">
             <MudFab Color="Color.Dark"
                     Size="Size.Small"
-                    StartIcon="@Icons.Material.Filled.Add" />
+                    StartIcon="@Icons.Material.Filled.Add"
+                    OnClick="OnAddSet" />
         </div>
     </div>
 </MudField>
@@ -33,6 +35,9 @@
     [Parameter]
     public EventCallback<ImmutableArray<PlannedSetDetail>> OnUpdateSets { get; set; }
 
+    [Parameter]
+    public EventCallback OnAddSet { get; set; }
+
     List<PlannedSetDetail> _sets = new();
 
     protected override void OnParametersSet()
@@ -43,5 +48,13 @@
     }
 
     void HandleChange() => OnUpdateSets.InvokeAsync(_sets.ToImmutableArray());
+
+    void HandleDeleteSet(PlannedSetDetail set)
+    {
+        _sets.Remove(set);
+        HandleChange();
+    }
+
+
 }
 
