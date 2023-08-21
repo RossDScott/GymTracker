@@ -41,7 +41,7 @@
             </MudField>
 
             <MudSwitch Checked="_model.AutoTriggerRestTimer"
-                       CheckedChanged="(bool x) => HandleAutoTriggerChange(x)"
+                       CheckedChanged="(bool x) => H(_model with { AutoTriggerRestTimer = x })"
                        Label="Auto Start Rest TImer" LabelPosition="LabelPosition.Start" />
 
             <PlannedSets Sets="_model.PlannedSets"
@@ -55,8 +55,7 @@
     MudForm _form;
     PlannedExerciseDetail _model => State.Value.SelectedExercise!;
 
-    public void HandleAutoTriggerChange(bool value) => 
-        HandleUpdatePlannedExercise(_model with { AutoTriggerRestTimer = value });
+    //public void HandleAutoTriggerChange(bool value) => HandleUpdatePlannedExercise(_model with { AutoTriggerRestTimer = value });
     public void HandleSetRestIntervalSeconds(int seconds) => HandleSetRestInterval(_model.RestInterval.Minutes, seconds);
     public void HandleSetRestIntervalMinutes(int minutes) => HandleSetRestInterval(minutes, _model.RestInterval.Seconds);
 
@@ -66,6 +65,7 @@
     public void HandleSetsUpdated(ImmutableArray<PlannedSetDetail> sets) =>
         HandleUpdatePlannedExercise(_model with { PlannedSets = sets });
 
+    void H(PlannedExerciseDetail editItem) => HandleUpdatePlannedExercise(editItem);
     void HandleUpdatePlannedExercise(PlannedExerciseDetail editItem) =>
         Dispatcher.Dispatch(new UpdateExerciseForWorkoutPlanAction(State.Value.SelectedWorkoutPlan!.Id, editItem));
 
