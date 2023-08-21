@@ -37,6 +37,7 @@
     {
         MetricType.Weight => @<WeightSet Set="set" OnUpdateSet="OnUpdateSet"></WeightSet>,
         MetricType.Time => @<TimedSet Set="set" OnUpdateSet="OnUpdateSet"></TimedSet>,
+        MetricType.TimeAndDistance => @<TimeAndDistanceSet Set="set" OnUpdateSet="OnUpdateSet"></TimeAndDistanceSet>,
         _ => throw new ArgumentOutOfRangeException(nameof(MetricType))
     };
 }
