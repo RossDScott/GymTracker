@@ -10,8 +10,8 @@
             </div>
         </MudItem>
         <MudItem xs="3">
-            <MudSelect Value="Set.SetType"
-                       ValueChanged="(string value) => HandleSetTypeChanged(value)"
+            <MudSelect @bind-Value="Set.SetType"
+                       @bind-Value:after="HandleChanged"
                        Dense="true"
                        DisableUnderLine="true"
                        Class="mt-0">
@@ -56,9 +56,5 @@
 
     string[] _setTypes = { "Warm-up", "Set", "Drop-set" };
 
-    void HandleSetTypeChanged(string type)
-    {
-        Set.SetType = type;
-        OnUpdateSet.InvokeAsync();
-    }
+    void HandleChanged() => OnUpdateSet.InvokeAsync();
 }

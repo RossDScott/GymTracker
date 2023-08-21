@@ -23,6 +23,7 @@ public static class ModelExtensions
         {
             Id = exercise.Id,
             Name = exercise.Exercise.Name,
+            MetricType = exercise.Exercise.MetricType,
             AutoTriggerRestTimer = exercise.AutoTriggerRestTimer,
             RestInterval = exercise.RestInterval,
             PlannedSets = exercise.PlannedSets

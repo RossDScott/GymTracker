@@ -1,7 +1,12 @@
 ﻿@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
 
 <MudItem xs="3">
-    <MudTextField @bind-Value="Set.Time" Label="Time" Variant="Variant.Text" Margin="Margin.Dense"></MudTextField>
+    <MudTextField @bind-Value="Set.Time"
+                  DebounceInterval="500"
+                  OnDebounceIntervalElapsed="OnUpdateSet"
+                  Label="Seconds"
+                  Variant="Variant.Text"
+                  Margin="Margin.Dense"></MudTextField>
 </MudItem>
 
 @code {

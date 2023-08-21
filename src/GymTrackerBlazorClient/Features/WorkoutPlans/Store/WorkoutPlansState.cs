@@ -1,5 +1,6 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Features.Common;
+using GymTracker.Domain.Models;
 using System.Collections.Immutable;
 using Models = GymTracker.Domain.Models;
 
@@ -29,11 +30,11 @@ public record PlannedExerciseDetail
 {
     public Guid Id { get; init; } = Guid.NewGuid();
     public string Name { get; init; } = string.Empty;
-
-    public ImmutableArray<PlannedSetDetail> PlannedSets { get; init; } = ImmutableArray<PlannedSetDetail>.Empty;
-
+    public MetricType MetricType { get; set; }
     public TimeSpan RestInterval { get; init; }
     public bool AutoTriggerRestTimer { get; init; } = true;
+
+    public ImmutableArray<PlannedSetDetail> PlannedSets { get; init; } = ImmutableArray<PlannedSetDetail>.Empty;
 }
 
 public record PlannedSetDetail
