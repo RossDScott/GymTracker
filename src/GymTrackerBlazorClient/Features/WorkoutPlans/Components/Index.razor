@@ -32,7 +32,8 @@
     <MudItem xs="5" Class="">
         @if (State.Value.SelectedExercise is not null)
         {
-            <PlannedExercise></PlannedExercise>
+            <PlannedExercise Exercise="State.Value.SelectedExercise!" 
+                             WorkoutPlanId="State.Value.SelectedWorkoutPlan!.Id"></PlannedExercise>
         }
     </MudItem>
 </MudGrid>
