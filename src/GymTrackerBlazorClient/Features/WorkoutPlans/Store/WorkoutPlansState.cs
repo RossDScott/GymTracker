@@ -30,11 +30,25 @@ public record PlannedExerciseDetail
 {
     public Guid Id { get; init; } = Guid.NewGuid();
     public string Name { get; init; } = string.Empty;
-    public MetricType MetricType { get; set; }
+    public MetricType MetricType { get; init; }
     public TimeSpan RestInterval { get; init; }
     public bool AutoTriggerRestTimer { get; init; } = true;
-
     public ImmutableArray<PlannedSetDetail> PlannedSets { get; init; } = ImmutableArray<PlannedSetDetail>.Empty;
+    public int TargetRepsLower { get; set; }
+    public int TargetRepsUpper { get; set; }
+    public decimal TargetWeightIncrement { get; set; }
+}
+
+public record PlannedExerciseEditDTO
+{
+    public Guid Id { get; init; }
+    public MetricType MetricType { get; set; }
+    public TimeSpan RestInterval { get; set; }
+    public bool AutoTriggerRestTimer { get; set; }
+    public ImmutableArray<PlannedSetDetail> PlannedSets { get; set; } = ImmutableArray<PlannedSetDetail>.Empty;
+    public int TargetRepsLower { get; set; }
+    public int TargetRepsUpper { get; set; }
+    public decimal TargetWeightIncrement { get; set; }
 }
 
 public record PlannedSetDetail

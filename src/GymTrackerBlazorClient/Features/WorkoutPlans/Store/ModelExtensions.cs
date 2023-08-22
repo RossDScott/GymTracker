@@ -26,6 +26,9 @@ public static class ModelExtensions
             MetricType = exercise.Exercise.MetricType,
             AutoTriggerRestTimer = exercise.AutoTriggerRestTimer,
             RestInterval = exercise.RestInterval,
+            TargetRepsLower = exercise.TargetRepsLower,
+            TargetRepsUpper = exercise.TargetRepsUpper,
+            TargetWeightIncrement = exercise.TargetWeightIncrement,
             PlannedSets = exercise.PlannedSets
                                     .OrderBy(x => x.Order)
                                     .Select(x => x.ToListItem())

@@ -24,6 +24,9 @@ public record PlannedExercise : IOrderable
     public ICollection<PlannedExerciseSet> PlannedSets { get; set; } = new List<PlannedExerciseSet>();
     public TimeSpan RestInterval { get; set; }
     public bool AutoTriggerRestTimer { get; set; } = true;
+    public int TargetRepsLower { get; set; }
+    public int TargetRepsUpper { get; set; }
+    public decimal TargetWeightIncrement { get; set; }
 }
 
 public record PlannedExerciseSet

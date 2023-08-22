@@ -12,11 +12,11 @@
             <MudField Variant="Variant.Outlined" Label="Rest Interval" InnerPadding="false">
                 <div Class="d-flex flex-row">
                     <MudSelect DisableUnderLine="true"
-                               Dense="true" 
-                               T="int" 
-                               Label="Minutes" 
+                               Dense="true"
+                               T="int"
+                               Label="Minutes"
                                Variant="Variant.Text"
-                               Value="_restInterval.Minutes"
+                               Value="_model.RestInterval.Minutes"
                                ValueChanged="HandleSetRestIntervalMinutes">
                         @for (int i = 0; i < 10; i++)
                         {
@@ -28,7 +28,7 @@
                                T="int"
                                Label="Seconds"
                                Variant="Variant.Text"
-                               Value="_restInterval.Seconds"
+                               Value="_model.RestInterval.Seconds"
                                ValueChanged="HandleSetRestIntervalSeconds">
                         @for (int i = 0; i < 61; i++)
                         {
@@ -38,11 +38,36 @@
                 </div>
             </MudField>
 
-            <MudSwitch @bind-Checked="_autoTriggerRestTimer"
+            <MudSwitch @bind-Checked="_model.AutoTriggerRestTimer"
                        @bind-Checked:after="HandleChange"
+                       Size="Size.Small"
                        Label="Auto Start Rest Timer" LabelPosition="LabelPosition.Start" />
 
-            <PlannedSets Sets="_plannedSets"
+            @if(Exercise.MetricType == Domain.Models.MetricType.Weight)
+            {
+                <MudField Variant="Variant.Outlined" Label="Progression" InnerPadding="false">
+                    <div Class="d-flex flex-row">
+                        <MudNumericField @bind-Value="_model.TargetRepsLower"
+                                         @bind-Value:after="HandleChange"
+                                         Label="Min Reps"
+                                         Variant="Variant.Text"
+                                         DisableUnderLine="true"
+                                         HideSpinButtons="true"
+                                         Min="0" Max="99" />
+                        <MudNumericField @bind-Value="_model.TargetRepsUpper"
+                                         @bind-Value:after="HandleChange"
+                                         Label="Max Reps"
+                                         Variant="Variant.Text"
+                                         DisableUnderLine="true"
+                                         HideSpinButtons="true"
+                                         Min="0" Max="99" />
+                    </div>
+                </MudField>
+            }
+ 
+
+
+            <PlannedSets Sets="_model.PlannedSets"
                          MetricType="Exercise.MetricType"
                          OnUpdateSets="HandleSetsUpdated"
                          OnAddSet="HandleAddSet"></PlannedSets>
@@ -52,9 +77,7 @@
 
 @code {
     MudForm _form;
-    TimeSpan _restInterval;
-    bool _autoTriggerRestTimer;
-    ImmutableArray<PlannedSetDetail> _plannedSets = ImmutableArray<PlannedSetDetail>.Empty;
+    PlannedExerciseEditDTO _model = new();
 
     [Parameter, EditorRequired]
     public Guid WorkoutPlanId { get; set; }
@@ -64,37 +87,36 @@
 
     protected override void OnParametersSet()
     {
-        _restInterval = Exercise.RestInterval;
-        _autoTriggerRestTimer = Exercise.AutoTriggerRestTimer;
-        _plannedSets = Exercise.PlannedSets;
+        _model = new PlannedExerciseEditDTO
+            {
+                Id = Exercise.Id,
+                RestInterval = Exercise.RestInterval,
+                AutoTriggerRestTimer = Exercise.AutoTriggerRestTimer,
+                TargetRepsLower = Exercise.TargetRepsLower,
+                TargetRepsUpper = Exercise.TargetRepsUpper,
+                TargetWeightIncrement = Exercise.TargetWeightIncrement,
+                PlannedSets = Exercise.PlannedSets
+            };
 
         base.OnParametersSet();
     }
 
-    public void HandleSetRestIntervalSeconds(int seconds) => HandleSetRestInterval(_restInterval.Minutes, seconds);
-    public void HandleSetRestIntervalMinutes(int minutes) => HandleSetRestInterval(minutes, _restInterval.Seconds);
+    public void HandleSetRestIntervalSeconds(int seconds) => HandleSetRestInterval(_model.RestInterval.Minutes, seconds);
+    public void HandleSetRestIntervalMinutes(int minutes) => HandleSetRestInterval(minutes, _model.RestInterval.Seconds);
     public void HandleSetRestInterval(int minutes, int seconds)
     {
-        _restInterval = new TimeSpan(0, 0, minutes, seconds);
+        _model.RestInterval = new TimeSpan(0, 0, minutes, seconds);
         HandleChange();
     }
 
     public void HandleSetsUpdated(ImmutableArray<PlannedSetDetail> sets)
     {
-        _plannedSets = sets;
+        _model.PlannedSets = sets;
         HandleChange();
     }
 
     public void HandleAddSet() => Dispatcher.Dispatch(new AddSetToExerciseAction(WorkoutPlanId, Exercise));
 
-    void HandleChange()
-    {
-        var updateDTO = Exercise with
-            {
-                RestInterval = _restInterval,
-                AutoTriggerRestTimer = _autoTriggerRestTimer,
-                PlannedSets = _plannedSets
-            };
-        Dispatcher.Dispatch(new UpdateExerciseForWorkoutPlanAction(WorkoutPlanId, updateDTO));
-    }
+    void HandleChange() =>
+        Dispatcher.Dispatch(new UpdateExerciseForWorkoutPlanAction(WorkoutPlanId, _model));
 }

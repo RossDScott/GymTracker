@@ -88,14 +88,17 @@ public class WorkoutPlansEffects
     [EffectMethod]
     public async Task OnUpdateExerciseForWorkoutPlan(UpdateExerciseForWorkoutPlanAction action, IDispatcher dispatcher)
     {
-        var dto = action.ExerciseDetail;
+        var dto = action.EditDTO;
         var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
         var exercises = workoutPlan.PlannedExercises.ToList();
-        var plannedExerciseToUpdate = exercises.Single(x => x.Id == action.ExerciseDetail.Id);
+        var plannedExerciseToUpdate = exercises.Single(x => x.Id == dto.Id);
         var sourceExercise = await _clientStorage.Exercises.FindByIdAsync(plannedExerciseToUpdate.Exercise.Id);
 
         plannedExerciseToUpdate.RestInterval = dto.RestInterval;
         plannedExerciseToUpdate.AutoTriggerRestTimer = dto.AutoTriggerRestTimer;
+        plannedExerciseToUpdate.TargetRepsLower = dto.TargetRepsLower;
+        plannedExerciseToUpdate.TargetRepsUpper = dto.TargetRepsUpper;
+        plannedExerciseToUpdate.TargetWeightIncrement = dto.TargetWeightIncrement;
         plannedExerciseToUpdate.PlannedSets = dto.PlannedSets
                                                  .Select(x => x.ToModel())
                                                  .ToList()
