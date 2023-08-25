@@ -1,0 +1,23 @@
+﻿<div class="d-flex flex-row @Class">
+    @foreach (var item in List)
+    {
+        <MudChip Color="Color.Default"
+                 Variant="(item.Name == SelectedItem ? Variant.Filled : Variant.Outlined)"
+                 OnClick="_ => OnItemClick.InvokeAsync(item)">
+                 @item.Name</MudChip>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IEnumerable<ListItem> List { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string SelectedItem { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<ListItem> OnItemClick { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}

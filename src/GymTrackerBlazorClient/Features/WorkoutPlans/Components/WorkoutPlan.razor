@@ -34,6 +34,10 @@
                                     => HandleChangeOrder(x.item, x.direction)">
                 </FullHeightList>
             </MudItem>
+            <MudSwitch Checked="_isActive"
+                       Label="Is Active"
+                       LabelPosition="LabelPosition.Start"
+                       CheckedChanged="(bool isActive) => HandleIsActiveChanged(isActive)" />
         </MudStack>
     </MudForm>
 </MudPaper>
@@ -103,5 +107,11 @@
     void HandleChangeOrder(ListItem item, OrderDirection direction)
     {
         Dispatcher.Dispatch(new ChangeOrderAction(WorkoutPlanDetail.Id, item.Id, direction));
+    }
+
+    async Task HandleIsActiveChanged(bool isActive)
+    {
+        _isActive = isActive;
+        await HandleUpdateWorkoutPlan();
     }
 }

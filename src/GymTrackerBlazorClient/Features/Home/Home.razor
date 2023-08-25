@@ -7,28 +7,34 @@
 
 <MudContainer Class="pa-3 ma-0">
     <MudButton 
-        Variant="Variant.Outlined"
-        Color="Color.Default"
-        Style="height: 200px; width: 200px"
-        OnClick="HandleManageExercises">
+               Variant="Variant.Outlined"
+               Color="Color.Default"
+               Style="height: 200px; width: 200px"
+               OnClick="HandleStartWorkout">
+        New Workout
+    </MudButton>
+
+    <MudButton Class="ml-2"
+               Variant="Variant.Outlined"
+               Color="Color.Default"
+               Style="height: 200px; width: 200px"
+               OnClick="HandleManageExercises">
         Manage Exercises
     </MudButton>
 
-    <MudButton 
-        Class="ml-2"
-        Variant="Variant.Outlined"
-        Color="Color.Default"
-        Style="height: 200px; width: 200px"
-        OnClick="HandleManageWorkoutPlans">
+    <MudButton Class="ml-2"
+               Variant="Variant.Outlined"
+               Color="Color.Default"
+               Style="height: 200px; width: 200px"
+               OnClick="HandleManageWorkoutPlans">
         Workout Plans
     </MudButton>
 
-    <MudButton 
-        Class="ml-2"
-        Variant="Variant.Outlined"
-        Color="Color.Default"
-        Style="height: 200px; width: 200px"
-        OnClick="HandleManageSettings">
+    <MudButton Class="ml-2"
+               Variant="Variant.Outlined"
+               Color="Color.Default"
+               Style="height: 200px; width: 200px"
+               OnClick="HandleManageSettings">
         Settings
     </MudButton>
 </MudContainer>
@@ -44,4 +50,5 @@
     void HandleManageExercises() => NavigationManager.NavigateTo("exercises");
     void HandleManageWorkoutPlans() => NavigationManager.NavigateTo("workout-plans");
     void HandleManageSettings() => NavigationManager.NavigateTo("settings");
+    void HandleStartWorkout() => NavigationManager.NavigateTo("start-workout");
 }
