@@ -8,6 +8,8 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
     public IKeyListItem<Exercise> Exercises { get; init; } = default!;
     public IKeyItem<AppSettings> AppSettings { get; init; } = default!;
     public IKeyListItem<WorkoutPlan> WorkoutPlans { get; init; } = default!;
+    public IKeyListItem<Workout> Workouts { get; init; } = default!;
+    public IKeyItem<Workout> CurrentWorkout { get; init; }
 
     public ClientStorageContext()
     {

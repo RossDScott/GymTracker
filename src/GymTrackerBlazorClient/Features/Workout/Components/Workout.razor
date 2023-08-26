@@ -1,8 +1,27 @@
 ﻿@page "/workout/perform/{id:guid}"
 @page "/workout/view/{id:guid}"
+@using GymTracker.BlazorClient.Features.AppBar.Store;
+@using GymTracker.BlazorClient.Features.Workout.Store;
+
+@inherits FluxorComponent
+
+@inject IDispatcher Dispatcher
+@inject IState<WorkoutState> State
 
 <h3>Workout</h3>
 
 @code {
+    [Parameter]
+    public Guid Id { get; set; }
 
+    protected override void OnInitialized()
+    {
+        Dispatcher.Dispatch(new FetchWorkoutPlansAction(WorkoutListOrder.Recent));
+        Dispatcher.Dispatch(new SetBreadcrumbAction(new[]
+        {
+            new BreadcrumbItem("Workout", "/workout/perform", false, Icons.Material.Filled.SportsMartialArts),
+            new BreadcrumbItem("Perform", "/workout/perform", false, Icons.Material.Filled.ChecklistRtl)
+        }));
+        base.OnInitialized();
+    }
 }

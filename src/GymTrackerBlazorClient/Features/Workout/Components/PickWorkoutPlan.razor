@@ -18,7 +18,7 @@
 <MudContainer Class="pa-3 ma-0 d-flex flex-row"Style="width:100%; overflow-y:auto">
     @foreach (var plan in State.Value.WorkoutPlans)
     {
-        <MudCard Class="mr-3" Style="min-width:200px">
+        <MudCard @onclick="_ => HandlePickWorkout(plan)" Class="mr-3" Style="min-width:200px">
             <MudCardHeader class="ps-2 pb-0 bt-2">
                 <CardHeaderContent>
                     <MudText Typo="Typo.h5" Align="Align.Left">@plan.Name</MudText>
@@ -43,11 +43,15 @@
         Dispatcher.Dispatch(new FetchWorkoutPlansAction(WorkoutListOrder.Recent));
         Dispatcher.Dispatch(new SetBreadcrumbAction(new[]
         {
-            new BreadcrumbItem("Pick Plan", "/start-workout", false, Icons.Material.Filled.PostAdd)
-    }));
+            new BreadcrumbItem("Workout", "/workout/new", false, Icons.Material.Filled.SportsMartialArts),
+            new BreadcrumbItem("New", "/workout/new", false, Icons.Material.Filled.PostAdd)
+        }));
         base.OnInitialized();
     }
 
-    void HandleOrderChange(ListItem item) =>
-        Dispatcher.Dispatch(new FetchWorkoutPlansAction(Enum.Parse<WorkoutListOrder>(item.Name)));
+    void HandleOrderChange(ListItem item) 
+        => Dispatcher.Dispatch(new FetchWorkoutPlansAction(Enum.Parse<WorkoutListOrder>(item.Name)));
+
+    void HandlePickWorkout(WorkoutPlanListItem workoutPlan)
+        => Dispatcher.Dispatch(new StartWorkoutAction(workoutPlan.Id));
 }

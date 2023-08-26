@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GymTracker.Domain.Models;
+﻿namespace GymTracker.Domain.Models;
 public record Workout
 {
     public Workout(WorkoutPlan plan)
     {
         Plan = plan;
+        Exercises = plan.PlannedExercises
+            .Select(plannedExercise => new WorkoutExercise(plannedExercise))
+            .ToList();
     }
 
-    public Guid Id { get; set; }
+    public Guid Id { get; init; } = Guid.NewGuid();
     public WorkoutPlan Plan { get; set; }
 
     public DateTimeOffset WorkoutStart { get; set; }
     public DateTimeOffset? WorkoutEnd { get; set; }
 
+    public ICollection<WorkoutExercise> Exercises { get; set; } = new List<WorkoutExercise>();
 
     public string Notes { get; set; } = string.Empty;
-
-
 }
 
 public record WorkoutExercise : IOrderable
@@ -54,16 +50,19 @@ public record WorkoutExerciseSet
     public WorkoutExerciseSet(PlannedExerciseSet? targetSet)
     {
         PlannedExerciseSet = targetSet;
-        var plannedMetrics = targetSet?.TargetMetrics;
-        Metrics = plannedMetrics != null
-            ? plannedMetrics with { }
-            : new ExerciseSetMetrics();
+
+        if (targetSet != null)
+        {
+            Order = targetSet.Order;
+            SetType = targetSet.SetType;
+            OrderForSetType = targetSet.OrderForSetType;
+        }
     }
 
-    public Guid Id { get; init; }
+    public Guid Id { get; init; } = Guid.NewGuid();
     public PlannedExerciseSet? PlannedExerciseSet { get; set; } = null;
     public int Order { get; set; }
     public string SetType { get; set; } = default!;
     public int OrderForSetType { get; set; }
-    public ExerciseSetMetrics Metrics { get; set; }
+    public ExerciseSetMetrics Metrics { get; set; } = new ExerciseSetMetrics();
 }
