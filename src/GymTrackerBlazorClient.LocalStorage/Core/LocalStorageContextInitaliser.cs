@@ -1,12 +1,12 @@
 ﻿using Blazored.LocalStorage;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
+using GymTracker.Repository;
 using System.Reflection;
 
-namespace GymTracker.LocalStorage.ContextAbstraction;
+namespace GymTracker.LocalStorage.Core;
 public static class LocalStorageContextExtensions
 {
-    public static void Initialise<T>(this T context, 
-        ILocalStorageService localStorageService) 
+    public static void Initialise<T>(this T context,
+        ILocalStorageService localStorageService)
         where T : LocalStorageContext, new()
     {
         context.GetType()
@@ -20,12 +20,13 @@ public static class LocalStorageContextExtensions
         context.Keys = keys;
         context.Configure();
         context.InitializeData();
+        Console.WriteLine(Guid.NewGuid().ToString());
     }
 
     private static IEnumerable<IKeyItem> InitialiseKeys<T>(
-        T context, 
-        Type keyService, 
-        Type keyImplementation, 
+        T context,
+        Type keyService,
+        Type keyImplementation,
         ILocalStorageService localStorageService) where T : LocalStorageContext, new()
     {
         var keys = new List<IKeyItem>();
@@ -41,8 +42,8 @@ public static class LocalStorageContextExtensions
 
                 ConstructorInfo? constructor = genericType.GetConstructor(new[] { typeof(ILocalStorageService), typeof(string) });
                 object? instance = constructor?.Invoke(new object[] { localStorageService, item.Name });
-                
-                if(instance is not null)
+
+                if (instance is not null)
                 {
                     item.SetValue(context, instance);
                     keys.Add((IKeyItem)instance);

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace GymTracker.Domain.Models.ClientStorage;
+namespace GymTracker.Domain.Models;
 public record AppSettings
 {
     public string? AzureBlobBackupContainerSASURI { get; init; } = null;

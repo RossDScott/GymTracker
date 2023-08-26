@@ -1,17 +1,17 @@
-﻿using GymTracker.Domain.Abstractions.Services.Backup;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
+﻿using GymTracker.Domain;
+using GymTracker.Repository;
 
-namespace GymTracker.Domain.Services;
+namespace GymTracker.LocalStorage;
 public class BackupOrchestrator : IBackupOrchestrator
 {
-    private readonly IClientStorage _clientStorage;
+    private readonly ClientStorageContext _clientStorage;
     private readonly IDataBackupClient _dataBackupClient;
 
     private readonly List<IKeyItem> _keyItemsToBackup;
 
     private bool _isRestoring = false;
 
-    public BackupOrchestrator(IClientStorage clientStorage, IDataBackupClient dataBackupClient)
+    public BackupOrchestrator(ClientStorageContext clientStorage, IDataBackupClient dataBackupClient)
     {
         _clientStorage = clientStorage;
         _dataBackupClient = dataBackupClient;

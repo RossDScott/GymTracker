@@ -1,8 +1,6 @@
-﻿using GymTracker.Domain.Abstractions.Services.ClientStorage;
-using GymTracker.Domain.Models;
-using GymTracker.Domain.Models.ClientStorage;
-using GymTracker.Domain.Services;
-using GymTracker.LocalStorage.ContextAbstraction;
+﻿using GymTracker.Domain.Models;
+using GymTracker.LocalStorage.Core;
+using GymTracker.Repository;
 
 namespace GymTracker.LocalStorage;
 public class ClientStorageContext : LocalStorageContext, IClientStorage
@@ -10,6 +8,11 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
     public IKeyListItem<Exercise> Exercises { get; init; } = default!;
     public IKeyItem<AppSettings> AppSettings { get; init; } = default!;
     public IKeyListItem<WorkoutPlan> WorkoutPlans { get; init; } = default!;
+
+    public ClientStorageContext()
+    {
+
+    }
 
     internal override void Configure()
     {

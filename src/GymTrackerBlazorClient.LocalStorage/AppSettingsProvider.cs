@@ -1,7 +1,8 @@
-﻿using GymTracker.Domain.Abstractions.Services.ClientStorage;
-using GymTracker.Domain.Models.ClientStorage;
+﻿using GymTracker.Domain;
+using GymTracker.Domain.Models;
+using GymTracker.Repository;
 
-namespace GymTracker.Domain.Configuration;
+namespace GymTracker.LocalStorage;
 public class AppSettingsProvider : IAppSettingsProvider
 {
     private readonly IClientStorage _clientStorage;

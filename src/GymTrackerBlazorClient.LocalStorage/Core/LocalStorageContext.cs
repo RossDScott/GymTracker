@@ -1,8 +1,8 @@
 ﻿using Blazored.LocalStorage;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
+using GymTracker.Repository;
 
-namespace GymTracker.LocalStorage.ContextAbstraction;
-public abstract class LocalStorageContext : ILocalStorageContext
+namespace GymTracker.LocalStorage.Core;
+public abstract class LocalStorageContext
 {
     protected readonly ILocalStorageService _localStorage = default!;
 

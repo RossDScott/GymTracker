@@ -1,5 +1,5 @@
 ﻿using Fluxor;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
+using GymTracker.Repository;
 using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.Workout.Store;

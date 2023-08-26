@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GymTracker.Domain\GymTracker.Domain.csproj" />
+    <ProjectReference Include="..\GymTracker.Repository\GymTracker.Repository.csproj" />
   </ItemGroup>
 
 </Project>

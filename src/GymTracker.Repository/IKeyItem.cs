@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace GymTracker.Domain.Abstractions.Services.ClientStorage;
+﻿namespace GymTracker.Repository;
 
 public interface IKeyItem
 {

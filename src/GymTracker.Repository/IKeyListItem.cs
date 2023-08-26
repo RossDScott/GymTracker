@@ -1,4 +1,4 @@
-﻿namespace GymTracker.Domain.Abstractions.Services.ClientStorage;
+﻿namespace GymTracker.Repository;
 
 public interface IKeyListItem<T> : IKeyItem<ICollection<T>>
 {

@@ -1,8 +1,8 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Extensions;
 using GymTracker.BlazorClient.Features.AppBar.Store;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
-using GymTracker.Domain.Extensions;
 using GymTracker.Domain.Models;
+using GymTracker.Repository;
 using MudBlazor;
 
 namespace GymTracker.BlazorClient.Features.Exercises.Store;
@@ -12,7 +12,7 @@ public class ExercisesEffects
     private readonly IClientStorage _clientStorage;
 
     public ExercisesEffects(IClientStorage clientStorage)
-	{
+    {
         _clientStorage = clientStorage;
     }
 
@@ -21,7 +21,7 @@ public class ExercisesEffects
     {
         var settings = await _clientStorage.AppSettings.GetOrDefaultAsync();
         var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
-        
+
         dispatcher.Dispatch(new SetInitialDataAction(
             settings.TargetBodyParts,
             settings.Equipment,
@@ -66,7 +66,7 @@ public class ExercisesEffects
         var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
         var exercise = await _clientStorage.Exercises.FindOrDefaultByIdAsync(updateDTO.Id)
             ?? new Exercise { Id = updateDTO.Id };
-        
+
         exercise.Name = updateDTO.Name;
         exercise.MetricType = updateDTO.MetricType;
         exercise.BodyTarget = updateDTO.BodyTarget.ToArray();

@@ -1,4 +1,4 @@
-﻿namespace GymTracker.Domain.Services;
+﻿namespace GymTracker.Domain;
 
 public interface IBackupOrchestrator
 {

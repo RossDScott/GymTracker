@@ -1,8 +1,8 @@
 ﻿using Fluxor;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
-using GymTracker.Domain.Services;
 using Models = GymTracker.Domain.Models;
 using MudBlazor;
+using GymTracker.Repository;
+using GymTracker.Domain;
 
 namespace GymTracker.BlazorClient.Features.AppSettings.Store;
 
@@ -72,7 +72,7 @@ public class AppSettingsEffects
         settings with { SetType = action.SetTypes }, dispatcher);
 
     private async Task UpdateSettings(
-        Func<Models.ClientStorage.AppSettings, Models.ClientStorage.AppSettings> updateFunc,
+        Func<Models.AppSettings, Models.AppSettings> updateFunc,
         IDispatcher dispatcher)
     {
         var existing = await GetSettings();
@@ -81,6 +81,6 @@ public class AppSettingsEffects
         dispatcher.Dispatch(new SetSettingsAction(updated));
     }
 
-    private ValueTask<Models.ClientStorage.AppSettings> GetSettings() => 
+    private ValueTask<Models.AppSettings> GetSettings() => 
         _clientStorage.AppSettings.GetOrDefaultAsync();
 }

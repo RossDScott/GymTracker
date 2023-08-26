@@ -1,8 +1,8 @@
 ﻿using Blazored.LocalStorage;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
+using GymTracker.Repository;
 using System.Text.Json;
 
-namespace GymTracker.LocalStorage.ContextAbstraction;
+namespace GymTracker.LocalStorage.Core;
 
 public class KeyItem<T> : IKeyItem<T>
 {
@@ -50,9 +50,9 @@ public class KeyItem<T> : IKeyItem<T>
     public ValueTask<T> GetOrDefaultAsync() => GetOrDefaultAsync(null);
     public async ValueTask<T> GetOrDefaultAsync(Func<T>? defaultConstructor)
     {
-        var constructor = 
-            defaultConstructor ?? 
-            Config?.DefaultConstructor ?? 
+        var constructor =
+            defaultConstructor ??
+            Config?.DefaultConstructor ??
             throw new ArgumentNullException(nameof(defaultConstructor));
 
         return await GetAsync() ?? constructor();
@@ -76,7 +76,7 @@ public class KeyItem<T> : IKeyItem<T>
             if (args.Key == Config.Key)
             {
                 var json = await DataAsJson();
-                if(!string.IsNullOrEmpty(json))
+                if (!string.IsNullOrEmpty(json))
                     callback(json);
             }
         };
@@ -85,7 +85,7 @@ public class KeyItem<T> : IKeyItem<T>
     public async ValueTask<string?> DataAsJson()
     {
         var data = await GetAsync();
-        return data is null ? null : JsonSerializer.Serialize<T>(data);
+        return data is null ? null : JsonSerializer.Serialize(data);
     }
     public async ValueTask SetDataFromJson(string jsonString)
     {

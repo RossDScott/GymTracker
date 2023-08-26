@@ -1,13 +1,13 @@
 ﻿using Blazored.LocalStorage;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
+using GymTracker.Repository;
 
-namespace GymTracker.LocalStorage.ContextAbstraction;
+namespace GymTracker.LocalStorage.Core;
 
 public class KeyListItem<T> : KeyItem<ICollection<T>>, IKeyListItem<T> where T : class
 {
     protected KeyListItemConfig<ICollection<T>, T> ListConfig = new();
 
-    public KeyListItem(ILocalStorageService localStorage, string key) : base(localStorage, key) 
+    public KeyListItem(ILocalStorageService localStorage, string key) : base(localStorage, key)
     {
         ConfigureDefaults();
     }
@@ -16,31 +16,31 @@ public class KeyListItem<T> : KeyItem<ICollection<T>>, IKeyListItem<T> where T :
         => configure(ListConfig);
 
     public async Task<T> FindByIdAsync(Guid id)
-        => (await this.GetOrDefaultAsync()).FindById(id, ListConfig);
+        => (await GetOrDefaultAsync()).FindById(id, ListConfig);
 
     public async Task<T?> FindOrDefaultByIdAsync(Guid id)
-        => (await this.GetOrDefaultAsync()).FindOrDefaultById(id, ListConfig);
+        => (await GetOrDefaultAsync()).FindOrDefaultById(id, ListConfig);
 
     public async Task<UpsertResponse> UpsertAsync(T item)
     {
-        var items = await this.GetOrDefaultAsync();
+        var items = await GetOrDefaultAsync();
         var existing = items.FindOrDefaultById(ListConfig.GetId(item), ListConfig);
-        if(existing == null)
+        if (existing == null)
             items.Add(item);
 
-        await this.SetAsync(items);
+        await SetAsync(items);
 
         return existing == null ? UpsertResponse.New : UpsertResponse.Existing;
     }
     private void ConfigureDefaults()
     {
-        this.Configure(x => x.DefaultConstructor = () => new List<T>());
+        Configure(x => x.DefaultConstructor = () => new List<T>());
 
         var type = typeof(T);
         var idProperty = type.GetProperty("Id", typeof(Guid));
         if (idProperty != null)
         {
-            this.ConfigureList(settings =>
+            ConfigureList(settings =>
             {
                 settings.GetId = (item) => (Guid)idProperty.GetValue(item)!;
             });

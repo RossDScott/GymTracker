@@ -1,13 +1,10 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Extensions;
 using GymTracker.BlazorClient.Features.AppBar.Store;
-using GymTracker.BlazorClient.Features.Exercises.Components;
-using GymTracker.BlazorClient.Features.Exercises.Store;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
-using GymTracker.Domain.Extensions;
 using GymTracker.Domain.Models;
-using Microsoft.AspNetCore.Components;
+using GymTracker.Domain.Models.Extensions;
+using GymTracker.Repository;
 using MudBlazor;
-using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.WorkoutPlans.Store;
 
@@ -34,7 +31,7 @@ public class WorkoutPlansEffects
     [EffectMethod]
     public async Task OnFetchWorkoutPlan(FetchWorkoutPlanAction action, IDispatcher dispatcher)
     {
-        var workoutPlan =await _clientStorage.WorkoutPlans.FindByIdAsync(action.Id);
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.Id);
 
         await dispatcher.DispatchWithDelay(new SetWorkoutPlanAction(workoutPlan));
         await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
@@ -50,9 +47,9 @@ public class WorkoutPlansEffects
         var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
         var exercise = await _clientStorage.Exercises.FindByIdAsync(action.ExerciseId);
         var order = workoutPlan.PlannedExercises.Count();
-   
-        var plannedExercise = new PlannedExercise(exercise) 
-        { 
+
+        var plannedExercise = new PlannedExercise(exercise)
+        {
             Order = order,
             RestInterval = TimeSpan.FromSeconds(150)
         };
@@ -114,7 +111,7 @@ public class WorkoutPlansEffects
     public async Task OnUpsertWorkoutPlan(UpsertWorkoutPlanAction action, IDispatcher dispatcher)
     {
         var updateDTO = action.WorkoutPlan;
-        
+
         var workoutPlan = await _clientStorage.WorkoutPlans.FindOrDefaultByIdAsync(updateDTO.Id)
             ?? new WorkoutPlan { Id = updateDTO.Id };
 

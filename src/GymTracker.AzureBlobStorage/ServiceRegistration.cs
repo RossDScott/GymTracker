@@ -1,7 +1,5 @@
-﻿using GymTracker.Domain.Abstractions.Services.Backup;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
+﻿using GymTracker.Domain;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace GymTracker.AzureBlobStorage;
 public static class ServiceRegistration

@@ -1,14 +1,12 @@
 ﻿using GymTracker.Domain.Models;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
-using GymTracker.Domain.Models.ClientStorage;
 using System.Collections.Immutable;
 
-namespace GymTracker.Domain.Services;
+namespace GymTracker.LocalStorage;
 public class DefaultDataBuilderService
 {
-    private readonly IClientStorage _clientStorage;
+    private readonly ClientStorageContext _clientStorage;
 
-    public DefaultDataBuilderService(IClientStorage localStorageContext)
+    public DefaultDataBuilderService(ClientStorageContext localStorageContext)
     {
         _clientStorage = localStorageContext;
     }

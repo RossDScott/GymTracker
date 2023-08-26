@@ -1,8 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using GymTracker.Domain.Abstractions.Services.Backup;
-using GymTracker.Domain.Configuration;
-using Microsoft.Extensions.Options;
+using GymTracker.Domain;
 
 namespace GymTracker.AzureBlobStorage;
 public class BlobBackupClient : IDataBackupClient
@@ -26,7 +24,7 @@ public class BlobBackupClient : IDataBackupClient
 
     public async Task BackupAsync(string key, string dataAsString)
     {
-        var containerClient =await BuildContainerClient();
+        var containerClient = await BuildContainerClient();
         if (string.IsNullOrWhiteSpace(dataAsString) || containerClient is null)
             return;
 

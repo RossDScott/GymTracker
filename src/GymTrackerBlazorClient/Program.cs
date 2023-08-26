@@ -6,8 +6,8 @@ using MudBlazor.Services;
 using Fluxor;
 using GymTracker.AzureBlobStorage;
 using GymTracker.LocalStorage;
-using GymTracker.Domain.Abstractions.Services.ClientStorage;
 using GymTracker.BlazorClient.Features.SidePanel;
+using GymTracker.Repository;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

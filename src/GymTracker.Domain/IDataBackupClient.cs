@@ -1,4 +1,4 @@
-﻿namespace GymTracker.Domain.Abstractions.Services.Backup;
+﻿namespace GymTracker.Domain;
 public interface IDataBackupClient
 {
     Task BackupAsync(string key, string dataAsString);
