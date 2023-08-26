@@ -24,4 +24,10 @@ public class WorkoutEffects
 
         dispatcher.Dispatch(new SetWorkoutPlansAction(list));
     }
+
+    [EffectMethod]
+    public async Task OnStartWorkout(StartWorkoutAction action, IDispatcher dispatcher)
+    {
+
+    }
 }

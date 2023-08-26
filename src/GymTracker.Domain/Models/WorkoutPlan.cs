@@ -11,8 +11,6 @@ public record WorkoutPlan
 
 public record PlannedExercise : IOrderable
 {
-    public PlannedExercise() {}
-
     public PlannedExercise(Exercise exercise)
     {
         Exercise = exercise;
