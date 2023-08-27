@@ -1,4 +1,5 @@
 ﻿@page "/"
+
 @using Fluxor
 @using GymTracker.BlazorClient.Features.AppBar.Store;
 
@@ -44,6 +45,8 @@
     protected override void OnInitialized()
     {
         Dispatcher.Dispatch(new ResetBreadcrumbsToHomeAction());
+
+        NavigationManager.NavigateTo("workout/perform");
         base.OnInitialized();
     }
 

@@ -38,6 +38,6 @@ public class WorkoutEffects
 
         await _clientStorage.CurrentWorkout.SetAsync(workout);
 
-        _navigationManager.NavigateTo($"/workout/perform/{workout.Id}");
+        _navigationManager.NavigateTo($"/workout/perform");
     }
 }

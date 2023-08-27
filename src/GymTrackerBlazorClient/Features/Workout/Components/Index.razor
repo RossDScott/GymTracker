@@ -1,6 +1,9 @@
-﻿@page "/workout/perform/{id:guid}"
+﻿@page "/workout/perform"
 @page "/workout/view/{id:guid}"
+
 @using GymTracker.BlazorClient.Features.AppBar.Store;
+@using GymTracker.BlazorClient.Features.Workout.Components.Main
+@using GymTracker.BlazorClient.Features.Workout.Components.SideBar
 @using GymTracker.BlazorClient.Features.Workout.Store;
 
 @inherits FluxorComponent
@@ -8,7 +11,16 @@
 @inject IDispatcher Dispatcher
 @inject IState<WorkoutState> State
 
-<h3>Workout</h3>
+<MudContainer Class="pa-3 ma-0" Style="height: 100%">
+    <MudGrid Style="height: 100%">
+        <MudItem xs="3">
+            <SideBar></SideBar>
+        </MudItem>
+        <MudItem>
+            <Main></Main>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
 @code {
     [Parameter]
