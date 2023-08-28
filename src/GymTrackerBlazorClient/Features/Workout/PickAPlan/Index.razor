@@ -15,7 +15,7 @@
              SelectedItem="@_selectedWorkoutPlanListOrder.Name"
              OnItemClick="HandleOrderChange"></ChipSet>
 
-    <div Class="d-flex flex-row" Style="width:100%; overflow-x:auto">
+    <div Class="d-flex flex-row ml-2 mt-2" Style="width:100%; overflow-x:auto">
         @foreach (var plan in _workoutPlans)
         {
             <MudCard @onclick="_ => HandlePickWorkout(plan)" Class="mr-3" Style="min-width:200px">
@@ -28,7 +28,10 @@
                     <MudList>
                         @foreach (var exercise in plan.PlannedExercises)
                         {
-                            <MudListItem Text="@exercise" Dense="true" Class="pb-0" />
+                            <MudListItem OnClick="_ => HandlePickWorkout(plan)" 
+                                         Text="@exercise" 
+                                         Dense="true" 
+                                         Class="pb-0" />
                         }
                     </MudList>
                 </MudCardContent>
