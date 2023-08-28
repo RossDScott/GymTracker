@@ -27,4 +27,18 @@ public class WorkoutEffects
 
         _navigationManager.NavigateTo($"/workout/perform");
     }
+
+    [EffectMethod]
+    public async Task OnEndWorkout(EndWorkoutAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        ArgumentNullException.ThrowIfNull(workout, nameof(workout));
+
+        workout.WorkoutEnd = DateTimeOffset.Now;
+
+        await _clientStorage.Workouts.UpsertAsync(workout);
+        await _clientStorage.CurrentWorkout.DeleteAsync();
+
+        _navigationManager.NavigateTo($"/");
+    }
 }

@@ -60,6 +60,12 @@ public class KeyItem<T> : IKeyItem<T>
 
     public ValueTask SetAsync(T item) => SetDataAndCacheAsync(item);
 
+    public async Task DeleteAsync()
+    {
+        await LocalStorage.RemoveItemAsync(Config.Key);
+        _cacheData = default;
+    }
+
     public void SubscribeToChanges(Action<T> callback)
     {
         LocalStorage.Changed += (_, args) =>

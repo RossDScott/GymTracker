@@ -8,6 +8,7 @@ public interface IKeyItem
     ValueTask<string?> DataAsJson();
     ValueTask SetDataFromJson(string jsonString);
     void SubscribeToChangesAsJson(Action<string> callback);
+    Task DeleteAsync();
 }
 
 public interface IKeyItem<T> : IKeyItem

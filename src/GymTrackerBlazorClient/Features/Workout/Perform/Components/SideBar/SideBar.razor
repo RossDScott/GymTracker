@@ -1,11 +1,14 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers
+@using GymTracker.BlazorClient.Features.Workout.Perform.Store;
+
+@inject IDispatcher Dispatcher
 
 <div class="d-flex flex-column" style="height: 100%">
     <div style="height:200px; background-color:blue">
         Exercises
     </div>
     <div class="mt-auto mb-5">
-        <MudButton Variant="Variant.Outlined" FullWidth="true">End Workout</MudButton>
+        <MudButton OnClick="HandleEndWorkout" Variant="Variant.Outlined" FullWidth="true">End Workout</MudButton>
     </div>
     <div>
         <MudDivider Class="mb-5" />
@@ -14,5 +17,5 @@
 </div>
 
 @code {
-
+    void HandleEndWorkout() => Dispatcher.Dispatch(new EndWorkoutAction());
 }
