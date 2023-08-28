@@ -35,7 +35,7 @@
 	
 	<ItemGroup>
 	  <Folder Include="Features\Home\Store\" />
-	  <Folder Include="Features\Workout\Components\SideBar\Exercises\" />
+	  <Folder Include="Features\Workout\Perform\Components\SideBar\Exercises\" />
 	</ItemGroup>
 
 </Project>

@@ -2,9 +2,9 @@
 @page "/workout/view/{id:guid}"
 
 @using GymTracker.BlazorClient.Features.AppBar.Store;
-@using GymTracker.BlazorClient.Features.Workout.Components.Main
-@using GymTracker.BlazorClient.Features.Workout.Components.SideBar
-@using GymTracker.BlazorClient.Features.Workout.Store;
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar
+@using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 
 @inherits FluxorComponent
 
@@ -28,7 +28,6 @@
 
     protected override void OnInitialized()
     {
-        Dispatcher.Dispatch(new FetchWorkoutPlansAction(WorkoutListOrder.Recent));
         Dispatcher.Dispatch(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Workout", "/workout/perform", false, Icons.Material.Filled.SportsMartialArts),

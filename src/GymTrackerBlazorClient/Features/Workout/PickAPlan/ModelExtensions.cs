@@ -1,7 +1,7 @@
 ﻿using GymTracker.Domain.Models;
 using System.Collections.Immutable;
 
-namespace GymTracker.BlazorClient.Features.Workout.Store;
+namespace GymTracker.BlazorClient.Features.Workout.PickAPlan;
 
 public static class ModelExtensions
 {

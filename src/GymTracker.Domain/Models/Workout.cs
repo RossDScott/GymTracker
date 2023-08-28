@@ -1,6 +1,9 @@
-﻿namespace GymTracker.Domain.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace GymTracker.Domain.Models;
 public record Workout
 {
+    [JsonConstructor]
     public Workout(WorkoutPlan plan)
     {
         Plan = plan;
@@ -27,6 +30,7 @@ public record WorkoutExercise : IOrderable
         Exercise = exercise;
     }
 
+    [JsonConstructor]
     public WorkoutExercise(PlannedExercise plannedExercise)
     {
         Exercise = plannedExercise.Exercise;
@@ -47,15 +51,16 @@ public record WorkoutExercise : IOrderable
 
 public record WorkoutExerciseSet
 {
-    public WorkoutExerciseSet(PlannedExerciseSet? targetSet)
+    [JsonConstructor]
+    public WorkoutExerciseSet(PlannedExerciseSet? plannedExerciseSet)
     {
-        PlannedExerciseSet = targetSet;
+        PlannedExerciseSet = plannedExerciseSet;
 
-        if (targetSet != null)
+        if (plannedExerciseSet != null)
         {
-            Order = targetSet.Order;
-            SetType = targetSet.SetType;
-            OrderForSetType = targetSet.OrderForSetType;
+            Order = plannedExerciseSet.Order;
+            SetType = plannedExerciseSet.SetType;
+            OrderForSetType = plannedExerciseSet.OrderForSetType;
         }
     }
 

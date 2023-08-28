@@ -1,0 +1,31 @@
+﻿@using System.Timers;
+@using GymTracker.BlazorClient.Features.Workout.Perform.Store;
+
+@inject IState<WorkoutState> State
+
+<span class="fw-semibold">Workout Time</span>
+<h1>@duration.ToString(@"hh\:mm")</h1>
+
+<MudText Typo="Typo.subtitle1">Workout Time</MudText>
+<MudText Typo="Typo.h3">@duration.ToString("HH:mm")</MudText>
+
+@code {
+    private TimeSpan duration = TimeSpan.FromMilliseconds(0);
+    private Timer timer = new(1000);
+
+    protected override void OnInitialized()
+    {
+        timer.Elapsed += (sender, eventArgs) => OnTimerCallback();
+        timer.Start();
+    }
+
+    private void OnTimerCallback()
+    {
+        //calcDuration();
+        StateHasChanged();
+    }
+
+    //private void calcDuration() => duration = DateTimeOffset.Now.Subtract(State.Value. ?? DateTimeOffset.Now);
+
+    public void Dispose() => timer.Dispose();
+}

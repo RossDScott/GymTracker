@@ -2,13 +2,24 @@
 
 @using Fluxor
 @using GymTracker.BlazorClient.Features.AppBar.Store;
+@using GymTracker.Repository;
 
 @inject NavigationManager NavigationManager
 @inject IDispatcher Dispatcher
+@inject IClientStorage ClientStorage
 
 <MudContainer Class="pa-3 ma-0">
-    <MudButton 
-               Variant="Variant.Outlined"
+    @if (_hasExistingWorkout)
+    {
+        <MudButton Class="mr-2" Variant="Variant.Outlined"
+                   Color="Color.Default"
+                   Style="height: 200px; width: 200px"
+                   OnClick="HandleContinueWorkout">
+            Continue Workout
+        </MudButton>
+    }
+
+    <MudButton Variant="Variant.Outlined"
                Color="Color.Default"
                Style="height: 200px; width: 200px"
                OnClick="HandleStartWorkout">
@@ -40,18 +51,25 @@
     </MudButton>
 </MudContainer>
 
-
 @code {
+    bool _hasExistingWorkout = false;
+
     protected override void OnInitialized()
     {
         Dispatcher.Dispatch(new ResetBreadcrumbsToHomeAction());
 
-        NavigationManager.NavigateTo("workout/perform");
+        //NavigationManager.NavigateTo("workout/perform");
         base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hasExistingWorkout = await ClientStorage.CurrentWorkout.GetAsync() is not null;
     }
 
     void HandleManageExercises() => NavigationManager.NavigateTo("exercises");
     void HandleManageWorkoutPlans() => NavigationManager.NavigateTo("workout-plans");
     void HandleManageSettings() => NavigationManager.NavigateTo("settings");
     void HandleStartWorkout() => NavigationManager.NavigateTo("workout/new");
+    void HandleContinueWorkout() => NavigationManager.NavigateTo("workout/perform");
 }

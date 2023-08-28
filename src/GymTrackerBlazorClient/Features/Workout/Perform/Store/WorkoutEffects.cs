@@ -1,10 +1,9 @@
 ﻿using Fluxor;
 using GymTracker.Repository;
 using Microsoft.AspNetCore.Components;
-using System.Collections.Immutable;
 using Models = GymTracker.Domain.Models;
 
-namespace GymTracker.BlazorClient.Features.Workout.Store;
+namespace GymTracker.BlazorClient.Features.Workout.Perform.Store;
 
 public class WorkoutEffects
 {
@@ -15,18 +14,6 @@ public class WorkoutEffects
     {
         _clientStorage = clientStorage;
         _navigationManager = navigationManager;
-    }
-
-    [EffectMethod]
-    public async Task OnFetchWorkoutPlans(FetchWorkoutPlansAction action, IDispatcher dispatcher)
-    {
-        var workoutPlans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
-        var list = workoutPlans
-            .Where(x => x.IsAcitve)
-            .Select(x => x.ToWorkoutPlanListItem())
-            .ToImmutableArray();
-
-        dispatcher.Dispatch(new SetWorkoutPlansAction(list));
     }
 
     [EffectMethod]
