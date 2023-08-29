@@ -11,10 +11,13 @@
 @inject IDispatcher Dispatcher
 @inject IState<WorkoutState> State
 
-<MudContainer Class="pa-3 ma-0" Style="height: 100%">
+<MudContainer Class="pa-3 ma-0" Style="height: 100%; padding-bottom: 0!important;">
     <MudGrid Style="height: 100%">
-        <MudItem xs="3">
+        <MudItem Style="flex-basis: 20%; max-width: 20%">
             <SideBar></SideBar>
+        </MudItem>
+        <MudItem Class="px-1 pb-0">
+            <MudDivider Vertical="true" FlexItem="true" Style="height: 100%" />
         </MudItem>
         <MudItem>
             <Main></Main>

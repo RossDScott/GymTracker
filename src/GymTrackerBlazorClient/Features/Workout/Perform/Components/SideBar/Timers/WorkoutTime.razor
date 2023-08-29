@@ -4,7 +4,7 @@
 @inject IState<WorkoutState> State
 
 <MudText Typo="Typo.subtitle1">Workout Time</MudText>
-<MudText Typo="Typo.h3">@duration.ToString(@"hh\:mm")</MudText>
+<MudText Typo="Typo.h4">@duration.ToString(@"hh\:mm")</MudText>
 
 @code {
     private TimeSpan duration = TimeSpan.FromMilliseconds(0);

@@ -39,6 +39,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <None Include="Features\Workout\Perform\Components\SideBar\Timers\CountdownTimer\Components\CountdownTimer.razor" />
 	  <None Include="Features\Workout\Perform\Components\SideBar\Timers\Stopwatch\Components\Stopwatch.razor" />
 	</ItemGroup>
 

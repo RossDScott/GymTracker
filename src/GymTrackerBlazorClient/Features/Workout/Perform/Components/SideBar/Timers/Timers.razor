@@ -1,4 +1,5 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.CountdownTimer.Components
 @using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.Stopwatch.Components
 
 <div class="ml-3">
@@ -17,8 +18,12 @@
             <Stopwatch></Stopwatch>
         </div>
     </div>
+    <div class="d-flex justify-start ml-3">
+        <div class="timerContainer">
+            <CountdownTimer></CountdownTimer>
+        </div>
+    </div>
 </div>
-
 
 @code {
 

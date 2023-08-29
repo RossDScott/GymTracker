@@ -1,0 +1,71 @@
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.CountdownTimer.Store;
+@inherits FluxorComponent
+
+@inject IDispatcher Dispatcher
+@inject IState<CountdownTimerState> State
+@inject IJSRuntime JS;
+
+<script>
+    window.showPicker = (element) => {
+        element.showPicker();
+    };
+</script>
+
+<MudText Typo="Typo.subtitle1">Current Time</MudText>
+@if(State.Value.ShowStartTimerFace)
+{
+    @startTimerFace()
+}
+@if(State.Value.ShowCountdownDuration)
+{
+    <MudText Typo="Typo.h4">@State.Value.Duration.ToString(@"mm\:ss\:fff")</MudText>
+}
+
+@if(State.Value.TimesUp)
+{
+    <MudText Typo="Typo.h4" Class="pulsate">Times Up!</MudText>
+}
+
+@if (!State.Value.TimesUp)
+{
+    <div class="d-flex">
+        <ControlButtons
+        CanPause="true"
+        IsPaused="@State.Value.IsPaused"
+        IsRunning="@(State.Value.StartTime is not null)"
+        OnStart="@handleStart"
+        OnPause="@handlePause"
+        OnReset="@handleReset">
+        </ControlButtons>
+    </div>
+}
+@code{
+    RenderFragment startTimerFace() => State.Value.IsEditing
+        ? @<MudText Typo="Typo.h4"><input @ref="timeInput" @bind="StartDurationInputBindProxy" @bind:event="onchange" type="time" step="1" min="00:00:01" max="00:59:59"></MudText>
+        : @<MudText @onclick="handleStartEditTime" Typo="Typo.h4">@State.Value.StartDuration.ToString(@"mm\:ss\:fff")</MudText>;
+}
+
+@code {
+    private ElementReference timeInput;
+
+    private TimeOnly StartDurationInputBindProxy {
+        get => State.Value.StartDurationTime;
+        set => Dispatcher.Dispatch(new CountdownTimerSetStartDurationAction(value.ToTimeSpan()));
+    }
+
+    private void handleSetDuration(TimeOnly value) => Dispatcher.Dispatch(new CountdownTimerSetStartDurationAction(value.ToTimeSpan()));
+    private void handleStart() => Dispatcher.Dispatch(new CountdownTimerStartAction(StartTime: DateTime.Now));
+    private void handlePause() => Dispatcher.Dispatch(new CountdownTimerPauseAction());
+    private void handleReset() => Dispatcher.Dispatch(new CountdownTimerResetAction());
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (State.Value.IsEditing && timeInput.Context is not null)
+        {
+            await timeInput.FocusAsync();
+            await JS.InvokeVoidAsync("showPicker", timeInput);
+        }
+    }
+
+    private void handleStartEditTime() => Dispatcher.Dispatch(new CountdownTimerStartEditAction());
+}
