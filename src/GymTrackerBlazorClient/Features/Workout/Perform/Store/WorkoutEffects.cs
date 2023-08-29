@@ -24,8 +24,20 @@ public class WorkoutEffects
         workout.WorkoutStart = DateTimeOffset.Now;
 
         await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new SetWorkoutAction(workout));
 
         _navigationManager.NavigateTo($"/workout/perform");
+    }
+
+    [EffectMethod]
+    public async Task OnContinueWorkout(ContinueWorkoutAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        ArgumentNullException.ThrowIfNull(workout, nameof(workout));
+
+        dispatcher.Dispatch(new SetWorkoutAction(workout));
+
+        _navigationManager.NavigateTo("workout/perform");
     }
 
     [EffectMethod]

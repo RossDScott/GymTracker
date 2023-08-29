@@ -1,0 +1,26 @@
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.Components.Stopwatch.Store;
+
+@inherits FluxorComponent;
+
+@inject IDispatcher Dispatcher
+@inject IState<StopwatchState> State
+
+<MudText Typo="Typo.subtitle1">Stopwatch</MudText>
+<MudText Typo="Typo.h3">@State.Value.Duration.ToString(@"mm\:ss\:fff")</MudText>
+
+<div class="d-flex">
+    <ControlButtons
+        CanPause="true"
+        IsPaused="@State.Value.IsPaused"
+        IsRunning="@(State.Value.StartTime is not null)"
+        OnStart="@handleStart"
+        OnPause="@handlePause"
+        OnReset="@handleReset">
+    </ControlButtons>
+</div>
+
+@code {
+    private void handleStart() => Dispatcher.Dispatch(new StopwatchStartAction());
+    private void handlePause() => Dispatcher.Dispatch(new StopwatchPauseAction());
+    private void handleReset() => Dispatcher.Dispatch(new StopwatchResetAction());
+}

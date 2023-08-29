@@ -37,5 +37,9 @@
 	  <Folder Include="Features\Home\Store\" />
 	  <Folder Include="Features\Workout\Perform\Components\SideBar\Exercises\" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Include="Features\Workout\Perform\Components\SideBar\Timers\Components\Stopwatch\Components\Stopwatch.razor" />
+	</ItemGroup>
 
 </Project>

@@ -1,7 +1,22 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.Components
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.Components.Stopwatch.Components
 
 <div class="ml-3">
-    <CurrentTime></CurrentTime>
+    <div class="d-flex justify-start ml-3">
+        <div class="timerContainer">
+            <CurrentTime></CurrentTime>
+        </div>
+    </div>
+    <div class="d-flex justify-start ml-3">
+        <div class="timerContainer">
+            <WorkoutTime></WorkoutTime>
+        </div>
+    </div>
+    <div class="d-flex justify-start ml-3">
+        <div class="timerContainer">
+            <Stopwatch></Stopwatch>
+        </div>
+    </div>
 </div>
 
 

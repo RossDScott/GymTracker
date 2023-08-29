@@ -2,6 +2,7 @@
 
 @using Fluxor
 @using GymTracker.BlazorClient.Features.AppBar.Store;
+@using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 @using GymTracker.Repository;
 
 @inject NavigationManager NavigationManager
@@ -71,5 +72,5 @@
     void HandleManageWorkoutPlans() => NavigationManager.NavigateTo("workout-plans");
     void HandleManageSettings() => NavigationManager.NavigateTo("settings");
     void HandleStartWorkout() => NavigationManager.NavigateTo("workout/new");
-    void HandleContinueWorkout() => NavigationManager.NavigateTo("workout/perform");
+    void HandleContinueWorkout() => Dispatcher.Dispatch(new ContinueWorkoutAction());
 }

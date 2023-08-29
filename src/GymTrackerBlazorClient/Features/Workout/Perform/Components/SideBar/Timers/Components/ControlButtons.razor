@@ -1,0 +1,39 @@
+﻿@if (!IsPaused && IsRunning && CanPause)
+{
+    <MudButton OnClick="OnPause" Variant="Variant.Outlined" Size="Size.Small" Class="ms-auto pt-0 pb-0">
+        Pause
+    </MudButton>
+}
+
+@if (IsPaused)
+{
+    <MudButton OnClick="OnReset" Variant="Variant.Outlined" Size="Size.Small" Class="ms-auto me-1 pt-0 pb-0">
+        Reset
+    </MudButton>
+}
+
+@if (!IsRunning)
+{
+    <MudButton OnClick="OnStart" Variant="Variant.Outlined" Size="Size.Small"  Class="@startResumeButtonClass">
+        @(IsPaused ? "Resume" : "Start")
+    </MudButton>
+}
+
+@code {
+    [Parameter]
+    public bool IsPaused { get; set; }
+    [Parameter]
+    public bool IsRunning { get; set; }
+    [Parameter]
+    public bool CanPause { get; set; }
+
+    [Parameter]
+    public EventCallback OnStart { get; set; }
+    [Parameter]
+    public EventCallback OnPause { get; set; }
+    [Parameter]
+    public EventCallback OnReset { get; set; }
+
+    string startResumeButtonClass => (IsPaused ? "ms-1" : "ms-auto") + " pt-0 pb-0";
+
+}

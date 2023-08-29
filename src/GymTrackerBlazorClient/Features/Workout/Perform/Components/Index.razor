@@ -32,7 +32,13 @@
         {
             new BreadcrumbItem("Workout", "/workout/perform", false, Icons.Material.Filled.SportsMartialArts),
             new BreadcrumbItem("Perform", "/workout/perform", false, Icons.Material.Filled.ChecklistRtl)
-        }));
+    }));
         base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+
+        base.OnParametersSet();
     }
 }
