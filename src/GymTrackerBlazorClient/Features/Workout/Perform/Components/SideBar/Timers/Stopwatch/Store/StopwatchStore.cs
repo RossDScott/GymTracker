@@ -1,6 +1,6 @@
 ﻿using Fluxor;
 
-namespace GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.Components.Stopwatch.Store;
+namespace GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.Stopwatch.Store;
 
 [FeatureState]
 public record StopwatchState
