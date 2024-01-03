@@ -20,7 +20,10 @@
             <MudDivider Vertical="true" FlexItem="true" Style="height: 100%" />
         </MudItem>
         <MudItem>
-            <Main></Main>
+            @if (State.Value.SelectedExerciseId.HasValue)
+            {
+                <Main></Main>    
+            }
         </MudItem>
     </MudGrid>
 </MudContainer>
@@ -35,7 +38,7 @@
         {
             new BreadcrumbItem("Workout", "/workout/perform", false, Icons.Material.Filled.SportsMartialArts),
             new BreadcrumbItem("Perform", "/workout/perform", false, Icons.Material.Filled.ChecklistRtl)
-    }));
+        }));
         base.OnInitialized();
     }
 

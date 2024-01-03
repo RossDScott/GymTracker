@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GymTracker.AzureBlobStorage
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GymTracker.LocalStorage", "GymTrackerBlazorClient.LocalStorage\GymTracker.LocalStorage.csproj", "{F3BEF91B-4AD7-4BB4-AD30-4F0CF1CDF2E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymTracker.Repository", "GymTracker.Repository\GymTracker.Repository.csproj", "{62D37E5A-37E9-4B43-BF09-3C0F8B4DD321}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GymTracker.Repository", "GymTracker.Repository\GymTracker.Repository.csproj", "{62D37E5A-37E9-4B43-BF09-3C0F8B4DD321}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

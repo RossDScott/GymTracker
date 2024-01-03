@@ -1,0 +1,34 @@
+﻿@using GymTracker.BlazorClient.Features.Common;
+@using GymTracker.BlazorClient.Features.Workout.Perform.Store;
+@inherits FluxorComponent
+
+@inject IDispatcher Dispatcher
+@inject IState<WorkoutState> State
+
+<MudList Clickable="true" SelectedValue="State.Value.SelectedExerciseId" >
+    @foreach(var item in State.Value.Workout.ExerciseList)
+    {
+        @renderExerciseRow(item)
+    }
+</MudList>
+
+@*<AddExercise OnAdd="(exercise) => sessionData.AddExercise(exercise)"></AddExercise>*@
+
+@code {
+    RenderFragment renderExerciseRow(ListItem exercise) =>
+        @<MudListItem 
+            Value="exercise.Id" 
+            Dense="true"
+            @onclick="() => Dispatcher.Dispatch(new SetSelectedExerciseAction(exercise.Id))">
+            <MudText Typo="Typo.subtitle2">@exercise.Name</MudText>
+        </MudListItem>;
+}
+
+@code {
+    protected override Task OnInitializedAsync()
+    {
+        //Dispatcher.Dispatch(new LoadExercisesAction());
+
+        return base.OnInitializedAsync();
+    }
+}

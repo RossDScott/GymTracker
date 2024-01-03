@@ -7,3 +7,5 @@ public record ContinueWorkoutAction();
 public record EndWorkoutAction();
 
 public record SetWorkoutAction(Models.Workout workout);
+
+public record SetSelectedExerciseAction(Guid ExerciseId);

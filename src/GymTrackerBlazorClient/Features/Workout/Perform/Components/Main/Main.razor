@@ -1,4 +1,16 @@
-﻿<h3>Main</h3>
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Components
+
+@inject IDispatcher Dispatcher
+
+
+<main class="ms-3 d-flex flex-column">
+    @* <Title></Title> *@
+    <div id="mainContent" class="d-flex">
+        <ExerciseDetail></ExerciseDetail>
+        @* <SessionSideBar></SessionSideBar> *@
+    </div>
+</main>
+
 
 @code {
 
