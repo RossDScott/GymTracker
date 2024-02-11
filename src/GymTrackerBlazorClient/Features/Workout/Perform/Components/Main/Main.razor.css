@@ -1,0 +1,13 @@
+﻿main {
+    height: 100%;
+    width: 82%;
+}
+
+#mainContent {
+    height: 100%;
+    margin-bottom: 1rem;
+}
+
+#sessionSidebar {
+    width: 30%;
+}

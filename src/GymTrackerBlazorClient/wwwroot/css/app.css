@@ -5,3 +5,12 @@
 .fullWidth{
     min-width: 100%;
 }
+
+.textCenter{
+    text-align: center;
+}
+
+.numericInput input{
+    text-align: center;
+    width: 2.2em!important;
+}

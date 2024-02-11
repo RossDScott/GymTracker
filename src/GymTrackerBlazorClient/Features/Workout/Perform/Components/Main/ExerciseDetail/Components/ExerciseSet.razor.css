@@ -1,0 +1,15 @@
+﻿.row {
+    /* margin-bottom: .5rem; */
+    padding: .2rem 0;
+}
+
+    .row.selected {
+        background-color: #e9e9e9;
+        color: black;
+    }
+
+        .row.selected input {
+            font-size: .9rem !important;
+            padding-left: .1rem;
+            padding-right: .1rem;
+        }

@@ -1,0 +1,29 @@
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
+@inject IDispatcher Dispatcher
+
+<MudItem xs="2" Class="d-flex textCenter flex-column">
+    <MudIcon Class="mx-auto" Icon="@Icons.Material.Outlined.ArrowCircleUp" Title="Favorite" />
+
+    <MudNumericField @bind-Value="EditSet.TargetWeight"
+                     @bind-Value:after="handleRowDataChange"
+                     Variant="Variant.Text"
+                     DisableUnderLine="true"
+                     HideSpinButtons="true"
+                     Min="0" Max="500"
+                     AdornmentText="Kg"
+                     Adornment="Adornment.End"
+                     FullWidth="false"
+                     Class="mx-auto mb-1 mt-n3 numericInput" />
+
+    <MudIcon Class="mx-auto" Icon="@Icons.Material.Outlined.ArrowCircleDown" Title="Favorite" />
+</MudItem>
+<MudItem xs="1" class="textCenter me-3">@EditSet.TargetReps</MudItem>
+<MudItem xs="2" class="textCenter">@EditSet.ActualWeight</MudItem>
+<MudItem xs="1" class="textCenter me-3">@EditSet.ActualReps</MudItem>
+
+@code {
+    [Parameter, EditorRequired]
+    public EditSet EditSet { get; set; } = default!;
+
+    private void handleRowDataChange() => Dispatcher.Dispatch(new SetSetDataAction(EditSet));
+}

@@ -1,0 +1,11 @@
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
+
+<MudItem xs="2" Class="textCenter">@Set.TargetWeight</MudItem>
+<MudItem xs="1" Class="textCenter me-3">@Set.TargetReps</MudItem>
+<MudItem xs="2" Class="textCenter">@Set.ActualWeight</MudItem>
+<MudItem xs="1" Class="textCenter me-3">@Set.ActualReps</MudItem>
+
+@code {
+    [Parameter, EditorRequired]
+    public Set Set { get; set; } = default!;
+}

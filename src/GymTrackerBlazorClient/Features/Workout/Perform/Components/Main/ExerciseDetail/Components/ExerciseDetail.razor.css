@@ -1,0 +1,78 @@
+﻿#session {
+    height: 100%;
+    width: 70%;
+}
+
+
+#grid {
+    /* height: 75%; */
+    overflow-y: auto;
+    font-size: .9rem !important;
+}
+
+    #grid.isEditing {
+        color: lightgray;
+    }
+
+.bi {
+    font-size: 1.5rem !important;
+}
+
+#grid .row {
+    /* margin-bottom: .5rem; */
+    padding: .2rem 0;
+}
+
+.row.selectedRow {
+    background-color: #e9e9e9;
+    color: black;
+}
+
+    .row.selectedRow input {
+        font-size: .9rem !important;
+        padding-left: .1rem;
+        padding-right: .1rem;
+    }
+
+.bi {
+    font-size: 1.6rem;
+}
+
+#rowDetail {
+    height: 25%;
+}
+
+.selectedRowOptions {
+    position: absolute;
+    width: 50px;
+    height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: #dad6d6;
+}
+
+    .selectedRowOptions .circleWithText {
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        text-align: center;
+        display: flex;
+        border: solid black 1.5px;
+        white-space: nowrap;
+        width: 30px;
+        height: 30px;
+        background-color: white;
+    }
+
+        .selectedRowOptions .circleWithText.selected {
+            background-color: rgb(56, 56, 56);
+            color: white;
+        }
+
+        .selectedRowOptions .circleWithText span {
+            font-size: 0.7rem;
+            font-weight: bold;
+        }

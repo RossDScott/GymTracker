@@ -24,4 +24,10 @@ public static class ExerciseDetailReducers
                     }).ToImmutableList()
         };
     }
+
+    [ReducerMethod]
+    public static ExerciseDetailState OnSetSelectedSetAction(ExerciseDetailState state, SetSelectedSetAction action)
+    {
+        return state with { SelectedSetId = action.Id };
+    }
 }
