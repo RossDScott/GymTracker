@@ -21,7 +21,10 @@ public static class ExerciseDetailReducers
                         TargetTime = x.PlannedExerciseSet?.TargetMetrics?.Time,
                         TargetWeight = x.PlannedExerciseSet?.TargetMetrics?.Weight,
                         Completed = false
-                    }).ToImmutableList()
+                    }).ToImmutableList(),
+            SelectedSetId = state.WorkoutExerciseId == action.WorkoutExercise.Id
+                ? state.SelectedSetId
+                : null
         };
     }
 

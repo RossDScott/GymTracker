@@ -24,4 +24,20 @@ public class ExerciseDetailEffects
 
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
     }
+
+    [EffectMethod]
+    public async Task OnSetSetDataAction(SetSetDataAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
+        var set = exercise.Sets.Single(x => x.Id == action.EditSet.Id);
+
+        if (set.PlannedExerciseSet != null)
+        {
+            set.PlannedExerciseSet.TargetMetrics.Weight = action.EditSet.TargetWeight;
+        }
+
+        await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+    }
 }

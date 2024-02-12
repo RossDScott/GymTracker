@@ -3,6 +3,7 @@
 
 @using GymTracker.BlazorClient.Features.AppBar.Store;
 @using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
 @using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar
 @using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 
@@ -11,7 +12,7 @@
 @inject IDispatcher Dispatcher
 @inject IState<WorkoutState> State
 
-<div class="fullHeight fullWidth d-flex">
+<div class="fullHeight fullWidth d-flex" @onclick="() => Dispatcher.Dispatch(new SetSelectedSetAction(null))">
     <SideBar></SideBar>
     <MudDivider Vertical="true" FlexItem="true" Class="mx-3" />
     <MudItem Class="flex-grow-1">

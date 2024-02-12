@@ -2,7 +2,7 @@
 @inject IDispatcher Dispatcher
 
 <MudItem xs="2" Class="d-flex textCenter flex-column">
-    <MudIcon Class="mx-auto" Icon="@Icons.Material.Outlined.ArrowCircleUp" Title="Favorite" />
+    @upDownIcon(x => x.TargetWeight++, true)
 
     <MudNumericField @bind-Value="EditSet.TargetWeight"
                      @bind-Value:after="handleRowDataChange"
@@ -15,15 +15,30 @@
                      FullWidth="false"
                      Class="mx-auto mb-1 mt-n3 numericInput" />
 
-    <MudIcon Class="mx-auto" Icon="@Icons.Material.Outlined.ArrowCircleDown" Title="Favorite" />
+    @upDownIcon(x => x.TargetWeight--, false)
 </MudItem>
 <MudItem xs="1" class="textCenter me-3">@EditSet.TargetReps</MudItem>
 <MudItem xs="2" class="textCenter">@EditSet.ActualWeight</MudItem>
 <MudItem xs="1" class="textCenter me-3">@EditSet.ActualReps</MudItem>
 
+    @code {
+    public RenderFragment upDownIcon(Action<EditSet> action, bool up) =>
+        @<MudIcon @onclick="() => handleRowDataChange(action)"
+             Class="mx-auto" Icon="@(up ? Icons.Material.Outlined.ArrowCircleUp : Icons.Material.Outlined.ArrowCircleDown)" />;
+}
+
 @code {
+    [Parameter, EditorRequired]
+    public Guid WorkoutExerciseId { get; set; }
+
     [Parameter, EditorRequired]
     public EditSet EditSet { get; set; } = default!;
 
-    private void handleRowDataChange() => Dispatcher.Dispatch(new SetSetDataAction(EditSet));
+
+    private void handleRowDataChange() => Dispatcher.Dispatch(new SetSetDataAction(WorkoutExerciseId, EditSet));
+    private void handleRowDataChange(Action<EditSet> updateSet)
+    {
+        updateSet(EditSet);
+        handleRowDataChange();
+    }
 }

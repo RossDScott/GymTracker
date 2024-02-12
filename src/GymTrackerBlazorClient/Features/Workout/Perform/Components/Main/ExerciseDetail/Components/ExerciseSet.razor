@@ -1,7 +1,9 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
 @inject IDispatcher Dispatcher
 
-<MudGrid Class="fullWidth ma-0" @onclick="handleEditRow">
+<div @onclick="handleEditRow"
+     @onclick:stopPropagation="true">
+    <MudGrid Class="fullWidth ma-0">
     <MudItem xs="2" class="fw-bold">@Set.Name</MudItem>
 
     @(IsSelected ? @EditRow(editSet) : @ViewRow(Set))
@@ -10,8 +12,10 @@
         <i class="bi @completedCircleClass" @onclick="handleToggleCompleted" @onclick:stopPropagation="true"></i>
     </MudItem>
 </MudGrid>
+</div>
 
-@code {
+
+ @code {
     [Parameter, EditorRequired]
     public RenderFragment<Set> ViewRow { get; set; } = null!;
     [Parameter, EditorRequired]
@@ -26,9 +30,13 @@
 
     private string completedCircleClass => Set.Completed ? "bi-check-circle" : "bi-circle";
 
-    private void handleEditRow()
+    protected override void OnParametersSet()
     {
         editSet = new EditSet(Set);
+    }
+
+    private void handleEditRow()
+    {
         Dispatcher.Dispatch(new SetSelectedSetAction(Set.Id));
     }
 
