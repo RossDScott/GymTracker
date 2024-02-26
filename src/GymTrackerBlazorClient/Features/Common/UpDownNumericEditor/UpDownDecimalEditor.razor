@@ -1,0 +1,37 @@
+﻿@upDownIcon(x => ++x, true)
+
+<MudNumericField @bind-Value="Value"
+                 @bind-Value:after="handleValueChange"
+                 Variant="Variant.Text"
+                 DisableUnderLine="true"
+                 HideSpinButtons="true"
+                 Min="0" Max="500"
+                 AdornmentText="@AdornmentText"
+                 Adornment="Adornment.End"
+                 FullWidth="false"
+                 Class="mx-auto mb-1 mt-n3 numericInput" />
+
+@upDownIcon(x => --x, false)
+
+@code {
+    public RenderFragment upDownIcon(Func<decimal?, decimal?> updateValue, bool up) =>
+        @<MudIcon @onclick="() => handleValueChange(updateValue)"
+             Class="mx-auto" Icon="@(up ? Icons.Material.Outlined.ArrowCircleUp : Icons.Material.Outlined.ArrowCircleDown)" />;
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public decimal? Value { get; set; }
+    [Parameter]
+    public EventCallback<decimal?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string AdornmentText { get; set; } = string.Empty;
+
+    private Task handleValueChange() => ValueChanged.InvokeAsync(Value);
+
+    private Task handleValueChange(Func<decimal?, decimal?> updateValue){
+        Value = updateValue(Value);
+        return handleValueChange();
+    }
+}

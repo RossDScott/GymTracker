@@ -1,31 +1,22 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
+@using GymTracker.BlazorClient.Features.Common.UpDownNumericEditor
+
 @inject IDispatcher Dispatcher
 
 <MudItem xs="2" Class="d-flex textCenter flex-column">
-    @upDownIcon(x => x.TargetWeight++, true)
-
-    <MudNumericField @bind-Value="EditSet.TargetWeight"
-                     @bind-Value:after="handleRowDataChange"
-                     Variant="Variant.Text"
-                     DisableUnderLine="true"
-                     HideSpinButtons="true"
-                     Min="0" Max="500"
-                     AdornmentText="Kg"
-                     Adornment="Adornment.End"
-                     FullWidth="false"
-                     Class="mx-auto mb-1 mt-n3 numericInput" />
-
-    @upDownIcon(x => x.TargetWeight--, false)
+    <UpDownDecimalEditor @bind-Value="EditSet.TargetWeight" @bind-Value:after="handleRowDataChange" AdornmentText="Kg"></UpDownDecimalEditor>
 </MudItem>
-<MudItem xs="1" class="textCenter me-3">@EditSet.TargetReps</MudItem>
-<MudItem xs="2" class="textCenter">@EditSet.ActualWeight</MudItem>
-<MudItem xs="1" class="textCenter me-3">@EditSet.ActualReps</MudItem>
+<MudItem xs="1" class="textCenter me-3">
+    <UpDownIntegerEditor @bind-Value="EditSet.TargetReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
+</MudItem>
+<MudItem xs="2" class="textCenter">
+    <UpDownDecimalEditor @bind-Value="EditSet.ActualWeight" @bind-Value:after="handleRowDataChange" AdornmentText="Kg"></UpDownDecimalEditor>
+</MudItem>
+<MudItem xs="1" class="textCenter me-3">
+    <UpDownIntegerEditor @bind-Value="EditSet.ActualReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
+</MudItem>
 
-    @code {
-    public RenderFragment upDownIcon(Action<EditSet> action, bool up) =>
-        @<MudIcon @onclick="() => handleRowDataChange(action)"
-             Class="mx-auto" Icon="@(up ? Icons.Material.Outlined.ArrowCircleUp : Icons.Material.Outlined.ArrowCircleDown)" />;
-}
+
 
 @code {
     [Parameter, EditorRequired]
@@ -36,9 +27,4 @@
 
 
     private void handleRowDataChange() => Dispatcher.Dispatch(new SetSetDataAction(WorkoutExerciseId, EditSet));
-    private void handleRowDataChange(Action<EditSet> updateSet)
-    {
-        updateSet(EditSet);
-        handleRowDataChange();
-    }
 }

@@ -1,13 +1,18 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Components
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.SideBar
 
 @inject IDispatcher Dispatcher
 
 
 <main class="d-flex flex-column fullWidth fullHeight">
     @* <Title></Title> *@
-    <div id="mainContent" class="d-flex fullWidth mt-3">
-        <ExerciseDetail></ExerciseDetail>
-        @* <SessionSideBar></SessionSideBar> *@
+    <div class="d-flex fullWidth fullHeight mt-3">
+        <div id="mainSession" class="me-3 fullHeight">
+            <ExerciseDetail></ExerciseDetail>
+        </div>
+        <div id="mainSessionSideBar" class="fullHeight" style="background-color: darkgray">
+            <SideBar></SideBar>
+        </div>
     </div>
 </main>
 

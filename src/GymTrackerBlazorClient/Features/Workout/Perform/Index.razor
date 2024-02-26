@@ -12,15 +12,19 @@
 @inject IDispatcher Dispatcher
 @inject IState<WorkoutState> State
 
-<div class="fullHeight fullWidth d-flex" @onclick="() => Dispatcher.Dispatch(new SetSelectedSetAction(null))">
-    <SideBar></SideBar>
+<div id="mainContent" class="fullHeight fullWidth d-flex" @onclick="() => Dispatcher.Dispatch(new SetSelectedSetAction(null))">
+    <div id="sessionSidebar" class="fullHeight">
+        <SideBar></SideBar>
+    </div>
+   
     <MudDivider Vertical="true" FlexItem="true" Class="mx-3" />
-    <MudItem Class="flex-grow-1">
+
+    <div id="mainSession" Class="flex-grow-1 fullHeight">
         @if (State.Value.SelectedExerciseId.HasValue)
         {
             <Main></Main>
         }
-    </MudItem>
+    </div>
 </div>
 
 @code {

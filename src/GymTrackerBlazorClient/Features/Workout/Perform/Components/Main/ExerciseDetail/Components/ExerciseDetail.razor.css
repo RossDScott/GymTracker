@@ -1,12 +1,16 @@
-﻿#session {
+﻿#mainSession {
     height: 100%;
     width: 70%;
 }
 
+#mainSessionSideBar {
+    height: 100%;
+    width: 30%;
+}
 
-#grid {
+/*#grid {*/
     /* height: 75%; */
-    overflow-y: auto;
+    /*overflow-y: auto;
     font-size: .9rem !important;
 }
 
@@ -18,9 +22,9 @@
     font-size: 1.5rem !important;
 }
 
-#grid .row {
+#grid .row {*/
     /* margin-bottom: .5rem; */
-    padding: .2rem 0;
+    /*padding: .2rem 0;
 }
 
 .row.selectedRow {
@@ -75,4 +79,4 @@
         .selectedRowOptions .circleWithText span {
             font-size: 0.7rem;
             font-weight: bold;
-        }
+        }*/

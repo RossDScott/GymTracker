@@ -35,6 +35,10 @@ public class ExerciseDetailEffects
         if (set.PlannedExerciseSet != null)
         {
             set.PlannedExerciseSet.TargetMetrics.Weight = action.EditSet.TargetWeight;
+            set.PlannedExerciseSet.TargetMetrics.Reps = action.EditSet.TargetReps;
+            set.Metrics.Weight = action.EditSet.ActualWeight;
+            set.Metrics.Reps = action.EditSet.ActualReps;
+            set.Completed = true;
         }
 
         await _clientStorage.CurrentWorkout.SetAsync(workout);

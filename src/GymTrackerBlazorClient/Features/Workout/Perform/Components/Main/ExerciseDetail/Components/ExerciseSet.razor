@@ -2,7 +2,8 @@
 @inject IDispatcher Dispatcher
 
 <div @onclick="handleEditRow"
-     @onclick:stopPropagation="true">
+     @onclick:stopPropagation="true"
+     class="row @selectedClass">
     <MudGrid Class="fullWidth ma-0">
     <MudItem xs="2" class="fw-bold">@Set.Name</MudItem>
 
@@ -15,7 +16,7 @@
 </div>
 
 
- @code {
+    @code {
     [Parameter, EditorRequired]
     public RenderFragment<Set> ViewRow { get; set; } = null!;
     [Parameter, EditorRequired]
@@ -28,6 +29,7 @@
 
     private EditSet editSet = default!;
 
+    private string selectedClass => IsSelected ? "selected" : "";
     private string completedCircleClass => Set.Completed ? "bi-check-circle" : "bi-circle";
 
     protected override void OnParametersSet()
