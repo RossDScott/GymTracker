@@ -44,4 +44,33 @@ public class ExerciseDetailEffects
         await _clientStorage.CurrentWorkout.SetAsync(workout);
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
     }
+
+    [EffectMethod]
+    public async Task OnToggleSetCompletedAction(ToggleSetCompletedAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
+        var set = exercise.Sets.Single(x => x.Id == action.SetId);
+
+        set.Completed = !set.Completed;
+        if (set.Completed)
+        {
+            set.Metrics.Distance = set.Metrics.Distance ?? set.PlannedExerciseSet?.TargetMetrics.Distance;
+            set.Metrics.Reps = set.Metrics.Reps ?? set.PlannedExerciseSet?.TargetMetrics.Reps;
+            set.Metrics.Weight = set.Metrics.Weight ?? set.PlannedExerciseSet?.TargetMetrics.Weight;
+            set.Metrics.Time = set.Metrics.Time ?? set.PlannedExerciseSet?.TargetMetrics.Time;
+            set.CompletedOn = DateTimeOffset.Now;
+        }
+        else
+        {
+            set.Metrics.Distance = null;
+            set.Metrics.Reps = null;
+            set.Metrics.Weight = null;
+            set.Metrics.Time = null;
+            set.CompletedOn = null;
+        }
+
+        await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+    }
 }

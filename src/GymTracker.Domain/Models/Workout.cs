@@ -71,5 +71,5 @@ public record WorkoutExerciseSet
     public int OrderForSetType { get; set; }
     public ExerciseSetMetrics Metrics { get; set; } = new ExerciseSetMetrics();
     public bool Completed { get; set; } = false;
-    public DateTimeOffset CompletedOn { get; set; }
+    public DateTimeOffset? CompletedOn { get; set; } = null;
 }

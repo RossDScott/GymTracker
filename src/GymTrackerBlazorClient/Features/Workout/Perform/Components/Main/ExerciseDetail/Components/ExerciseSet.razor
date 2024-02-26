@@ -5,32 +5,28 @@
      @onclick:stopPropagation="true"
      class="row @selectedClass">
     <MudGrid Class="fullWidth ma-0">
-    <MudItem xs="2" class="fw-bold">@Set.Name</MudItem>
+        <MudItem xs="2" class="fw-bold">@Set.Name</MudItem>
 
-    @(IsSelected ? @EditRow(editSet) : @ViewRow(Set))
-
-    <MudItem xs="1" class="text-center">
-        <i class="bi @completedCircleClass" @onclick="handleToggleCompleted" @onclick:stopPropagation="true"></i>
-    </MudItem>
-</MudGrid>
+        @(IsSelected ? @EditRow(editSet) : @ViewRow(Set))
+        <MudItem xs="1" class="text-center">
+            <MudIconButton Icon="@completedCircleIcon" OnClick="handleToggleCompleted" />
+        </MudItem>
+    </MudGrid>
 </div>
 
 
-    @code {
-    [Parameter, EditorRequired]
-    public RenderFragment<Set> ViewRow { get; set; } = null!;
-    [Parameter, EditorRequired]
-    public RenderFragment<EditSet> EditRow { get; set; } = null!;
+@code {
+    [Parameter, EditorRequired] public RenderFragment<Set> ViewRow { get; set; } = null!;
+    [Parameter, EditorRequired] public RenderFragment<EditSet> EditRow { get; set; } = null!;
 
-    [Parameter, EditorRequired]
-    public Set Set { get; set; } = default!;
-    [Parameter, EditorRequired]
-    public bool IsSelected { get; set; }
+    [Parameter, EditorRequired] public Guid WorkoutExerciseId { get; set; }
+    [Parameter, EditorRequired] public Set Set { get; set; } = default!;
+    [Parameter, EditorRequired] public bool IsSelected { get; set; }
 
     private EditSet editSet = default!;
 
     private string selectedClass => IsSelected ? "selected" : "";
-    private string completedCircleClass => Set.Completed ? "bi-check-circle" : "bi-circle";
+    private string completedCircleIcon => Set.Completed ? Icons.Material.Filled.Circle : @Icons.Material.Outlined.Circle;
 
     protected override void OnParametersSet()
     {
@@ -42,5 +38,5 @@
         Dispatcher.Dispatch(new SetSelectedSetAction(Set.Id));
     }
 
-    private void handleToggleCompleted() => Dispatcher.Dispatch(new ToggleSetCompletedAction(Set.Id));
+    private void handleToggleCompleted() => Dispatcher.Dispatch(new ToggleSetCompletedAction(WorkoutExerciseId, Set.Id));
 }

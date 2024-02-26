@@ -27,7 +27,10 @@
     {
         @foreach(var set in State.Value.Sets)
         {
-            <ExerciseSet Set="set" IsSelected="State.Value.SelectedSetId == set.Id">
+            <ExerciseSet 
+                Set="set"
+                WorkoutExerciseId="State.Value.WorkoutExerciseId" 
+                IsSelected="State.Value.SelectedSetId == set.Id">
                 <ViewRow Context="viewWeightSet">
                     <ViewWeightSet Set="viewWeightSet"></ViewWeightSet>
                 </ViewRow>
