@@ -1,4 +1,5 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Extensions;
 using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 using GymTracker.Repository;
 using Microsoft.AspNetCore.Components;
@@ -38,7 +39,6 @@ public class ExerciseDetailEffects
             set.PlannedExerciseSet.TargetMetrics.Reps = action.EditSet.TargetReps;
             set.Metrics.Weight = action.EditSet.ActualWeight;
             set.Metrics.Reps = action.EditSet.ActualReps;
-            set.Completed = true;
         }
 
         await _clientStorage.CurrentWorkout.SetAsync(workout);
@@ -60,6 +60,8 @@ public class ExerciseDetailEffects
             set.Metrics.Weight = set.Metrics.Weight ?? set.PlannedExerciseSet?.TargetMetrics.Weight;
             set.Metrics.Time = set.Metrics.Time ?? set.PlannedExerciseSet?.TargetMetrics.Time;
             set.CompletedOn = DateTimeOffset.Now;
+
+            dispatcher.DispatchWithDelay(new SetSelectedSetAction(null));
         }
         else
         {

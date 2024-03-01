@@ -38,8 +38,8 @@ public class ExercisesEffects
     {
         var exercise = await _clientStorage.Exercises.FindByIdAsync(action.Id);
 
-        await dispatcher.DispatchWithDelay(new SetExerciseAction(exercise));
-        await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
+        dispatcher.DispatchWithDelay(new SetExerciseAction(exercise));
+        dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
             new BreadcrumbItem(exercise.Name, $"/exercises", false, Icons.Material.Filled.Edit),
@@ -47,16 +47,18 @@ public class ExercisesEffects
     }
 
     [EffectMethod]
-    public async Task OnCreateNewExercise(CreateNewExerciseAction action, IDispatcher dispatcher)
+    public Task OnCreateNewExercise(CreateNewExerciseAction action, IDispatcher dispatcher)
     {
         var newExercise = new Exercise { Id = Guid.NewGuid(), MetricType = MetricType.Weight };
 
-        await dispatcher.DispatchWithDelay(new SetExerciseAction(newExercise));
-        await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
+        dispatcher.DispatchWithDelay(new SetExerciseAction(newExercise));
+        dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
             new BreadcrumbItem("New", "/exercises", false, Icons.Material.Filled.Add),
         }));
+
+        return Task.CompletedTask;
     }
 
     [EffectMethod]

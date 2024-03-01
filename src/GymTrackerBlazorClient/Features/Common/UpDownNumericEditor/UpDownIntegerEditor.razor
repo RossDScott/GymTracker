@@ -1,17 +1,19 @@
-﻿@upDownIcon(x => ++x, true)
+﻿<span @onclick:stopPropagation="true">
+    @upDownIcon(x => ++x, true)
 
-<MudNumericField @bind-Value="Value"
-                 @bind-Value:after="handleValueChange"
-                 Variant="Variant.Text"
-                 DisableUnderLine="true"
-                 HideSpinButtons="true"
-                 Min="0" Max="500"
-                 AdornmentText="@AdornmentText"
-                 Adornment="Adornment.End"
-                 FullWidth="false"
-                 Class="mx-auto mb-1 mt-n3 numericInput" />
+    <MudNumericField @bind-Value="Value"
+                     @bind-Value:after="handleValueChange"
+                     Variant="Variant.Text"
+                     DisableUnderLine="true"
+                     HideSpinButtons="true"
+                     Min="0" Max="500"
+                     AdornmentText="@AdornmentText"
+                     Adornment="Adornment.End"
+                     FullWidth="false"
+                     Class="mx-auto mb-1 mt-n3 numericInput" />
 
-@upDownIcon(x => --x, false)
+    @upDownIcon(x => --x, false)
+</span>
 
 @code {
     public RenderFragment upDownIcon(Func<int?, int?> updateValue, bool up) =>

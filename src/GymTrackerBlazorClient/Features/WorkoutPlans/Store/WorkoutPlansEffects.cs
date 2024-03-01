@@ -33,8 +33,8 @@ public class WorkoutPlansEffects
     {
         var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.Id);
 
-        await dispatcher.DispatchWithDelay(new SetWorkoutPlanAction(workoutPlan));
-        await dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
+        dispatcher.DispatchWithDelay(new SetWorkoutPlanAction(workoutPlan));
+        dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("WorkoutPlans", "/workout-plans", false, Icons.Material.Filled.List),
             new BreadcrumbItem(workoutPlan.Name, $"/workout-plans", false, Icons.Material.Filled.Edit),
@@ -144,7 +144,7 @@ public class WorkoutPlansEffects
 
         await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
         dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
-        await dispatcher.DispatchWithDelay(new SetExerciseAction(targetExercise));
+        dispatcher.DispatchWithDelay(new SetExerciseAction(targetExercise));
     }
 
     [EffectMethod]

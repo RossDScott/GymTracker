@@ -40,6 +40,9 @@ public static class ExerciseDetailReducers
         var sets = state.Sets;
         var currentlySelectedSet = sets.SingleOrDefault(x => x.Id == state.SelectedSetId);
 
+        if (currentlySelectedSet?.Id == action.Id)
+            return state with { SelectedSetId = null };
+
         if (currentlySelectedSet != null && !currentlySelectedSet.Completed)
             sets = sets.Replace(currentlySelectedSet, currentlySelectedSet with
             {
