@@ -37,9 +37,13 @@ public class ExerciseDetailEffects
         {
             set.PlannedExerciseSet.TargetMetrics.Weight = action.EditSet.TargetWeight;
             set.PlannedExerciseSet.TargetMetrics.Reps = action.EditSet.TargetReps;
-            set.Metrics.Weight = action.EditSet.ActualWeight;
-            set.Metrics.Reps = action.EditSet.ActualReps;
         }
+
+        set.Metrics.Weight = action.EditSet.ActualWeight;
+        set.Metrics.Reps = action.EditSet.ActualReps;
+
+        if (exercise.PlannedExercise != null)
+            exercise.PlannedExercise.TargetWeightIncrement = action.EditSet.WeightIncrement;
 
         await _clientStorage.CurrentWorkout.SetAsync(workout);
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));

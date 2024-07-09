@@ -26,6 +26,8 @@ public static class ExerciseDetailReducers
                         ActualTime = x.Metrics.Time,
                         ActualWeight = x.Metrics.Weight,
 
+                        DefaultWeightIncrement = action.WorkoutExercise?.PlannedExercise?.TargetWeightIncrement,
+
                         Completed = x.Completed
                     }).ToImmutableList(),
             SelectedSetId = state.WorkoutExerciseId == action.WorkoutExercise.Id

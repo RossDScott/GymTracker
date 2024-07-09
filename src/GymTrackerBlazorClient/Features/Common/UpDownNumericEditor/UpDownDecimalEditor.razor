@@ -1,5 +1,7 @@
-﻿<span @onclick:stopPropagation="true">
-    @upDownIcon(x => ++x, true)
+﻿@using GymTracker.BlazorClient.Features.Common.UpDownNumericEditor.Store
+
+<span @onclick:stopPropagation="true">
+    @upDownIcon(x => x += Increment, true)
 
     <MudNumericField @bind-Value="Value"
                      @bind-Value:after="handleValueChange"
@@ -12,9 +14,8 @@
                      FullWidth="false"
                      Class="mx-auto mb-1 mt-n3 numericInput" />
 
-    @upDownIcon(x => --x, false)
+    @upDownIcon(x => x -= Increment, false)
 </span>
-
 
 @code {
     public RenderFragment upDownIcon(Func<decimal?, decimal?> updateValue, bool up) =>
@@ -23,6 +24,9 @@
 }
 
 @code {
+    [Parameter, EditorRequired]
+    public decimal Increment { get; set; }
+
     [Parameter, EditorRequired]
     public decimal? Value { get; set; }
     [Parameter]

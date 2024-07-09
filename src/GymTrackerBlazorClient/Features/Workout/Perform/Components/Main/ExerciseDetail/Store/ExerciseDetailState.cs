@@ -28,6 +28,8 @@ public record Set
     public decimal? ActualWeight { get; init; }
     public decimal? ActualTime { get; init; }
 
+    public decimal? DefaultWeightIncrement { get; set; }
+
     public bool Completed { get; init; }
 }
 
@@ -45,6 +47,8 @@ public record EditSet
         this.ActualReps = set.ActualReps;
         this.ActualWeight = set.ActualWeight;
         this.ActualTime = set.TargetTime;
+
+        this.WeightIncrement = set.DefaultWeightIncrement ?? 1;
     }
 
     public Guid Id { get; set; }
@@ -57,4 +61,6 @@ public record EditSet
     public int? ActualReps { get; set; }
     public decimal? ActualWeight { get; set; }
     public decimal? ActualTime { get; set; }
+
+    public decimal WeightIncrement { get; set; }
 }

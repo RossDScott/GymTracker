@@ -4,16 +4,27 @@
 @inject IDispatcher Dispatcher
 
 <MudItem xs="2" Class="d-flex textCenter flex-column">
-    <UpDownDecimalEditor @bind-Value="EditSet.TargetWeight" @bind-Value:after="handleRowDataChange" AdornmentText="Kg"></UpDownDecimalEditor>
+    <UpDownDecimalEditor 
+        @bind-Value="EditSet.TargetWeight" 
+        @bind-Value:after="handleRowDataChange"
+        Increment="EditSet.WeightIncrement"
+        AdornmentText="Kg"></UpDownDecimalEditor>
 </MudItem>
 <MudItem xs="1" class="textCenter me-3">
     <UpDownIntegerEditor @bind-Value="EditSet.TargetReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
 </MudItem>
 <MudItem xs="2" class="textCenter">
-    <UpDownDecimalEditor @bind-Value="EditSet.ActualWeight" @bind-Value:after="handleRowDataChange" AdornmentText="Kg"></UpDownDecimalEditor>
+    <UpDownDecimalEditor 
+        @bind-Value="EditSet.ActualWeight" 
+        @bind-Value:after="handleRowDataChange"
+        Increment="EditSet.WeightIncrement"
+        AdornmentText="Kg"></UpDownDecimalEditor>
 </MudItem>
 <MudItem xs="1" class="textCenter me-3">
     <UpDownIntegerEditor @bind-Value="EditSet.ActualReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
+</MudItem>
+<MudItem>
+    <UpDownIncrement @bind-Value="EditSet.WeightIncrement" @bind-Value:after="handleRowDataChange"></UpDownIncrement>
 </MudItem>
 
 @code {
@@ -22,7 +33,6 @@
 
     [Parameter, EditorRequired]
     public EditSet EditSet { get; set; } = default!;
-
 
     private void handleRowDataChange() => Dispatcher.Dispatch(new SetSetDataAction(WorkoutExerciseId, EditSet));
 }

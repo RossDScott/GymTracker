@@ -1,0 +1,37 @@
+﻿@using GymTracker.BlazorClient.Features.Common.UpDownNumericEditor.Store
+
+@inject IDispatcher Dispatcher
+
+<div class="d-flex flex-column">
+    @foreach (var increment in UpDownState.AvailableIncrements)
+    {
+        @incrementOption(increment)
+    }
+</div>
+
+@code{
+    [Parameter, EditorRequired]
+    public decimal Value { get; set; }
+    [Parameter]
+    public EventCallback<decimal> ValueChanged { get; set; }
+
+    public RenderFragment incrementOption(decimal increment) =>
+        @<MudFab 
+            Color="Color.Primary" 
+            Size="Size.Small" 
+            Class="my-1" 
+            Label="@label(increment)"
+            Style="@style(increment)"
+            @onclick="() => handleSetIncrement(increment)" />
+    ;
+
+    void handleSetIncrement(decimal increment)
+    {
+        Value = increment;
+        ValueChanged.InvokeAsync(increment);
+    }
+    string label(decimal increment) => $"+{increment}";
+    string style(decimal increment) => Value == increment
+        ? "border: solid 2px white;"
+        : "";
+}
