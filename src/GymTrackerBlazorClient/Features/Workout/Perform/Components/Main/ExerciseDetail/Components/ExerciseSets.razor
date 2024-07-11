@@ -29,7 +29,8 @@
         {
             <ExerciseSet 
                 Set="set"
-                WorkoutExerciseId="State.Value.WorkoutExerciseId" 
+                WorkoutExerciseId="State.Value.WorkoutExerciseId"
+                WeightIncrement="State.Value.WeightIncrement"
                 IsSelected="State.Value.SelectedSetId == set.Id">
                 <ViewRow Context="viewWeightSet">
                     <ViewWeightSet Set="viewWeightSet"></ViewWeightSet>
@@ -37,6 +38,7 @@
                 <EditRow Context="editWeightSet">
                     <EditWeightSet 
                         EditSet="editWeightSet"
+                        WeightIncrement="State.Value.WeightIncrement"
                         WorkoutExerciseId="State.Value.WorkoutExerciseId"></EditWeightSet>
                 </EditRow>
             </ExerciseSet>

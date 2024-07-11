@@ -1,17 +1,26 @@
 ﻿@using GymTracker.BlazorClient.Features.Common.UpDownNumericEditor
 @using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
+
 @inject IDispatcher Dispatcher
 
 <div @onclick="handleEditRow"
      @onclick:stopPropagation="true"
      class="row @selectedClass">
-    <MudGrid Class="fullWidth ma-0">
+    <MudGrid Class="fullWidth ma-0 py-1">
         <MudItem xs="2" class="fw-bold">@Set.Name</MudItem>
 
         @(IsSelected ? @EditRow(editSet) : @ViewRow(Set))
-        <MudItem xs="1" class="text-center">
-            <MudIconButton Icon="@completedCircleIcon" OnClick="handleToggleCompleted" />
+        <MudItem xs="1" class="text-center pt-2">
+            <MudIconButton Icon="@completedCircleIcon" Class="ma-0 pa-0" OnClick="handleToggleCompleted" />
         </MudItem>
+
+        @if (IsSelected)
+        {
+            <MudItem>
+                <UpDownIncrement @bind-Value="WeightIncrement" @bind-Value:after="handleWeightIncrementChange"></UpDownIncrement>
+            </MudItem>
+        }
+
     </MudGrid>
 </div>
 
@@ -20,6 +29,7 @@
     [Parameter, EditorRequired] public RenderFragment<EditSet> EditRow { get; set; } = null!;
 
     [Parameter, EditorRequired] public Guid WorkoutExerciseId { get; set; }
+    [Parameter, EditorRequired] public decimal WeightIncrement { get; set; }
     [Parameter, EditorRequired] public Set Set { get; set; } = default!;
     [Parameter, EditorRequired] public bool IsSelected { get; set; }
 
@@ -39,4 +49,5 @@
     }
 
     private void handleToggleCompleted() => Dispatcher.Dispatch(new ToggleSetCompletedAction(WorkoutExerciseId, Set.Id));
+    private void handleWeightIncrementChange() => Dispatcher.Dispatch(new SetWeightIncrementAction(WorkoutExerciseId, WeightIncrement));
 }

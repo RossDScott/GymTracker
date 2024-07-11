@@ -7,7 +7,7 @@
     <UpDownDecimalEditor 
         @bind-Value="EditSet.TargetWeight" 
         @bind-Value:after="handleRowDataChange"
-        Increment="EditSet.WeightIncrement"
+        Increment="WeightIncrement"
         AdornmentText="Kg"></UpDownDecimalEditor>
 </MudItem>
 <MudItem xs="1" class="textCenter me-3">
@@ -17,19 +17,19 @@
     <UpDownDecimalEditor 
         @bind-Value="EditSet.ActualWeight" 
         @bind-Value:after="handleRowDataChange"
-        Increment="EditSet.WeightIncrement"
+        Increment="WeightIncrement"
         AdornmentText="Kg"></UpDownDecimalEditor>
 </MudItem>
 <MudItem xs="1" class="textCenter me-3">
     <UpDownIntegerEditor @bind-Value="EditSet.ActualReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
 </MudItem>
-<MudItem>
-    <UpDownIncrement @bind-Value="EditSet.WeightIncrement" @bind-Value:after="handleRowDataChange"></UpDownIncrement>
-</MudItem>
 
 @code {
     [Parameter, EditorRequired]
     public Guid WorkoutExerciseId { get; set; }
+
+    [Parameter, EditorRequired]
+    public decimal WeightIncrement { get; set; }
 
     [Parameter, EditorRequired]
     public EditSet EditSet { get; set; } = default!;

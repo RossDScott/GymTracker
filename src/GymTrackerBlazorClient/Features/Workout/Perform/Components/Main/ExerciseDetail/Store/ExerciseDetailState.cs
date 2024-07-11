@@ -9,7 +9,7 @@ public record ExerciseDetailState
 {
     public Guid WorkoutExerciseId { get; set; }
     public MetricType MetricType { get; init; }
-
+    public decimal WeightIncrement { get; set; }
     public Guid? SelectedSetId { get; init; }
 
     public ImmutableList<Set> Sets { get; init; } = ImmutableList<Set>.Empty;
@@ -27,8 +27,6 @@ public record Set
     public int? ActualReps { get; init; }
     public decimal? ActualWeight { get; init; }
     public decimal? ActualTime { get; init; }
-
-    public decimal? DefaultWeightIncrement { get; set; }
 
     public bool Completed { get; init; }
 }
@@ -48,7 +46,7 @@ public record EditSet
         this.ActualWeight = set.ActualWeight;
         this.ActualTime = set.TargetTime;
 
-        this.WeightIncrement = set.DefaultWeightIncrement ?? 1;
+        //this.WeightIncrement = set.DefaultWeightIncrement ?? 1;
     }
 
     public Guid Id { get; set; }
@@ -62,5 +60,5 @@ public record EditSet
     public decimal? ActualWeight { get; set; }
     public decimal? ActualTime { get; set; }
 
-    public decimal WeightIncrement { get; set; }
+    //public decimal WeightIncrement { get; set; }
 }

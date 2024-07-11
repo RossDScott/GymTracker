@@ -12,6 +12,7 @@ public static class ExerciseDetailReducers
         {
             WorkoutExerciseId = action.WorkoutExercise.Id,
             MetricType = action.WorkoutExercise.Exercise.MetricType,
+            WeightIncrement = action.WorkoutExercise.PlannedExercise?.TargetWeightIncrement ?? 1,
             Sets = action.WorkoutExercise.Sets.Select(x =>
                     new Set
                     {
@@ -25,8 +26,6 @@ public static class ExerciseDetailReducers
                         ActualReps = x.Metrics.Reps,
                         ActualTime = x.Metrics.Time,
                         ActualWeight = x.Metrics.Weight,
-
-                        DefaultWeightIncrement = action.WorkoutExercise?.PlannedExercise?.TargetWeightIncrement,
 
                         Completed = x.Completed
                     }).ToImmutableList(),
