@@ -2,7 +2,7 @@
 
 @inject IDispatcher Dispatcher
 
-<div class="d-flex flex-column">
+<div class="d-flex flex-column buttons">
     @foreach (var increment in UpDownState.AvailableIncrements)
     {
         @incrementOption(increment)
@@ -18,8 +18,8 @@
     public RenderFragment incrementOption(decimal increment) =>
         @<MudFab 
             Color="Color.Primary" 
-            Size="Size.Small" 
-            Class="my-1" 
+            Size="Size.Small"
+            Class="my-1 incrementButton"
             Label="@label(increment)"
             Style="@style(increment)"
             @onclick="() => handleSetIncrement(increment)" />

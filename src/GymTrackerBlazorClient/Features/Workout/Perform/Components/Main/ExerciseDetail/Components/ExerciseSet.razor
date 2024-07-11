@@ -7,16 +7,16 @@
      @onclick:stopPropagation="true"
      class="row @selectedClass">
     <MudGrid Class="fullWidth ma-0 py-1">
-        <MudItem xs="2" class="fw-bold">@Set.Name</MudItem>
+        <MudItem xs="2" class="fw-bold d-flex align-content-center flex-wrap">@Set.Name</MudItem>
 
         @(IsSelected ? @EditRow(editSet) : @ViewRow(Set))
-        <MudItem xs="1" class="text-center pt-2">
+            <MudItem xs="1" class="text-center pt-2 d-flex align-content-center flex-wrap">
             <MudIconButton Icon="@completedCircleIcon" Class="ma-0 pa-0" OnClick="handleToggleCompleted" />
         </MudItem>
 
         @if (IsSelected)
         {
-            <MudItem>
+            <MudItem Class="pa-0">
                 <UpDownIncrement @bind-Value="WeightIncrement" @bind-Value:after="handleWeightIncrementChange"></UpDownIncrement>
             </MudItem>
         }

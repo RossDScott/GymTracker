@@ -1,3 +1,7 @@
-﻿.incrementButton{
-    margin-bottom: 5px;
+﻿.buttons {
+
 }
+
+    .buttons .incrementButton {
+        margin-top: 0px !important;
+    }
