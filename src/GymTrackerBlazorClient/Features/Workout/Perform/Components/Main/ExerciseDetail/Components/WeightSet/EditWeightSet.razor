@@ -3,24 +3,24 @@
 
 @inject IDispatcher Dispatcher
 
-<MudItem xs="2" Class="d-flex textCenter flex-column">
+<MudItem xs="2" Class="d-flex py-0 textCenter flex-column">
     <UpDownDecimalEditor 
         @bind-Value="EditSet.TargetWeight" 
         @bind-Value:after="handleRowDataChange"
         Increment="WeightIncrement"
         AdornmentText="Kg"></UpDownDecimalEditor>
 </MudItem>
-<MudItem xs="1" class="textCenter me-3">
+<MudItem xs="1" class="textCenter py-0 me-3">
     <UpDownIntegerEditor @bind-Value="EditSet.TargetReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
 </MudItem>
-<MudItem xs="2" class="textCenter">
+<MudItem xs="2" class="textCenter py-0">
     <UpDownDecimalEditor 
         @bind-Value="EditSet.ActualWeight" 
         @bind-Value:after="handleRowDataChange"
         Increment="WeightIncrement"
         AdornmentText="Kg"></UpDownDecimalEditor>
 </MudItem>
-<MudItem xs="1" class="textCenter me-3">
+<MudItem xs="1" class="textCenter me-3 py-0">
     <UpDownIntegerEditor @bind-Value="EditSet.ActualReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
 </MudItem>
 

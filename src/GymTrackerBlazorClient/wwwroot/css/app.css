@@ -14,3 +14,11 @@
     text-align: center;
     width: 2.5em!important;
 }
+
+.buttons .incrementButton:first-child {
+    margin-top: 0px !important;
+}
+
+.buttons .incrementButton:last-child {
+    margin-bottom: 0px !important;
+}
