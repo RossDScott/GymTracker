@@ -20,4 +20,11 @@ public abstract class LocalStorageContext
     }
 
     internal abstract Task InitializeData();
+
+    private readonly ICollection<ITrigger> _triggers = new List<ITrigger>();
+    protected void AddTrigger(ITrigger trigger)
+    {
+        _triggers.Add(trigger);
+        trigger.Subscribe();
+    }
 }

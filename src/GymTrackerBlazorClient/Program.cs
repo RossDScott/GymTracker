@@ -1,13 +1,13 @@
-using GymTracker.Domain;
+using Fluxor;
+using GymTracker.AzureBlobStorage;
 using GymTracker.BlazorClient;
+using GymTracker.BlazorClient.Features.SidePanel;
+using GymTracker.Domain;
+using GymTracker.LocalStorage;
+using GymTracker.Repository;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
-using Fluxor;
-using GymTracker.AzureBlobStorage;
-using GymTracker.LocalStorage;
-using GymTracker.BlazorClient.Features.SidePanel;
-using GymTracker.Repository;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -25,6 +25,7 @@ builder.Services.AddScoped<SidePanelService>();
 
 var serviceProvider = builder.Services.BuildServiceProvider();
 //await serviceProvider.ConfigureAzureBlobBackupSettings();
+//var exerciseLogService = serviceProvider.GetRequiredService<ExerciseLogService>();
 
 builder.Services.AddFluxor(o => o.ScanAssemblies(typeof(Program).Assembly));
 

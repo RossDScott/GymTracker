@@ -8,4 +8,6 @@ public interface IClientStorage
     IKeyListItem<WorkoutPlan> WorkoutPlans { get; init; }
     IKeyListItem<Workout> Workouts { get; init; }
     IKeyItem<Workout> CurrentWorkout { get; init; }
+
+    IKeyListItem<ExerciseStatistics> ExerciseStatistics { get; init; }
 }

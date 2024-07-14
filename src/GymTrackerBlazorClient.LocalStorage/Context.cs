@@ -1,4 +1,5 @@
-﻿using GymTracker.Domain.Models;
+﻿using GymTracker.BlazorClient.Services;
+using GymTracker.Domain.Models;
 using GymTracker.LocalStorage.Core;
 using GymTracker.Repository;
 
@@ -9,7 +10,9 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
     public IKeyItem<AppSettings> AppSettings { get; init; } = default!;
     public IKeyListItem<WorkoutPlan> WorkoutPlans { get; init; } = default!;
     public IKeyListItem<Workout> Workouts { get; init; } = default!;
-    public IKeyItem<Workout> CurrentWorkout { get; init; }
+    public IKeyItem<Workout> CurrentWorkout { get; init; } = default!;
+
+    public IKeyListItem<ExerciseStatistics> ExerciseStatistics { get; init; } = default!;
 
     public ClientStorageContext()
     {
@@ -23,6 +26,13 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
             settings.DefaultConstructor = () => new AppSettings();
             settings.AutoBackup = false;
         });
+
+        ExerciseStatistics.ConfigureList(settings =>
+        {
+            settings.GetId = (ExerciseStatistics x) => x.ExerciseId;
+        });
+
+        AddTrigger(new StatisticsBuilderService(this));
 
         base.Configure();
     }

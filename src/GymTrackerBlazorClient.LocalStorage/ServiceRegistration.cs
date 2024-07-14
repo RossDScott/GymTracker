@@ -23,7 +23,7 @@ public static class ServiceRegistration
 
             return context;
         });
-        services.AddScoped<TService>(serviceProvider
+        var implementation = services.AddScoped<TService>(serviceProvider
             => serviceProvider.GetRequiredService<TImplementation>());
 
         services.AddScoped<IBackupOrchestrator, BackupOrchestrator>();
