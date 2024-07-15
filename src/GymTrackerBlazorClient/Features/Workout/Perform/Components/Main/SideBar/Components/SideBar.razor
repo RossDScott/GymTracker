@@ -1,16 +1,20 @@
 ﻿<div class="d-flex flex-column fullWidth">
 
-    <MudTabs Outlined="true" MinimumTabWidth="55px" Centered="true">
-        <MudTabPanel Icon="@Icons.Material.Filled.History" />
-        <MudTabPanel Icon="@Icons.Material.Filled.BarChart" />
-        <MudTabPanel Icon="@Icons.Material.Filled.VideoLibrary" />
-    </MudTabs>
-
-    <MudDivider DividerType="DividerType.Middle" Class="my-6 mt-auto" />
-
-    test
+    <MudPaper Class="" Elevation="0" Outlined="true" Square="true">
+        <MudTabs Outlined="false" PanelClass="pa-1" MinimumTabWidth="55px" Border="true" Centered="true" @bind-ActivePanelIndex="activeTabIndex">
+            <MudTabPanel Icon="@Icons.Material.Filled.History">
+                <History></History>
+            </MudTabPanel>
+            <MudTabPanel Icon="@Icons.Material.Filled.BarChart">
+                <Charts></Charts>
+            </MudTabPanel>
+            <MudTabPanel Icon="@Icons.Material.Filled.VideoLibrary">
+                <Guides></Guides>
+            </MudTabPanel>
+        </MudTabs>
+    </MudPaper>
 </div>
 
 @code {
-
+    int activeTabIndex = 0;
 }
