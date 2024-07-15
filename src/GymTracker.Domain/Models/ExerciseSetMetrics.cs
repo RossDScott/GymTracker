@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GymTracker.Domain.Models;
+﻿namespace GymTracker.Domain.Models;
 public record ExerciseSetMetrics
 {
     public int? Reps { get; set; }

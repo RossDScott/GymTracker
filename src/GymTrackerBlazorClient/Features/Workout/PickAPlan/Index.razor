@@ -1,11 +1,10 @@
 ﻿@page "/workout/new"
-
+@using GymTracker.BlazorClient.Features.Common
 @using GymTracker.BlazorClient.Features.AppBar.Store;
-@using GymTracker.BlazorClient.Features.Common;
 @using GymTracker.BlazorClient.Features.Common.ChipSet
 @using System.Collections.Immutable;
 @using GymTracker.BlazorClient.Features.Workout.Perform.Store;
-@using GymTracker.Repository;
+@using GymTracker.LocalStorage.Core;
 
 @inject IDispatcher Dispatcher
 @inject IClientStorage ClientStorage

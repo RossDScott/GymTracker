@@ -35,6 +35,7 @@
 	
 	<ItemGroup>
 	  <Folder Include="Features\Home\Store\" />
+	  <Folder Include="Features\Workout\Perform\Components\Main\SideBar\Store\" />
 	</ItemGroup>
 	
 	<ItemGroup>

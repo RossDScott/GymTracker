@@ -1,6 +1,6 @@
 ﻿using GymTracker.Domain;
 using GymTracker.Domain.Models;
-using GymTracker.Repository;
+using GymTracker.LocalStorage.Core;
 
 namespace GymTracker.LocalStorage;
 public class AppSettingsProvider : IAppSettingsProvider

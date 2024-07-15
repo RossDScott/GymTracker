@@ -3,7 +3,7 @@ using GymTracker.BlazorClient.Extensions;
 using GymTracker.BlazorClient.Features.AppBar.Store;
 using GymTracker.Domain.Models;
 using GymTracker.Domain.Models.Extensions;
-using GymTracker.Repository;
+using GymTracker.LocalStorage.Core;
 using MudBlazor;
 
 namespace GymTracker.BlazorClient.Features.WorkoutPlans.Store;

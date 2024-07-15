@@ -1,7 +1,7 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Extensions;
 using GymTracker.BlazorClient.Features.Workout.Perform.Store;
-using GymTracker.Repository;
+using GymTracker.LocalStorage.Core;
 using Microsoft.AspNetCore.Components;
 
 namespace GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store;

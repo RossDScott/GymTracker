@@ -1,8 +1,8 @@
 ﻿using Fluxor;
-using Models = GymTracker.Domain.Models;
-using MudBlazor;
-using GymTracker.Repository;
 using GymTracker.Domain;
+using GymTracker.LocalStorage.Core;
+using MudBlazor;
+using Models = GymTracker.Domain.Models;
 
 namespace GymTracker.BlazorClient.Features.AppSettings.Store;
 
@@ -14,7 +14,7 @@ public class AppSettingsEffects
     private readonly ISnackbar _snackbar;
 
     public AppSettingsEffects(
-        IClientStorage clientStorage, 
+        IClientStorage clientStorage,
         IServiceProvider serviceProvider,
         IBackupOrchestrator backupOrchestrator,
         ISnackbar snackbar)
@@ -81,6 +81,6 @@ public class AppSettingsEffects
         dispatcher.Dispatch(new SetSettingsAction(updated));
     }
 
-    private ValueTask<Models.AppSettings> GetSettings() => 
+    private ValueTask<Models.AppSettings> GetSettings() =>
         _clientStorage.AppSettings.GetOrDefaultAsync();
 }

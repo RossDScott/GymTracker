@@ -2,7 +2,6 @@
 using GymTracker.Domain.Models;
 using System.Collections.Immutable;
 using GymTracker.BlazorClient.Features.Common;
-using System.Linq;
 
 namespace GymTracker.BlazorClient.Features.ExercisePicker.Store;
 

@@ -1,5 +1,5 @@
 ﻿using Fluxor;
-using GymTracker.Repository;
+using GymTracker.LocalStorage.Core;
 using Microsoft.AspNetCore.Components;
 using Models = GymTracker.Domain.Models;
 

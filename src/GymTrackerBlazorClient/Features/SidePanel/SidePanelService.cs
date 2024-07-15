@@ -1,5 +1,4 @@
-﻿using FluentValidation.TestHelper;
-using Fluxor;
+﻿using Fluxor;
 using GymTracker.BlazorClient.Features.SidePanel.Models;
 using GymTracker.BlazorClient.Features.SidePanel.Store.Actions;
 using Microsoft.AspNetCore.Components;

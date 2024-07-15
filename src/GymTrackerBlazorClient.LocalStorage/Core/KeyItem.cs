@@ -1,5 +1,4 @@
 ﻿using Blazored.LocalStorage;
-using GymTracker.Repository;
 using System.Text.Json;
 
 namespace GymTracker.LocalStorage.Core;

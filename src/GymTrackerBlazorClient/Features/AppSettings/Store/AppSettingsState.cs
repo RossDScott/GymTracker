@@ -1,6 +1,5 @@
 ﻿using Fluxor;
 using System.Collections.Immutable;
-using Models = GymTracker.Domain.Models;
 
 namespace GymTracker.BlazorClient.Features.AppSettings.Store;
 

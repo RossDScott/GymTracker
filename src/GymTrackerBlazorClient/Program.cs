@@ -4,7 +4,7 @@ using GymTracker.BlazorClient;
 using GymTracker.BlazorClient.Features.SidePanel;
 using GymTracker.Domain;
 using GymTracker.LocalStorage;
-using GymTracker.Repository;
+using GymTracker.LocalStorage.Core;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
