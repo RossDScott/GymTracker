@@ -42,10 +42,12 @@ public class StatisticsBuilderService : ITrigger
                 {
                     WorkoutDateTime = completedExercise.WorkoutEnd,
                     Sets = completedExercise.Sets
-                        .Where(x => x.SetType == "Set")
+                        .Where(x => x.SetType == "Set" && x.Completed)
                         .Select(x => x.Metrics)
                         .ToList()
-                }).ToList()
+                })
+                .Where(x => x.Sets.Any())
+                .ToList()
             }).ToList();
 
         _localStorageContex.ExerciseStatistics.SetAsync(statistics);

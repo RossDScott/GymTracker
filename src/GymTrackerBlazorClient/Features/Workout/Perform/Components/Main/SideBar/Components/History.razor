@@ -1,32 +1,90 @@
-﻿<MudText Typo="Typo.h6" Class="px-1">History - 3 Months</MudText>
-<MudDivider Class="mb-1" />
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.SideBar.Store
+@using GymTracker.Domain.Models
+@inherits FluxorComponent
 
-<div class="d-flex flex-column px-1">
-    <MudText Typo="Typo.subtitle1">Personal Best</MudText>
-    <MudText Typo="Typo.body1" Align="Align.Right">Max Weight: 3 x 45g</MudText>
-    <MudText Typo="Typo.body1" Align="Align.Right">Max Volume: 400 Kg</MudText>
+@inject IDispatcher Dispatcher
+@inject IState<HistoryState> State
+
+<div class="fullHeight">
+    <div>
+        <MudText Typo="Typo.h6" Class="px-1">History - 3 Months</MudText>
+        <MudDivider Class="mb-1" />
+
+        <div class="d-flex flex-column px-1">
+            <MudText Typo="Typo.subtitle1">Personal Best</MudText>
+            <div class="d-flex justify-space-between">
+                <MudText Typo="Typo.body2" Align="Align.Right">@MaxMetricTitle</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Right">@MaxMetric</MudText>
+            </div>
+            <div class="d-flex justify-space-between">
+                <MudText Typo="Typo.body2" Align="Align.Right">@MaxVolumeTitle</MudText>
+                <MudText Typo="Typo.body2" Align="Align.Right">@MaxVolume</MudText>
+            </div>
+        </div>
+
+        <MudDivider Class="my-3" />
+    </div>
+
+    <div class="" style="overflow-y: auto; height: 550px">
+        @foreach (var workout in State.Value.History)
+        {
+            <div class="px-2 d-flex justify-space-between">
+                <div class="d-flex justify-space-between flex-column">
+                    <MudText Typo="Typo.subtitle2">@workout.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
+                        <MudText Typo="Typo.body2" Align="Align.Left">@TotalVolume(workout)</MudText>
+                    </div>
+
+                    <div>
+                        @foreach (var set in workout.Sets)
+                    {
+                        <MudText Typo="Typo.body2" Align="Align.Right">@SetDetail(set)</MudText>
+                    }
+                </div>
+            </div>
+            <MudDivider DividerType="DividerType.Middle" Class="my-1" />
+        }
+    </div>
 </div>
 
-<MudDivider Class="my-3" />
 
-<div class="px-2">
-    <MudText Typo="Typo.subtitle2">15/07/25</MudText>
-    <MudText Typo="Typo.body1" Align="Align.Right">3 x 45g</MudText>
-    <MudText Typo="Typo.body1" Align="Align.Right">3 x 45g</MudText>
-    <MudText Typo="Typo.body1" Align="Align.Right">3 x 45g</MudText>
-
-    <MudDivider DividerType="DividerType.Middle" Class="my-1" />
-</div>
-
-<div class="px-2">
-    <MudText Typo="Typo.subtitle2">15/07/25</MudText>
-    <MudText Typo="Typo.body1" Align="Align.Right">3 x 45g</MudText>
-    <MudText Typo="Typo.body1" Align="Align.Right">3 x 45g</MudText>
-    <MudText Typo="Typo.body1" Align="Align.Right">3 x 45g</MudText>
-
-    <MudDivider DividerType="DividerType.Middle" Class="my-1" />
-</div>
 
 @code {
-
+    string MaxMetricTitle => State.Value.MetricType switch
+    {
+        MetricType.Weight => "Max Weight:",
+        MetricType.Time => "Max Time:",
+        _ => ""
+    };
+    string MaxMetric => (State.Value.MaxSet, State.Value.MetricType) switch
+    {
+        (null, _) => "None",
+        (_, MetricType.Weight) => $"{State.Value.MaxSet.Reps} x {State.Value.MaxSet.Weight} Kg",
+        (_, MetricType.Time) => $"{State.Value.MaxSet.Time}",
+        _ => ""
+    };
+    string MaxVolumeTitle => State.Value.MetricType switch
+    {
+        MetricType.Weight => "Max Volume:",
+        _ => ""
+    };
+    string MaxVolume => (State.Value.MaxVolume, State.Value.MetricType) switch
+    {
+        (null, _) => "None",
+        (_, MetricType.Weight) => $"({State.Value.MaxVolume.Reps} x {State.Value.MaxVolume.Weight} Kg) {State.Value.MaxVolume.Weight * State.Value.MaxVolume.Reps} Kg",
+        _ => ""
+    };
+    string SetDetail(ExerciseSetMetrics set) => State.Value.MetricType switch
+    {
+        MetricType.Weight => $"{set.Reps} x {set.Weight} Kg",
+        MetricType.Time => $"{set.Time} seconds",
+        MetricType.TimeAndDistance => set.Distance?.ToString() ?? "",
+        _ => ""
+    };
+    string TotalVolume(Perform.Components.Main.SideBar.Store.Workout workout) => State.Value.MetricType switch
+    {
+        MetricType.Weight => $"V: {workout.Sets.Select(x => x.Weight * x.Reps).Sum()} Kg",
+        MetricType.Time => $"T: {workout.Sets.Select(x => x.Time).Sum()} seconds",
+        MetricType.TimeAndDistance => $"D: {workout.Sets.Select(x => x.Distance).Sum()}",
+        _ => ""
+    };
 }
