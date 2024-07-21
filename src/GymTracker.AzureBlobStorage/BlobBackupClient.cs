@@ -5,7 +5,6 @@ using GymTracker.Domain;
 namespace GymTracker.AzureBlobStorage;
 public class BlobBackupClient : IDataBackupClient
 {
-    private BlobContainerClient? _blobContainerClient = null;
     private readonly IAppSettingsProvider _appSettings;
 
     public BlobBackupClient(IAppSettingsProvider appSettings)
