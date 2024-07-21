@@ -1,0 +1,19 @@
+﻿@page "/workout/end"
+@using GymTracker.BlazorClient.Features.Workout.End.Store
+
+@inherits FluxorComponent
+
+@inject IDispatcher Dispatcher
+@inject IState<EndWorkoutState> State
+
+<h3>EndWorkout</h3>
+
+@State.Value.Duration
+
+<div>
+    @System.Text.Json.JsonSerializer.Serialize(State.Value.ExerciseList)
+</div>
+
+@code {
+
+}

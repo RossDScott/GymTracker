@@ -1,6 +1,7 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 using GymTracker.Domain.Models;
+using GymTracker.Domain.Models.Extensions;
 using GymTracker.LocalStorage.Core;
 using System.Collections.Immutable;
 
@@ -51,18 +52,8 @@ public static class HistoryStateReducer
         return state with
         {
             MetricType = action.MetricType,
-            MaxSet = action.MetricType switch
-            {
-                MetricType.Weight => sets.MaxBy(x => x.Weight),
-                MetricType.Time => sets.MaxBy(x => x.Time),
-                MetricType.TimeAndDistance => sets.MaxBy(x => x.Distance),
-                _ => null
-            },
-            MaxVolume = action.MetricType switch
-            {
-                MetricType.Weight => sets.MaxBy(x => x.Weight * x.Reps),
-                _ => null
-            },
+            MaxSet = sets.GetMaxSet(action.MetricType),
+            MaxVolume = sets.GetMaxVolumeSet(action.MetricType),
             History = dataForMonths
             .OrderByDescending(x => x.WorkoutDateTime)
             .Select(x => new Workout
