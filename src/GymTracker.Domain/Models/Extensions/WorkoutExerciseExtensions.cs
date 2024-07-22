@@ -5,9 +5,4 @@ public static class WorkoutExerciseExtensions
         => workoutExercise.Sets
             .Select(x => x.Metrics)
             .GetMaxSet(workoutExercise.Exercise.MetricType);
-
-    public static ExerciseSetMetrics? GetMaxVolumeSet(this WorkoutExercise workoutExercise)
-        => workoutExercise.Sets
-            .Select(x => x.Metrics)
-            .GetMaxVolumeSet(workoutExercise.Exercise.MetricType);
 }

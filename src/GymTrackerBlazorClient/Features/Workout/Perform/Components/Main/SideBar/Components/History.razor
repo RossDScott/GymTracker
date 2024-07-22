@@ -33,7 +33,7 @@
                 <div class="d-flex justify-space-between flex-column">
                     <MudText Typo="Typo.subtitle2">@workout.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
                     <MudText Typo="Typo.body2" Align="Align.Left">
-                        @workout.Sets.GetMaxVolumeSet(State.Value.MetricType)
+                        @workout.Sets.GetMeasureTotalVolume(State.Value.MetricType)
                     </MudText>
                 </div>
 
