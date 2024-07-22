@@ -22,7 +22,7 @@ public record ExerciseDetail
 
 public record ProgressSet
 {
-    public ProgressType ProgressType { get; set; }
+    public ProgressType ProgressType { get; init; }
     public required ExerciseSetMetrics Metrics { get; init; }
     public bool Selected { get; set; } = false;
 }
@@ -32,6 +32,5 @@ public enum ProgressType
     Previous,
     AutoProgress,
     MaxSet,
-    MaxVolume,
     Custom
 }

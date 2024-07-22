@@ -24,6 +24,29 @@ public static class EndWorkoutReducers
         };
     }
 
+    [ReducerMethod]
+    public static EndWorkoutState OnSetSelectedProgress(EndWorkoutState state, SetSelectedProgressAction action)
+    {
+        var exercise = state.ExerciseList.First(x => x.WorkoutExerciseId == action.workoutExerciseId);
+        var progressSets = exercise.ProgressSets.ToList();
+        var selected = progressSets.SingleOrDefault(x => x.ProgressType == action.progressType);
+
+        if (selected == null)
+            return state;
+
+        progressSets.ForEach(x => x.Selected = false);
+        selected.Selected = true;
+
+        return state with
+        {
+            ExerciseList = state.ExerciseList
+                                .Replace(
+                                    exercise,
+                                    exercise with
+                                    { ProgressSets = progressSets.ToImmutableArray() })
+        };
+    }
+
     private static ImmutableArray<ProgressSet> BuildProgressSets(WorkoutExercise workoutExercise)
     {
         var metricType = workoutExercise.Exercise.MetricType;
@@ -54,12 +77,6 @@ public static class EndWorkoutReducers
             }
         }
 
-        if (metricType == MetricType.Weight)
-        {
-            var maxVolumeSet = workoutExercise.GetMaxVolumeSet();
-            if (maxVolumeSet != null) progressSets.Add(new ProgressSet { ProgressType = ProgressType.MaxVolume, Metrics = maxVolumeSet, Selected = false });
-        }
-
         if (!progressSets.Any(x => x.Selected))
         {
             ProgressSet? selectedProgress = progressSets.FirstOrDefault(x => x.ProgressType == ProgressType.MaxSet);
@@ -77,4 +94,6 @@ public static class EndWorkoutReducers
 
         return progressSets.ToImmutableArray();
     }
+
+
 }

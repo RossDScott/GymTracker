@@ -1,5 +1,6 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.SideBar.Store
 @using GymTracker.Domain.Models
+@using GymTracker.Domain.Models.Extensions
 @inherits FluxorComponent
 
 @inject IDispatcher Dispatcher
@@ -31,13 +32,17 @@
             <div class="px-2 d-flex justify-space-between">
                 <div class="d-flex justify-space-between flex-column">
                     <MudText Typo="Typo.subtitle2">@workout.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
-                        <MudText Typo="Typo.body2" Align="Align.Left">@TotalVolume(workout)</MudText>
-                    </div>
+                    <MudText Typo="Typo.body2" Align="Align.Left">
+                        @workout.Sets.GetMaxVolumeSet(State.Value.MetricType)
+                    </MudText>
+                </div>
 
-                    <div>
-                        @foreach (var set in workout.Sets)
+                <div>
+                    @foreach (var set in workout.Sets)
                     {
-                        <MudText Typo="Typo.body2" Align="Align.Right">@SetDetail(set)</MudText>
+                        <MudText Typo="Typo.body2" Align="Align.Right">
+                            @set.GetMeasureText(State.Value.MetricType)
+                        </MudText>
                     }
                 </div>
             </div>
@@ -73,18 +78,18 @@
         (_, MetricType.Weight) => $"({State.Value.MaxVolume.Reps} x {State.Value.MaxVolume.Weight} Kg) {State.Value.MaxVolume.Weight * State.Value.MaxVolume.Reps} Kg",
         _ => ""
     };
-    string SetDetail(ExerciseSetMetrics set) => State.Value.MetricType switch
-    {
-        MetricType.Weight => $"{set.Reps} x {set.Weight} Kg",
-        MetricType.Time => $"{set.Time} seconds",
-        MetricType.TimeAndDistance => set.Distance?.ToString() ?? "",
-        _ => ""
-    };
-    string TotalVolume(Perform.Components.Main.SideBar.Store.Workout workout) => State.Value.MetricType switch
-    {
-        MetricType.Weight => $"V: {workout.Sets.Select(x => x.Weight * x.Reps).Sum()} Kg",
-        MetricType.Time => $"T: {workout.Sets.Select(x => x.Time).Sum()} seconds",
-        MetricType.TimeAndDistance => $"D: {workout.Sets.Select(x => x.Distance).Sum()}",
-        _ => ""
-    };
+    // string SetDetail(ExerciseSetMetrics set) => State.Value.MetricType switch
+    // {
+    //     MetricType.Weight => $"{set.Reps} x {set.Weight} Kg",
+    //     MetricType.Time => $"{set.Time} seconds",
+    //     MetricType.TimeAndDistance => set.Distance?.ToString() ?? "",
+    //     _ => ""
+    // };
+    // string TotalVolume(Perform.Components.Main.SideBar.Store.Workout workout) => State.Value.MetricType switch
+    // {
+    //     MetricType.Weight => $"V: {workout.Sets.Select(x => x.Weight * x.Reps).Sum()} Kg",
+    //     MetricType.Time => $"T: {workout.Sets.Select(x => x.Time).Sum()} seconds",
+    //     MetricType.TimeAndDistance => $"D: {workout.Sets.Select(x => x.Distance).Sum()}",
+    //     _ => ""
+    // };
 }

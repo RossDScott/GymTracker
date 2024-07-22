@@ -1,19 +1,73 @@
 ﻿@page "/workout/end"
 @using GymTracker.BlazorClient.Features.Workout.End.Store
+@using GymTracker.Domain.Models.Extensions
 
 @inherits FluxorComponent
 
 @inject IDispatcher Dispatcher
 @inject IState<EndWorkoutState> State
 
-<h3>EndWorkout</h3>
+@State.Value.Duration.ToString(@"hh\:mm\:ss")
 
-@State.Value.Duration
-
-<div>
-    @System.Text.Json.JsonSerializer.Serialize(State.Value.ExerciseList)
+<div class="ma-3">
+    <MudGrid>
+        <MudItem Class="name" xs="3"><MudText Typo="Typo.h6">Exercise</MudText></MudItem>
+        <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Target</MudText></MudItem>
+        <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Max</MudText></MudItem>
+        <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Progression</MudText></MudItem>
+    </MudGrid>
+    @foreach (var exercise in State.Value.ExerciseList)
+    {
+        <MudGrid>
+            <MudItem Class="name" xs="3">@exercise.ExerciseName</MudItem>
+            @GetItem(exercise, ProgressType.Previous)
+            @GetItem(exercise, ProgressType.MaxSet)
+            @GetItem(exercise, ProgressType.AutoProgress)
+        </MudGrid>
+    }
 </div>
 
-@code {
+<style>
+    .mud-grid-item{
+        text-align: center;
+    }
+    .name{
+        text-align: left;
+    }
+    .selected {
+        background-color: #212228;
+        border: 1px solid white;
+    }
+</style>
 
+@code {
+    RenderFragment GetItem(ExerciseDetail exerciseDetail, ProgressType progressType)
+        => @<MudItem 
+                Class="@GetSelectedClass(exerciseDetail, progressType)" xs="2"
+                @onclick="() => OnItemClick(exerciseDetail, progressType)">
+                @GetMetric(exerciseDetail, progressType)
+           </MudItem>
+    ;
+
+    string GetMetric(ExerciseDetail exerciseDetail, ProgressType progressType)
+    {
+        var progressSet = exerciseDetail.ProgressSets.SingleOrDefault(x => x.ProgressType == progressType);
+
+        if (progressSet == null)
+            return "N/A";
+
+        return progressSet.Metrics.GetMeasureText(exerciseDetail.MetricType);
+    }
+
+    string GetSelectedClass(ExerciseDetail exerciseDetail, ProgressType progressType)
+    {
+        var progressSet = exerciseDetail.ProgressSets.SingleOrDefault(x => x.ProgressType == progressType);
+
+        return progressSet?.Selected ?? false ? "selected ma-2" : "ma-2";
+    }
+
+    void OnItemClick(ExerciseDetail exerciseDetail, ProgressType progressType)
+    {
+        Dispatcher.Dispatch(new SetSelectedProgressAction(exerciseDetail.WorkoutExerciseId, progressType));
+    }
 }
