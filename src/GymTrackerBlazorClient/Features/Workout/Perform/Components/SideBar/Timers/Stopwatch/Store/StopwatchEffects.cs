@@ -32,20 +32,23 @@ public class StopwatchEffects
     }
 
     [EffectMethod]
-    public async Task OnStart(StopwatchStartAction action, IDispatcher dispatcher)
+    public Task OnStart(StopwatchStartAction action, IDispatcher dispatcher)
     {
         _timer.Start();
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public async Task OnPause(StopwatchPauseAction action, IDispatcher dispatcher)
+    public Task OnPause(StopwatchPauseAction action, IDispatcher dispatcher)
     {
         _timer.Stop();
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public async Task OnReset(StopwatchResetAction action, IDispatcher dispatcher)
+    public Task OnReset(StopwatchResetAction action, IDispatcher dispatcher)
     {
         _timer.Stop();
+        return Task.CompletedTask;
     }
 }

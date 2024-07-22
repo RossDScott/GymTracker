@@ -40,20 +40,23 @@ public class CountdownTimerEffects
     }
 
     [EffectMethod]
-    public async Task OnStart(CountdownTimerStartAction action, IDispatcher dispatcher)
+    public Task OnStart(CountdownTimerStartAction action, IDispatcher dispatcher)
     {
         _timer.Start();
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public async Task OnPause(CountdownTimerPauseAction action, IDispatcher dispatcher)
+    public Task OnPause(CountdownTimerPauseAction action, IDispatcher dispatcher)
     {
         _timer.Stop();
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public async Task OnReset(CountdownTimerResetAction action, IDispatcher dispatcher)
+    public Task OnReset(CountdownTimerResetAction action, IDispatcher dispatcher)
     {
         _timer.Stop();
+        return Task.CompletedTask;
     }
 }
