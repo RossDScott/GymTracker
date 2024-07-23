@@ -40,9 +40,13 @@ public class DefaultDataBuilderService
         "Barbell", "Dumbbel", "Pulley", "Spin Bike", "Treadmill", "Floor"
     };
 
+
+
     private string[] BuildSetTypes() => new string[]
     {
-        "Warm-up", "Set", "Drop-set"
+        DefaultData.BuildSetTypes.WarmUp,
+        DefaultData.BuildSetTypes.DropSet,
+        DefaultData.BuildSetTypes.DropSet
     };
 
     private async Task BuildExercises()

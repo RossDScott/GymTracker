@@ -1,5 +1,6 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Features.AppBar.Store;
+using GymTracker.Domain.Models;
 using GymTracker.LocalStorage.Core;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -46,9 +47,25 @@ public class EndWorkoutEffects
     {
         var workout = await _clientStorage.CurrentWorkout.GetAsync();
         ArgumentNullException.ThrowIfNull(workout, nameof(workout));
+        var state = _state.Value;
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(workout.Plan.Id);
 
         workout.WorkoutEnd = _state.Value.WorkoutEnd;
+        foreach (var exercise in state.ExerciseList)
+        {
+            var workoutPlanExercise = workoutPlan.PlannedExercises.SingleOrDefault(x => x.Id == exercise.PlannedWorkoutExerciseId);
 
+            if (workoutPlanExercise == null) continue;
+
+            var acceptedProgress = exercise.ProgressSets.Single(x => x.Selected);
+            var sets = workoutPlanExercise.PlannedSets.Where(x => x.SetType == DefaultData.BuildSetTypes.Set);
+            foreach (var set in sets)
+            {
+                set.TargetMetrics = acceptedProgress.Metrics;
+            }
+        }
+
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
         await _clientStorage.Workouts.UpsertAsync(workout);
         await _clientStorage.CurrentWorkout.DeleteAsync();
 

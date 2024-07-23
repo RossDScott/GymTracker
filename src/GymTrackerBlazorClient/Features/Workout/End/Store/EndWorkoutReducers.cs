@@ -17,6 +17,7 @@ public static class EndWorkoutReducers
                 .Select(exercise => new ExerciseDetail
                 {
                     WorkoutExerciseId = exercise.Id,
+                    PlannedWorkoutExerciseId = exercise.PlannedExercise?.Id,
                     ExerciseName = exercise.Exercise.Name,
                     MetricType = exercise.Exercise.MetricType,
                     ProgressSets = BuildProgressSets(exercise)

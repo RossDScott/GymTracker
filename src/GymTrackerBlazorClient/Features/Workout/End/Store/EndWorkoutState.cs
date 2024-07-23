@@ -14,8 +14,9 @@ public record EndWorkoutState
 
 public record ExerciseDetail
 {
-    public Guid WorkoutExerciseId { get; set; }
-    public required string ExerciseName { get; set; }
+    public Guid WorkoutExerciseId { get; init; }
+    public Guid? PlannedWorkoutExerciseId { get; init; } = null;
+    public required string ExerciseName { get; init; }
     public MetricType MetricType { get; init; }
     public ImmutableArray<ProgressSet> ProgressSets { get; init; } = ImmutableArray<ProgressSet>.Empty;
 }
