@@ -9,7 +9,7 @@ public enum MetricType
 public record Exercise
 {
     public Guid Id { get; init; } = Guid.NewGuid();
-    public string Name { get; set; } = default!;
+    public required string Name { get; set; }
     public MetricType MetricType { get; set; }
     public string[] BodyTarget { get; set; } = Array.Empty<string>();
     public string[] Equipment { get; set; } = Array.Empty<string>();

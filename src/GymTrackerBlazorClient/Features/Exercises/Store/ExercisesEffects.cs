@@ -49,7 +49,7 @@ public class ExercisesEffects
     [EffectMethod]
     public Task OnCreateNewExercise(CreateNewExerciseAction action, IDispatcher dispatcher)
     {
-        var newExercise = new Exercise { Id = Guid.NewGuid(), MetricType = MetricType.Weight };
+        var newExercise = new Exercise { Id = Guid.NewGuid(), Name = "", MetricType = MetricType.Weight };
 
         dispatcher.DispatchWithDelay(new SetExerciseAction(newExercise));
         dispatcher.DispatchWithDelay(new SetBreadcrumbAction(new[]
@@ -67,7 +67,7 @@ public class ExercisesEffects
         var updateDTO = action.Exercise;
         var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
         var exercise = await _clientStorage.Exercises.FindOrDefaultByIdAsync(updateDTO.Id)
-            ?? new Exercise { Id = updateDTO.Id };
+            ?? new Exercise { Id = updateDTO.Id, Name = updateDTO.Name };
 
         exercise.Name = updateDTO.Name;
         exercise.MetricType = updateDTO.MetricType;

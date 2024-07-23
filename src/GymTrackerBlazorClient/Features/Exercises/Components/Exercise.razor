@@ -74,7 +74,7 @@
     [Parameter, EditorRequired]
     public EventCallback<DetailItem> OnExerciseUpdated { get; set; }
 
-    MudForm _form;
+    MudForm _form = default!;
 
     string _exerciseName = string.Empty;
     MetricType _metricType = MetricType.Weight;

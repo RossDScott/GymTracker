@@ -55,7 +55,7 @@
     [Parameter, EditorRequired]
     public Guid? SelectedExerciseId { get; set; } = null;
 
-    MudForm _form;
+    MudForm _form = default!;
     string _workoutPlanName = string.Empty;
     bool _isActive = true;
 

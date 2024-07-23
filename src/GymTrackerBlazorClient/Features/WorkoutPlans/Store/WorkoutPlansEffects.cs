@@ -48,10 +48,11 @@ public class WorkoutPlansEffects
         var exercise = await _clientStorage.Exercises.FindByIdAsync(action.ExerciseId);
         var order = workoutPlan.PlannedExercises.Count();
 
-        var plannedExercise = new PlannedExercise(exercise)
+        var plannedExercise = new PlannedExercise
         {
+            Exercise = exercise,
             Order = order,
-            RestInterval = TimeSpan.FromSeconds(150)
+            RestInterval = exercise.DefaultRestInterval
         };
 
         var plannedSets = order == 0
@@ -154,7 +155,7 @@ public class WorkoutPlansEffects
         var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
         var exercises = workoutPlan.PlannedExercises;
         var exercise = exercises.Single(x => x.Id == dto.Id);
-        var lastSet = exercise.PlannedSets.LastOrDefault() ?? new PlannedExerciseSet { SetType = "Warm-Up" };
+        var lastSet = exercise.PlannedSets.LastOrDefault() ?? new PlannedExerciseSet { SetType = "Warm-Up", TargetMetrics = new ExerciseSetMetrics() };
 
         var newSet = new PlannedExerciseSet
         {

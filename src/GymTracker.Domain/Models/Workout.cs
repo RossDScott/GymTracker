@@ -67,7 +67,7 @@ public record WorkoutExerciseSet
     public Guid Id { get; init; } = Guid.NewGuid();
     public PlannedExerciseSet? PlannedExerciseSet { get; set; } = null;
     public int Order { get; set; }
-    public string SetType { get; set; } = default!;
+    public string SetType { get; set; } = DefaultData.BuildSetTypes.Set;
     public int OrderForSetType { get; set; }
     public ExerciseSetMetrics Metrics { get; set; } = new ExerciseSetMetrics();
     public bool Completed { get; set; } = false;
