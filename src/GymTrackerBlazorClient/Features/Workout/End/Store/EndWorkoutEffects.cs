@@ -58,7 +58,7 @@ public class EndWorkoutEffects
             if (workoutPlanExercise == null) continue;
 
             var acceptedProgress = exercise.ProgressSets.Single(x => x.Selected);
-            var sets = workoutPlanExercise.PlannedSets.Where(x => x.SetType == DefaultData.BuildSetTypes.Set);
+            var sets = workoutPlanExercise.PlannedSets.Where(x => x.SetType == DefaultData.SetType.Set);
             foreach (var set in sets)
             {
                 set.TargetMetrics = acceptedProgress.Metrics;

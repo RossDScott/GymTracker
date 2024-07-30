@@ -1,0 +1,21 @@
+{
+  "TargetBodyParts": [ "Core", "Arms", "Back", "Chest", "Legs", "Shoulders" ],
+  "Equipment": [ "Barbell", "Dumbbel", "Pulley", "Spin Bike", "Treadmill", "Floor" ],
+  "Exercises": [
+    {
+      "Name": "Barbell Deadlift",
+      "MetricType": 0,
+      "BodyTarget": [ "Back", "Glutes", "Hamstrings", "Core" ]
+    },
+    {
+      "Name": "Barbell Bench Press",
+      "MetricType": 0,
+      "BodyTarget": [ "Back", "Glutes", "Hamstrings", "Core" ]
+    },
+    {
+      "Name": "Plank",
+      "MetricType": 1,
+      "BodyTarget": [ "Core" ]
+    }
+  ]
+}

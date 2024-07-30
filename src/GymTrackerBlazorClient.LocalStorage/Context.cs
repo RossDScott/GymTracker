@@ -1,6 +1,7 @@
 ﻿using GymTracker.BlazorClient.Services;
 using GymTracker.Domain.Models;
 using GymTracker.LocalStorage.Core;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GymTracker.LocalStorage;
 public class ClientStorageContext : LocalStorageContext, IClientStorage
@@ -40,8 +41,8 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
     {
         if (!await HasInitialisedDefaultData.GetAsync())
         {
-            var defaultData = new DefaultDataBuilderService(this);
-            await defaultData.BuildDefaultData();
+            var defaultDataBuilder = _serviceProvider.GetRequiredService<DefaultDataBuilderService>();
+            await defaultDataBuilder.BuildDefaultData();
         }
     }
 }

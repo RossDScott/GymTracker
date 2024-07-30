@@ -13,6 +13,10 @@ public static class EndWorkoutReducers
         return state with
         {
             Duration = DateTimeOffset.Now - action.Workout.WorkoutStart,
+            TotalVolume = action.Workout.Exercises
+                .Where(x => x.Exercise.MetricType == MetricType.Weight)
+                .SelectMany(x => x.Sets)
+                .Sum(x => (x.Metrics.Weight ?? 0) * (x.Metrics.Reps ?? 0)),
             ExerciseList = action.Workout.Exercises
                 .Select(exercise => new ExerciseDetail
                 {

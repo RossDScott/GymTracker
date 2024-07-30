@@ -3,11 +3,13 @@
 namespace GymTracker.LocalStorage.Core;
 public abstract class LocalStorageContext
 {
+    protected readonly IServiceProvider _serviceProvider = default!;
     protected readonly ILocalStorageService _localStorage = default!;
 
     public IEnumerable<IKeyItem> Keys { get; internal set; } = Enumerable.Empty<IKeyItem>();
 
     public IKeyItem<bool> HasInitialisedDefaultData { get; init; } = default!;
+
 
     internal virtual void Configure()
     {

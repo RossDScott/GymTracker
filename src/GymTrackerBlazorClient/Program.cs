@@ -2,7 +2,9 @@ using Fluxor;
 using GymTracker.AzureBlobStorage;
 using GymTracker.BlazorClient;
 using GymTracker.BlazorClient.Features.SidePanel;
+using GymTracker.BlazorClient.Services;
 using GymTracker.Domain;
+using GymTracker.Domain.Models;
 using GymTracker.LocalStorage;
 using GymTracker.LocalStorage.Core;
 using Microsoft.AspNetCore.Components.Web;
@@ -16,6 +18,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddMudServices();
 
+builder.Services.AddScoped<IDefaultDataSource<DefaultData>, DefaultDataSource>();
+builder.Services.AddScoped<DefaultDataBuilderService>();
 builder.Services.RegisterLocalStorageContext<IClientStorage, ClientStorageContext>();
 
 builder.Services.RegisterDomainServices();

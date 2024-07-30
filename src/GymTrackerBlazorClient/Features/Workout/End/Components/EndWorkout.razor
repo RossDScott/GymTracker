@@ -7,7 +7,12 @@
 @inject IDispatcher Dispatcher
 @inject IState<EndWorkoutState> State
 
-@State.Value.Duration.ToString(@"hh\:mm\:ss")
+<div>
+    <MudText Typo="Typo.subtitle1">Duration: @State.Value.Duration.ToString(@"hh\:mm\:ss")</MudText>
+</div>
+<div>
+    <MudText Typo="Typo.subtitle1">Total Volume: @State.Value.TotalVolume Kg</MudText>
+</div>
 
 <div class="ma-3">
     <MudGrid>

@@ -9,6 +9,7 @@ public record EndWorkoutState
 {
     public DateTimeOffset WorkoutEnd { get; init; }
     public TimeSpan Duration { get; set; }
+    public decimal TotalVolume { get; set; }
     public ImmutableArray<ExerciseDetail> ExerciseList { get; init; } = ImmutableArray<ExerciseDetail>.Empty;
 }
 

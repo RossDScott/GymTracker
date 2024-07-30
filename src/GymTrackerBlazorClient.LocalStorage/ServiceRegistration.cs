@@ -19,7 +19,7 @@ public static class ServiceRegistration
 
             var context = new TImplementation();
 
-            context.Initialise(localStorage);
+            context.Initialise(localStorage, serviceProvider);
 
             return context;
         });

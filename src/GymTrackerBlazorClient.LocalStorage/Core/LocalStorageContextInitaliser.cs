@@ -5,12 +5,17 @@ namespace GymTracker.LocalStorage.Core;
 public static class LocalStorageContextExtensions
 {
     public static void Initialise<T>(this T context,
-        ILocalStorageService localStorageService)
+        ILocalStorageService localStorageService,
+        IServiceProvider serviceProvider)
         where T : LocalStorageContext, new()
     {
         context.GetType()
                .GetField("_localStorage", BindingFlags.Instance | BindingFlags.NonPublic)!
                .SetValue(context, localStorageService);
+
+        context.GetType()
+               .GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
+               .SetValue(context, serviceProvider);
 
         var keys = new List<IKeyItem>();
         keys.AddRange(InitialiseKeys(context, typeof(IKeyItem<>), typeof(KeyItem<>), localStorageService));
