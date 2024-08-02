@@ -1,6 +1,8 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Extensions;
+using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.CountdownTimer.Store;
 using GymTracker.BlazorClient.Features.Workout.Perform.Store;
+using GymTracker.Domain.Models;
 using GymTracker.LocalStorage.Core;
 using Microsoft.AspNetCore.Components;
 
@@ -76,6 +78,17 @@ public class ExerciseDetailEffects
             set.CompletedOn = DateTimeOffset.Now;
 
             dispatcher.DispatchWithDelay(new SetSelectedSetAction(null));
+
+            if (exercise.PlannedExercise?.AutoTriggerRestTimer ?? false)
+            {
+                var interval = set.SetType switch
+                {
+                    DefaultData.SetType.WarmUp => TimeSpan.FromMinutes(1),
+                    DefaultData.SetType.Set => exercise.PlannedExercise.RestInterval,
+                    _ => TimeSpan.FromMinutes(1),
+                };
+                dispatcher.Dispatch(new CountdownTimerStartWithDurationAction(interval));
+            }
         }
         else
         {

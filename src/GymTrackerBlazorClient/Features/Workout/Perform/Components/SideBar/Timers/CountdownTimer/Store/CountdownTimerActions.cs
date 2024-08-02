@@ -8,3 +8,4 @@ public record CountdownTimerTimesUpAction { }
 public record CountdownTimerStartEditAction { }
 public record CountdownTimerSetDurationAction(TimeSpan Duration);
 public record CountdownTimerSetStartDurationAction(TimeSpan StartDuration);
+public record CountdownTimerStartWithDurationAction(TimeSpan Duration);

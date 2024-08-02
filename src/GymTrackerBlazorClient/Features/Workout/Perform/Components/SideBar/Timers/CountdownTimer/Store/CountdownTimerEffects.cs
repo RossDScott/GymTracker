@@ -1,4 +1,5 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Extensions;
 using System.Timers;
 
 namespace GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.CountdownTimer.Store;
@@ -43,6 +44,14 @@ public class CountdownTimerEffects
     public Task OnStart(CountdownTimerStartAction action, IDispatcher dispatcher)
     {
         _timer.Start();
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public Task OnStartWithDuration(CountdownTimerStartWithDurationAction action, IDispatcher dispatcher)
+    {
+        dispatcher.Dispatch(new CountdownTimerSetStartDurationAction(action.Duration));
+        dispatcher.DispatchWithDelay(new CountdownTimerStartAction(DateTime.Now.AddMilliseconds(500)), 500);
         return Task.CompletedTask;
     }
 
