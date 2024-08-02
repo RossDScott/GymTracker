@@ -33,7 +33,7 @@
                 <div class="d-flex justify-space-between flex-column">
                     <MudText Typo="Typo.subtitle2">@workout.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
                     <MudText Typo="Typo.body2" Align="Align.Left">
-                        @workout.Sets.GetMeasureTotalVolume(State.Value.MetricType)
+                        @workout.TotalVolume
                     </MudText>
                 </div>
 
@@ -41,7 +41,7 @@
                     @foreach (var set in workout.Sets)
                     {
                         <MudText Typo="Typo.body2" Align="Align.Right">
-                            @set.GetMeasureText(State.Value.MetricType)
+                            @set.SetDetails
                         </MudText>
                     }
                 </div>

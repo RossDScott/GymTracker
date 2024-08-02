@@ -1,4 +1,6 @@
 ﻿using GymTracker.Domain.Models;
+using GymTracker.Domain.Models.Extensions;
+using GymTracker.Domain.Models.Statistics;
 using GymTracker.LocalStorage;
 using GymTracker.LocalStorage.Core;
 
@@ -20,10 +22,12 @@ public class StatisticsBuilderService : ITrigger
 
     public void WorkoutsChanged(ICollection<Workout> workouts)
     {
-        var completedWorkouts = workouts.Where(x => x.WorkoutEnd != null).ToList();
+        var completedWorkouts = workouts
+                                .Where(x => x.WorkoutEnd != null)
+                                .OrderByDescending(x => x.WorkoutEnd)
+                                .ToList();
 
         var exercises = completedWorkouts
-            .OrderByDescending(x => x.WorkoutEnd)
             .SelectMany(wo => wo.Exercises
             .Select(ex => new
             {
@@ -34,7 +38,7 @@ public class StatisticsBuilderService : ITrigger
             .GroupBy(x => x.ExerciseId)
             .ToList();
 
-        var statistics = exercises
+        var exerciseStatistics = exercises
             .Select(exercise => new ExerciseStatistic
             {
                 ExerciseId = exercise.Key,
@@ -42,7 +46,7 @@ public class StatisticsBuilderService : ITrigger
                 {
                     WorkoutDateTime = completedExercise.WorkoutEnd,
                     Sets = completedExercise.Sets
-                        .Where(x => x.SetType == "Set" && x.Completed)
+                        .Where(x => x.SetType == DefaultData.SetType.Set && x.Completed)
                         .Select(x => x.Metrics)
                         .ToList()
                 })
@@ -50,6 +54,25 @@ public class StatisticsBuilderService : ITrigger
                 .ToList()
             }).ToList();
 
-        _localStorageContex.ExerciseStatistics.SetAsync(statistics);
+        _localStorageContex.ExerciseStatistics.SetAsync(exerciseStatistics);
+
+        var sixMonthsAgo = DateTimeOffset.Now.AddMonths(-6);
+        var workoutPlanStatistics = completedWorkouts
+            .GroupBy(x => x.Plan.Id)
+            .Where(x => x.Any())
+            .Select(plan => new WorkoutPlanStatistics
+            {
+                WorkoutPlanId = plan.Key,
+                PreviousWorkout = plan.First().ToWorkoutStatistics(),
+                BestWeightTotalVolumeIn6Months =
+                    plan
+                        .Where(x => x.WorkoutEnd > sixMonthsAgo)
+                        .Select(x => x.GetWeightTotalVolume())
+                        .DefaultIfEmpty()
+                        .Max(),
+                History = plan.Select(x => x.ToWorkoutStatistics()).ToList(),
+            })
+            .ToList();
+        _localStorageContex.WorkoutPlanStatistics.SetAsync(workoutPlanStatistics);
     }
 }

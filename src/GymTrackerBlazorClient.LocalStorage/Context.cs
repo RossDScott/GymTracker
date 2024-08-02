@@ -1,5 +1,6 @@
 ﻿using GymTracker.BlazorClient.Services;
 using GymTracker.Domain.Models;
+using GymTracker.Domain.Models.Statistics;
 using GymTracker.LocalStorage.Core;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +14,8 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
     public IKeyItem<Workout> CurrentWorkout { get; init; } = default!;
 
     public IKeyListItem<ExerciseStatistic> ExerciseStatistics { get; init; } = default!;
+    public IKeyListItem<WorkoutPlanStatistics> WorkoutPlanStatistics { get; init; } = default!;
+
 
     public ClientStorageContext()
     {
@@ -30,6 +33,11 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
         ExerciseStatistics.ConfigureList(settings =>
         {
             settings.GetId = (ExerciseStatistic x) => x.ExerciseId;
+        });
+
+        WorkoutPlanStatistics.ConfigureList(settings =>
+        {
+            settings.GetId = (WorkoutPlanStatistics x) => x.WorkoutPlanId;
         });
 
         AddTrigger(new StatisticsBuilderService(this));

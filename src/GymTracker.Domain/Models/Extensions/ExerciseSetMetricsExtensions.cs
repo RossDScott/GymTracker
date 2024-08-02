@@ -2,7 +2,7 @@
 public static class ExerciseSetMetricsExtensions
 {
     public static ExerciseSetMetrics? GetMaxSet(this IEnumerable<ExerciseSetMetrics> metrics, MetricType metricType)
-        => metrics.MaxBy(x => x.GetMeasure(metricType));
+        => metrics.MaxBy(x => x.ToStandardMeasure(metricType));
 
     public static ExerciseSetMetrics? GetMaxVolumeSet(this IEnumerable<ExerciseSetMetrics> metrics, MetricType metricType)
         => metricType switch
@@ -11,7 +11,7 @@ public static class ExerciseSetMetricsExtensions
             _ => throw new ArgumentOutOfRangeException(nameof(metricType))
         };
 
-    public static decimal GetMeasure(this ExerciseSetMetrics metrics, MetricType metricType)
+    public static decimal ToStandardMeasure(this ExerciseSetMetrics metrics, MetricType metricType)
         => metricType switch
         {
             MetricType.Weight => metrics.Weight ?? 0,
@@ -21,20 +21,20 @@ public static class ExerciseSetMetricsExtensions
         };
 
     public static string GetMeasureText(this ExerciseSetMetrics set, MetricType metricType)
-        => metricType switch
-        {
-            MetricType.Weight => $"{set.Reps ?? 0} x {set.Weight ?? 0} Kg",
-            MetricType.Time => $"{set.Time ?? 0} seconds",
-            MetricType.TimeAndDistance => set.Distance?.ToString() ?? "",
-            _ => ""
-        };
+        => set.ToFormattedMetric(metricType);
 
-    public static string GetMeasureTotalVolume(this IEnumerable<ExerciseSetMetrics> sets, MetricType metricType)
-        => metricType switch
+    public static string GetWeightTotalVolumeWithMeasure(this IEnumerable<ExerciseSetMetrics> sets)
+        => $"{sets.Select(x => x.Weight * x.Reps).Sum()} Kg";
+
+    public static decimal GetWeightTotalVolume(this IEnumerable<ExerciseSetMetrics> sets)
+        => sets.Select(x => (x.Weight ?? 0) * (x.Reps ?? 0)).Sum();
+
+    public static string ToFormattedMetric(this ExerciseSetMetrics set, MetricType metricType)
+        => (metricType switch
         {
-            MetricType.Weight => $"V: {sets.Select(x => x.Weight * x.Reps).Sum()} Kg",
-            MetricType.Time => $"T: {sets.Select(x => x.Time).Sum()} seconds",
-            MetricType.TimeAndDistance => $"D: {sets.Select(x => x.Distance).Sum()}",
-            _ => ""
-        };
+            MetricType.Weight => $"{set.Reps ?? 0} x {set.Weight ?? 0}",
+            MetricType.Time => $"{set.Time ?? 0}",
+            MetricType.TimeAndDistance => set.Distance?.ToString() ?? "",
+            _ => throw new ArgumentException()
+        }).WithFormattedMetricMeasureMetric(metricType, set.ToStandardMeasure(metricType));
 }

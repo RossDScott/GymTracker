@@ -13,10 +13,12 @@ public static class EndWorkoutReducers
         return state with
         {
             Duration = DateTimeOffset.Now - action.Workout.WorkoutStart,
-            TotalVolume = action.Workout.Exercises
+            WorkoutEnd = DateTimeOffset.Now,
+            TotalVolumeMessage = action.Workout.Exercises
                 .Where(x => x.Exercise.MetricType == MetricType.Weight)
                 .SelectMany(x => x.Sets)
-                .Sum(x => (x.Metrics.Weight ?? 0) * (x.Metrics.Reps ?? 0)),
+                .Select(x => x.Metrics)
+                .GetWeightTotalVolumeWithMeasure(),
             ExerciseList = action.Workout.Exercises
                 .Select(exercise => new ExerciseDetail
                 {
@@ -24,8 +26,13 @@ public static class EndWorkoutReducers
                     PlannedWorkoutExerciseId = exercise.PlannedExercise?.Id,
                     ExerciseName = exercise.Exercise.Name,
                     MetricType = exercise.Exercise.MetricType,
-                    ProgressSets = BuildProgressSets(exercise)
-                }).ToImmutableArray()
+                    ProgressSets = BuildProgressSets(exercise),
+                    CompletedSets = exercise.Sets
+                                            .Where(x => x.SetType == DefaultData.SetType.Set)
+                                            .OrderBy(x => x.CompletedOn)
+                                            .Select(x => x.Metrics).ToImmutableArray()
+                }).ToImmutableArray(),
+            PreviousStatistics = action.PreviousStatistics
         };
     }
 
@@ -69,15 +76,21 @@ public static class EndWorkoutReducers
         {
             progressSets.Add(new ProgressSet { ProgressType = ProgressType.MaxSet, Metrics = maxSet, Selected = false });
 
-            if (metricType == MetricType.Weight &&
-                workoutExercise.PlannedExercise != null &&
-                maxSet.Reps >= workoutExercise.PlannedExercise.TargetRepsUpper)
+            if (metricType == MetricType.Weight && workoutExercise.PlannedExercise != null)
             {
-                var progressSet = maxSet with
+                ExerciseSetMetrics progressSet;
+                if (maxSet.Reps >= workoutExercise.PlannedExercise.TargetRepsUpper)
                 {
-                    Reps = workoutExercise.PlannedExercise.TargetRepsLower,
-                    Weight = maxSet.Weight + workoutExercise.PlannedExercise.TargetWeightIncrement
-                };
+                    progressSet = maxSet with
+                    {
+                        Reps = workoutExercise.PlannedExercise.TargetRepsLower,
+                        Weight = maxSet.Weight + workoutExercise.PlannedExercise.TargetWeightIncrement
+                    };
+                }
+                else
+                {
+                    progressSet = maxSet with { Reps = maxSet.Reps + 1 };
+                }
                 progressSets.Add(new ProgressSet { ProgressType = ProgressType.AutoProgress, Metrics = progressSet, Selected = true });
             }
         }
@@ -88,7 +101,7 @@ public static class EndWorkoutReducers
             var previousProgress = progressSets.FirstOrDefault(x => x.ProgressType == ProgressType.Previous);
 
             if (selectedProgress != null && previousProgress != null &&
-                selectedProgress.Metrics.GetMeasure(metricType) < previousProgress.Metrics.GetMeasure(metricType))
+                selectedProgress.Metrics.ToStandardMeasure(metricType) < previousProgress.Metrics.ToStandardMeasure(metricType))
                 selectedProgress = previousProgress;
 
             selectedProgress ??= previousProgress;

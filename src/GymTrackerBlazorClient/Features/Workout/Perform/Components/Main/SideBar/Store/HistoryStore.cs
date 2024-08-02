@@ -2,6 +2,7 @@
 using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 using GymTracker.Domain.Models;
 using GymTracker.Domain.Models.Extensions;
+using GymTracker.Domain.Models.Statistics;
 using GymTracker.LocalStorage.Core;
 using System.Collections.Immutable;
 
@@ -15,13 +16,19 @@ public record HistoryState
     public ExerciseSetMetrics? MaxSet { get; init; } = null;
     public ExerciseSetMetrics? MaxVolume { get; init; } = null;
 
-    public ImmutableList<Workout> History { get; init; } = ImmutableList<Workout>.Empty;
+    public ImmutableArray<Workout> History { get; init; } = ImmutableArray<Workout>.Empty;
 }
 
 public record Workout
 {
     public DateTimeOffset CompletedOn { get; init; }
-    public required ImmutableList<ExerciseSetMetrics> Sets { get; init; }
+    public required ImmutableArray<WorkoutExerciseSet> Sets { get; init; }
+    public required string TotalVolume { get; init; }
+}
+
+public record WorkoutExerciseSet
+{
+    public required string SetDetails { get; init; }
 }
 
 public record SetHistoryAction(ExerciseStatistic? ExerciseStatistic, MetricType MetricType);
@@ -44,7 +51,7 @@ public static class HistoryStateReducer
                 MetricType = action.MetricType,
                 MaxVolume = null,
                 MaxSet = null,
-                History = ImmutableList<Workout>.Empty
+                History = ImmutableArray<Workout>.Empty
             };
 
         var sets = dataForMonths.SelectMany(x => x.Sets).ToList();
@@ -59,10 +66,24 @@ public static class HistoryStateReducer
             .Select(x => new Workout
             {
                 CompletedOn = x.WorkoutDateTime,
-                Sets = x.Sets.ToImmutableList()
-            }).ToImmutableList()
+                TotalVolume = x.Sets.ToMeasureTotalVolume(action.MetricType),
+                Sets = x.Sets
+                        .Select(x => new WorkoutExerciseSet
+                        {
+                            SetDetails = x.ToFormattedMetric(action.MetricType)
+                        }).ToImmutableArray()
+            }).ToImmutableArray()
         };
     }
+
+    private static string ToMeasureTotalVolume(this IEnumerable<ExerciseSetMetrics> sets, MetricType metricType)
+        => (metricType switch
+        {
+            MetricType.Weight => $"V: {sets.Select(x => x.Weight * x.Reps).Sum()}",
+            MetricType.Time => $"T: {sets.Select(x => x.Time).Sum()}",
+            MetricType.TimeAndDistance => $"D: {sets.Select(x => x.Distance).Sum()}",
+            _ => ""
+        }).WithFormattedMetricMeasureMetric(metricType);
 }
 
 public class HistoryStateEffects

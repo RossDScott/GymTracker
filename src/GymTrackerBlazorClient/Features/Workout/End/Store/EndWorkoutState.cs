@@ -1,5 +1,6 @@
 ﻿using Fluxor;
 using GymTracker.Domain.Models;
+using GymTracker.Domain.Models.Statistics;
 using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.Workout.End.Store;
@@ -7,19 +8,21 @@ namespace GymTracker.BlazorClient.Features.Workout.End.Store;
 [FeatureState]
 public record EndWorkoutState
 {
-    public DateTimeOffset WorkoutEnd { get; init; }
-    public TimeSpan Duration { get; set; }
-    public decimal TotalVolume { get; set; }
-    public ImmutableArray<ExerciseDetail> ExerciseList { get; init; } = ImmutableArray<ExerciseDetail>.Empty;
+    public required DateTimeOffset WorkoutEnd { get; init; }
+    public required TimeSpan Duration { get; init; }
+    public required string TotalVolumeMessage { get; init; }
+    public required ImmutableArray<ExerciseDetail> ExerciseList { get; init; }
+    public WorkoutPlanStatistics? PreviousStatistics { get; init; } = null;
 }
 
 public record ExerciseDetail
 {
-    public Guid WorkoutExerciseId { get; init; }
+    public required Guid WorkoutExerciseId { get; init; }
     public Guid? PlannedWorkoutExerciseId { get; init; } = null;
     public required string ExerciseName { get; init; }
-    public MetricType MetricType { get; init; }
-    public ImmutableArray<ProgressSet> ProgressSets { get; init; } = ImmutableArray<ProgressSet>.Empty;
+    public required MetricType MetricType { get; init; }
+    public required ImmutableArray<ProgressSet> ProgressSets { get; init; }
+    public required ImmutableArray<ExerciseSetMetrics> CompletedSets { get; set; }
 }
 
 public record ProgressSet

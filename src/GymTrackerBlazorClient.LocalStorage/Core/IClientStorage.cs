@@ -1,4 +1,5 @@
 ﻿using GymTracker.Domain.Models;
+using GymTracker.Domain.Models.Statistics;
 
 namespace GymTracker.LocalStorage.Core;
 public interface IClientStorage
@@ -10,4 +11,5 @@ public interface IClientStorage
     IKeyItem<Workout> CurrentWorkout { get; init; }
 
     IKeyListItem<ExerciseStatistic> ExerciseStatistics { get; init; }
+    IKeyListItem<WorkoutPlanStatistics> WorkoutPlanStatistics { get; init; }
 }

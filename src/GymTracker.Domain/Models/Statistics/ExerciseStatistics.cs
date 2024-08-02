@@ -1,4 +1,4 @@
-﻿namespace GymTracker.Domain.Models;
+﻿namespace GymTracker.Domain.Models.Statistics;
 public record ExerciseStatistic
 {
     public Guid ExerciseId { get; init; }

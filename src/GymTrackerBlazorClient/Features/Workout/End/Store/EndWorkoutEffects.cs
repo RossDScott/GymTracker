@@ -31,8 +31,9 @@ public class EndWorkoutEffects
     {
         var workout = await _clientStorage.CurrentWorkout.GetAsync();
         ArgumentNullException.ThrowIfNull(workout, nameof(workout));
+        var workoutStatistics = await _clientStorage.WorkoutPlanStatistics.FindOrDefaultByIdAsync(workout.Plan.Id);
 
-        _dispatcher.Dispatch(new SetEndWorkoutAction(workout));
+        _dispatcher.Dispatch(new SetEndWorkoutAction(workout, workoutStatistics));
         _dispatcher.Dispatch(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Workout", "/workout/end", false, Icons.Material.Filled.SportsMartialArts),
@@ -40,6 +41,13 @@ public class EndWorkoutEffects
         }));
 
         _navigationManager.NavigateTo("/workout/end");
+    }
+
+    [EffectMethod]
+    public Task OnCancelEndWorkout(CancelEndWorkoutAction action, IDispatcher dispatcher)
+    {
+        _navigationManager.NavigateTo("/workout/perform");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]

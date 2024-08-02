@@ -11,12 +11,20 @@
     <MudText Typo="Typo.subtitle1">Duration: @State.Value.Duration.ToString(@"hh\:mm\:ss")</MudText>
 </div>
 <div>
-    <MudText Typo="Typo.subtitle1">Total Volume: @State.Value.TotalVolume Kg</MudText>
+    <MudText Typo="Typo.subtitle1">Total Volume: @State.Value.TotalVolumeMessage</MudText>
+    @if(State.Value.PreviousStatistics != null)
+    {
+        <MudText Typo="Typo.subtitle1">Previous Total Volume: @State.Value.PreviousStatistics.PreviousWorkout.TotalWeightVolumeWithMeasure</MudText>
+    }
 </div>
 
 <div class="ma-3">
     <MudGrid>
+        <MudItem xs="5"></MudItem>
+        <MudItem xs="6"><MudText Typo="Typo.h6">Next Workout Plan</MudText></MudItem></MudGrid>
+    <MudGrid>
         <MudItem Class="name" xs="3"><MudText Typo="Typo.h6">Exercise</MudText></MudItem>
+        <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6" Align="Align.Left">Completed</MudText></MudItem>
         <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Target</MudText></MudItem>
         <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Max</MudText></MudItem>
         <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Progression</MudText></MudItem>
@@ -25,6 +33,14 @@
     {
         <MudGrid>
             <MudItem Class="name" xs="3">@exercise.ExerciseName</MudItem>
+            <MudItem Class="ma-2" xs="2">
+                @foreach (var set in exercise.CompletedSets)
+                {
+                    <MudText Typo="Typo.body2" Align="Align.Left">
+                        @set.GetMeasureText(exercise.MetricType)
+                    </MudText>
+                }
+            </MudItem>
             @GetItem(exercise, ProgressType.Previous)
             @GetItem(exercise, ProgressType.MaxSet)
             @GetItem(exercise, ProgressType.AutoProgress)
@@ -33,7 +49,11 @@
 </div>
 
 <div>
-    <MudButton Variant="Variant.Filled">Cancel</MudButton>
+    <MudButton 
+        Variant="Variant.Filled"
+        OnClick="() => Dispatcher.Dispatch(new CancelEndWorkoutAction())">
+        Cancel
+    </MudButton>
     <MudButton 
         Variant="Variant.Filled" 
         Color="Color.Primary"
