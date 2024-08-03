@@ -46,6 +46,9 @@ public class ExerciseDetailEffects
 
         await _clientStorage.CurrentWorkout.SetAsync(workout);
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+
+        if (!set.Completed && (set.Metrics.Weight.HasValue || set.Metrics.Reps.HasValue))
+            dispatcher.DispatchWithDelay(new ToggleSetCompletedAction(exercise.Id, set.Id, false));
     }
 
     [EffectMethod]
@@ -77,7 +80,8 @@ public class ExerciseDetailEffects
             set.Metrics.Time = set.Metrics.Time ?? set.PlannedExerciseSet?.TargetMetrics.Time;
             set.CompletedOn = DateTimeOffset.Now;
 
-            dispatcher.DispatchWithDelay(new SetSelectedSetAction(null));
+            if (action.AutoUnselect)
+                dispatcher.DispatchWithDelay(new SetSelectedSetAction(null));
 
             if (exercise.PlannedExercise?.AutoTriggerRestTimer ?? false)
             {

@@ -4,6 +4,6 @@ namespace GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.Exerc
 
 public record SetExerciseDetailAction(WorkoutExercise WorkoutExercise);
 public record SetSelectedSetAction(Guid? Id);
-public record ToggleSetCompletedAction(Guid WorkoutExerciseId, Guid SetId);
+public record ToggleSetCompletedAction(Guid WorkoutExerciseId, Guid SetId, bool AutoUnselect);
 public record SetSetDataAction(Guid WorkoutExerciseId, EditSet EditSet);
 public record SetWeightIncrementAction(Guid WorkoutExerciseId, decimal WeightIncrement);

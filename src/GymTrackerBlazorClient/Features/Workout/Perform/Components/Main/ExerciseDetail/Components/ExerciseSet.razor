@@ -50,6 +50,6 @@
         Dispatcher.Dispatch(new SetSelectedSetAction(Set.Id));
     }
 
-    private void handleToggleCompleted() => Dispatcher.Dispatch(new ToggleSetCompletedAction(WorkoutExerciseId, Set.Id));
+    private void handleToggleCompleted() => Dispatcher.Dispatch(new ToggleSetCompletedAction(WorkoutExerciseId, Set.Id, true));
     private void handleWeightIncrementChange() => Dispatcher.Dispatch(new SetWeightIncrementAction(WorkoutExerciseId, WeightIncrement));
 }
