@@ -8,11 +8,11 @@
                      Variant="Variant.Text"
                      DisableUnderLine="true"
                      HideSpinButtons="true"
-                     Min="0" Max="500"
+                     Min="0" Max="500" MaxLength="3"
                      AdornmentText="@AdornmentText"
                      Adornment="Adornment.End"
                      FullWidth="false"
-                     Class="mx-auto mb-1 mt-n3 numericInput" />
+                     Class="ml-1 mb-1 mt-n3 numericInput" />
 
     @upDownIcon(x => x -= Increment, false)
 </span>
@@ -20,7 +20,8 @@
 @code {
     public RenderFragment upDownIcon(Func<decimal?, decimal?> updateValue, bool up) =>
         @<MudIcon @onclick="() => handleValueChange(updateValue)"
-             Class="mx-auto" Icon="@(up ? Icons.Material.Outlined.ArrowCircleUp : Icons.Material.Outlined.ArrowCircleDown)" />;
+            Size="Size.Large"
+            Class="mx-auto" Icon="@(up ? Icons.Material.Outlined.ArrowCircleUp : Icons.Material.Outlined.ArrowCircleDown)" />;
 }
 
 @code {
@@ -38,7 +39,7 @@
     private Task handleValueChange() => ValueChanged.InvokeAsync(Value);
 
     private Task handleValueChange(Func<decimal?, decimal?> updateValue){
-        Value = updateValue(Value);
+        Value = updateValue(Value ?? 0);
         return handleValueChange();
     }
 }

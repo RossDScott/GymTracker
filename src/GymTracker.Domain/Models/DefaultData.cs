@@ -8,6 +8,11 @@ public class DefaultData
         public const string DropSet = "Drop-set";
     }
 
+    public static TimeSpan DefaultRestInterval => TimeSpan.FromMinutes(2);
+    public const decimal DefaultWeightIncrement = 1m;
+    public const int DefaultTargetRepsLower = 4;
+    public const int DefaultTargetRepsUpper = 6;
+
     public required string[] TargetBodyParts { get; set; }
     public required string[] Equipment { get; set; }
 

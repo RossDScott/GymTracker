@@ -52,7 +52,11 @@ public class WorkoutPlansEffects
         {
             Exercise = exercise,
             Order = order,
-            RestInterval = exercise.DefaultRestInterval
+            RestInterval = exercise.DefaultRestInterval,
+            TargetWeightIncrement = DefaultData.DefaultWeightIncrement,
+            TargetRepsLower = DefaultData.DefaultTargetRepsLower,
+            TargetRepsUpper = DefaultData.DefaultTargetRepsUpper,
+            AutoTriggerRestTimer = true,
         };
 
         var plannedSets = order == 0

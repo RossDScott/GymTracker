@@ -6,7 +6,7 @@
 <div @onclick="handleEditRow"
      @onclick:stopPropagation="true"
      class="row @selectedClass py-0">
-    <MudGrid Justify="Justify.SpaceEvenly" Class="fullWidth ma-0 py-1 relative">
+    <MudGrid Class="fullWidth ma-0 py-1 relative">
         <MudItem xs="2" class="fw-bold d-flex align-content-center flex-wrap">@Set.Name</MudItem>
 
         @(IsSelected ? @EditRow(editSet) : @ViewRow(Set))
@@ -15,7 +15,7 @@
         </MudItem>
 
 
-            <MudItem xs="1" Class="pa-0 absolute" Style="right: -32px; top: -5px">
+            <MudItem xs="1" Class="pa-0 absolute" Style="right: 35px; top: 2px">
                 @if (IsSelected)
             {
                 <UpDownIncrement @bind-Value="WeightIncrement" @bind-Value:after="handleWeightIncrementChange"></UpDownIncrement>

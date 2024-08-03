@@ -9,8 +9,8 @@
                      Min="0" Max="500"
                      AdornmentText="@AdornmentText"
                      Adornment="Adornment.End"
-                     FullWidth="false"
-                     Class="mx-auto mb-1 mt-n3 numericInput" />
+                     FullWidth="true"
+                     Class="ml-n2 mb-1 mt-n3 numericInput" />
 
     @upDownIcon(x => --x, false)
 </span>
@@ -18,6 +18,7 @@
 @code {
     public RenderFragment upDownIcon(Func<int?, int?> updateValue, bool up) =>
         @<MudIcon @onclick="() => handleValueChange(updateValue)"
+             Size="Size.Large"
              Class="mx-auto" Icon="@(up ? Icons.Material.Outlined.ArrowCircleUp : Icons.Material.Outlined.ArrowCircleDown)" />;
 }
 
@@ -34,7 +35,7 @@
 
     private Task handleValueChange(Func<int?, int?> updateValue)
     {
-        Value = updateValue(Value);
+        Value = updateValue(Value ?? 0);
         return handleValueChange();
     }
 }

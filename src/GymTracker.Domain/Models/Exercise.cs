@@ -13,6 +13,6 @@ public record Exercise
     public MetricType MetricType { get; set; }
     public string[] BodyTarget { get; set; } = Array.Empty<string>();
     public string[] Equipment { get; set; } = Array.Empty<string>();
-    public TimeSpan DefaultRestInterval { get; set; } = TimeSpan.FromMinutes(2);
+    public TimeSpan DefaultRestInterval { get; set; } = DefaultData.DefaultRestInterval;
     public bool IsAcitve { get; set; } = true;
 }
