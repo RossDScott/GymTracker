@@ -1,21 +1,102 @@
 {
-  "TargetBodyParts": [ "Core", "Arms", "Back", "Chest", "Legs", "Shoulders" ],
-  "Equipment": [ "Barbell", "Dumbbel", "Pulley", "Spin Bike", "Treadmill", "Floor" ],
+  "TargetBodyParts": [ "Core", "Arms", "Back", "Chest", "Legs", "Shoulders", "Glutes" ],
+  "Equipment": [ "Barbell", "Dumbbel", "Pulley", "Spin Bike", "Treadmill", "Floor", "Rack" ],
   "Exercises": [
-    {
-      "Name": "Barbell Deadlift",
-      "MetricType": 0,
-      "BodyTarget": [ "Back", "Glutes", "Hamstrings", "Core" ]
-    },
     {
       "Name": "Barbell Bench Press",
       "MetricType": 0,
-      "BodyTarget": [ "Back", "Glutes", "Hamstrings", "Core" ]
+      "BodyTarget": [ "Chest", "Arms", "Shoulders" ],
+      "Equipment": [ "Barbell" ]
+    },
+    {
+      "Name": "Dumbbell Bench Press",
+      "MetricType": 0,
+      "BodyTarget": [ "Chest", "Arms", "Shoulders" ],
+      "Equipment": [ "Dumbbel" ]
+    },
+    {
+      "Name": "Seated Triceps Press",
+      "MetricType": 0,
+      "BodyTarget": [ "Arms" ],
+      "Equipment": [ "Dumbbel" ]
+    },
+    {
+      "Name": "Triceps Pushdown",
+      "MetricType": 0,
+      "BodyTarget": [ "Arms" ],
+      "Equipment": [ "Pulley" ]
     },
     {
       "Name": "Plank",
       "MetricType": 1,
-      "BodyTarget": [ "Core" ]
+      "BodyTarget": [ "Core" ],
+      "Equipment": [ "Floor" ]
+    },
+    {
+      "Name": "Barbell Deadlift",
+      "MetricType": 0,
+      "BodyTarget": [ "Back", "Glutes", "Hamstrings", "Core" ],
+      "Equipment": [ "Barbell" ]
+    },
+    {
+      "Name": "One-Arm Dumbbell Row",
+      "MetricType": 0,
+      "BodyTarget": [ "Back", "Arms" ],
+      "Equipment": [ "Dumbbel" ]
+    },
+    {
+      "Name": "Lat Pulldown (Narrow-Grip)",
+      "MetricType": 0,
+      "BodyTarget": [ "Back", "Arms", "Shoulders" ],
+      "Equipment": [ "Pulley" ]
+    },
+    {
+      "Name": "Lat Pulldown (Wide-Grip)",
+      "MetricType": 0,
+      "BodyTarget": [ "Back", "Arms", "Shoulders" ],
+      "Equipment": [ "Pulley" ]
+    },
+    {
+      "Name": "Barbell Curl",
+      "MetricType": 0,
+      "BodyTarget": [ "Arms" ],
+      "Equipment": [ "Barbell" ]
+    },
+    {
+      "Name": "Seated Row (Narrow-Grip)",
+      "MetricType": 0,
+      "BodyTarget": [ "Back", "Arms", "Shoulders" ],
+      "Equipment": [ "Pulley" ]
+    },
+    {
+      "Name": "Seated Row (Wide-Grip)",
+      "MetricType": 0,
+      "BodyTarget": [ "Back", "Arms", "Shoulders" ],
+      "Equipment": [ "Pulley" ]
+    },
+    {
+      "Name": "Barbell Squat",
+      "MetricType": 0,
+      "BodyTarget": [ "Legs", "Core" ],
+      "Equipment": [ "Barbell" ]
+    },
+    {
+      "Name": "RDL",
+      "MetricType": 0,
+      "BodyTarget": [ "Back", "Glutes", "Legs" ],
+      "Equipment": [ "Barbell" ]
+    },
+    {
+      "Name": "Hip thrusts",
+      "MetricType": 0,
+      "BodyTarget": [ "Glutes", "Legs" ],
+      "Equipment": [ "Barbell" ]
+    },
+    {
+      "Name": "Pullup",
+      "MetricType": 0,
+      "BodyTarget": [ "Back", "Arms", "Shoulders", "Core" ],
+      "Equipment": [ "Rack" ]
     }
   ]
 }

@@ -1,6 +1,6 @@
 ﻿using Fluxor;
 using GymTracker.Domain;
-using GymTracker.LocalStorage.Core;
+using GymTracker.LocalStorage;
 using MudBlazor;
 using Models = GymTracker.Domain.Models;
 
@@ -8,13 +8,13 @@ namespace GymTracker.BlazorClient.Features.AppSettings.Store;
 
 public class AppSettingsEffects
 {
-    private readonly IClientStorage _clientStorage;
+    private readonly ClientStorageContext _clientStorage;
     private readonly IServiceProvider _serviceProvider;
     private readonly IBackupOrchestrator _backupOrchestrator;
     private readonly ISnackbar _snackbar;
 
     public AppSettingsEffects(
-        IClientStorage clientStorage,
+        ClientStorageContext clientStorage,
         IServiceProvider serviceProvider,
         IBackupOrchestrator backupOrchestrator,
         ISnackbar snackbar)
@@ -54,6 +54,12 @@ public class AppSettingsEffects
     {
         await _backupOrchestrator.Restore();
         _snackbar.Add("Restore backup complete", Severity.Success);
+    }
+
+    [EffectMethod]
+    public async Task OnDeleteAll(DeleteAllAction action, IDispatcher dispatcher)
+    {
+        await _clientStorage.DeleteAll();
     }
 
     [EffectMethod]

@@ -69,7 +69,7 @@
                                    Variant="Variant.Text"
                                    @bind-Value="_model.TargetWeightIncrement"
                                    @bind-Value:after="HandleChange">
-                            @foreach(var increment in UpDownState.AvailableIncrements)
+                            @foreach (var increment in ProgressIncrements)
                             {
                                 <MudSelectItem Value="@increment" />
                             }
@@ -91,6 +91,8 @@
 @code {
     MudForm _form = default!;
     PlannedExerciseEditDTO _model = new();
+
+    decimal[] ProgressIncrements => new decimal[] { 0.25m, 0.5m, 1m, 2m, 3m, 4m, 5m, 10m };
 
     [Parameter, EditorRequired]
     public Guid WorkoutPlanId { get; set; }

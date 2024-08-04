@@ -9,7 +9,7 @@ public record ExerciseDetailState
 {
     public Guid WorkoutExerciseId { get; set; }
     public MetricType MetricType { get; init; }
-    public decimal WeightIncrement { get; set; }
+    public decimal WeightIncrement { get; set; } = 1;
     public Guid? SelectedSetId { get; init; }
 
     public ImmutableList<Set> Sets { get; init; } = ImmutableList<Set>.Empty;

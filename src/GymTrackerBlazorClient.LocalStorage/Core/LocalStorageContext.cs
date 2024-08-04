@@ -28,4 +28,7 @@ public abstract class LocalStorageContext
         _triggers.Add(trigger);
         trigger.Subscribe();
     }
+
+    public ValueTask DeleteAll() => _localStorage.ClearAsync();
+
 }

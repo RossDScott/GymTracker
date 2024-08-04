@@ -27,6 +27,9 @@
             <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="HandleRestoreAll">
                 Restore All
             </MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="HandleDeleteAll">
+                Delete All
+            </MudButton>
         </MudCardActions>
     </MudCard>
 
@@ -72,6 +75,7 @@
 
     void HandleBackupAll() => Dispatcher.Dispatch(new BackupAllAction());
     void HandleRestoreAll() => Dispatcher.Dispatch(new RestoreAllAction());
+    void HandleDeleteAll() => Dispatcher.Dispatch(new DeleteAllAction());
 
     void HandleTargetBodyPartsChange(ImmutableArray<string> targetBodyParts) =>
         Dispatcher.Dispatch(new UpdateTargetBodyAction(targetBodyParts));

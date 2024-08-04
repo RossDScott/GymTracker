@@ -5,7 +5,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-		<Version>1.0.3.0</Version>
+		<Version>1.1.0.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -41,6 +41,12 @@
 	<ItemGroup>
 	  <None Include="Features\Workout\Perform\Components\SideBar\Timers\CountdownTimer\Components\CountdownTimer.razor" />
 	  <None Include="Features\Workout\Perform\Components\SideBar\Timers\Stopwatch\Components\Stopwatch.razor" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Content Update="wwwroot\defaultdata.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 </Project>

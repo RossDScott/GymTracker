@@ -8,6 +8,7 @@ public record SetSettingsAction(Models.AppSettings Settings);
 
 public record BackupAllAction();
 public record RestoreAllAction();
+public record DeleteAllAction();
 public record UpdateAzureBlobBackupContainerSASURIAction(string URI);
 
 public record UpdateTargetBodyAction(ImmutableArray<string> TargetBodyParts);
