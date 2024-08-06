@@ -7,8 +7,29 @@
 @inject IDispatcher Dispatcher
 @inject IState<EndWorkoutState> State
 
+<MudGrid>
+    <MudItem xs="3">
+        <MudDatePicker Label="Start Date" @bind-Date="State.Value.WorkoutStartDate" />
+    </MudItem>
+    <MudItem xs="3">
+        <MudTimePicker Label="Start Time" @bind-Time="State.Value.WorkoutStartTime" />
+    </MudItem>
+</MudGrid>
+<MudGrid>
+    <MudItem xs="3">
+        <MudDatePicker Label="End Date" @bind-Date="State.Value.WorkoutEndDate" />
+    </MudItem>
+    <MudItem xs="3">
+        <MudTimePicker Label="End Time" @bind-Time="State.Value.WorkoutEndTime" />
+    </MudItem>
+</MudGrid>
+
 <div>
-    <MudText Typo="Typo.subtitle1">Duration: @State.Value.Duration.ToString(@"hh\:mm\:ss")</MudText>
+    
+    
+</div>
+<div>
+    <MudText Typo="Typo.subtitle1">Duration: @State.Value.Duration.ToString(@"hh\:mm")</MudText>
 </div>
 <div>
     <MudText Typo="Typo.subtitle1">Total Volume: @State.Value.TotalVolumeMessage</MudText>

@@ -8,8 +8,14 @@ namespace GymTracker.BlazorClient.Features.Workout.End.Store;
 [FeatureState]
 public record EndWorkoutState
 {
-    public required DateTimeOffset WorkoutEnd { get; init; }
-    public required TimeSpan Duration { get; init; }
+    public required DateTime? WorkoutStartDate { get; set; }
+    public required TimeSpan? WorkoutStartTime { get; set; }
+    public required DateTime? WorkoutEndDate { get; set; }
+    public required TimeSpan? WorkoutEndTime { get; set; }
+
+    public TimeSpan Duration =>
+        WorkoutEndDate!.Value.Date.Add(WorkoutEndTime!.Value) -
+        WorkoutStartDate!.Value.Date.Add(WorkoutStartTime!.Value);
     public required string TotalVolumeMessage { get; init; }
     public required ImmutableArray<ExerciseDetail> ExerciseList { get; init; }
     public WorkoutPlanStatistics? PreviousStatistics { get; init; } = null;

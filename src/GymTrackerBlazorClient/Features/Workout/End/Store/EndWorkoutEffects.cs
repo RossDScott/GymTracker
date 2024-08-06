@@ -58,7 +58,9 @@ public class EndWorkoutEffects
         var state = _state.Value;
         var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(workout.Plan.Id);
 
-        workout.WorkoutEnd = _state.Value.WorkoutEnd;
+        workout.WorkoutStart = state.WorkoutStartDate!.Value.Add(state.WorkoutStartTime!.Value);
+        workout.WorkoutEnd = state.WorkoutEndDate!.Value.Add(state.WorkoutEndTime!.Value);
+
         foreach (var exercise in state.ExerciseList)
         {
             var workoutPlanExercise = workoutPlan.PlannedExercises.SingleOrDefault(x => x.Id == exercise.PlannedWorkoutExerciseId);
