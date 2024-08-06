@@ -42,11 +42,14 @@ public class BackupOrchestrator : IBackupOrchestrator
         {
             foreach (var keyItem in _keyItemsToBackup)
             {
-                var json = await _dataBackupClient.DownloadBackupItem(keyItem.KeyName);
-                if (string.IsNullOrWhiteSpace(json))
-                    continue;
+                if (await _dataBackupClient.BackupExistsAsync(keyItem.KeyName))
+                {
+                    var json = await _dataBackupClient.DownloadBackupItem(keyItem.KeyName);
+                    if (string.IsNullOrWhiteSpace(json))
+                        continue;
 
-                await keyItem.SetDataFromJson(json);
+                    await keyItem.SetDataFromJson(json);
+                }
             }
         }
         catch (Exception)

@@ -43,4 +43,13 @@ public class BlobBackupClient : IDataBackupClient
         string blobData = downloadResult.Content.ToString();
         return blobData;
     }
+
+    public async Task<bool> BackupExistsAsync(string key)
+    {
+        var containerClient = await BuildContainerClient();
+        ArgumentNullException.ThrowIfNull(containerClient);
+
+        var blob = containerClient.GetBlobClient(key);
+        return await blob.ExistsAsync();
+    }
 }
