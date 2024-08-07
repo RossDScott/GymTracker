@@ -72,6 +72,17 @@ public class EndWorkoutEffects
             foreach (var set in sets)
             {
                 set.TargetMetrics = acceptedProgress.Metrics;
+
+            }
+
+            var workoutExercise = workout.Exercises.Single(x => x.Id == exercise.WorkoutExerciseId);
+            foreach (var set in workoutExercise.Sets)
+            {
+                if (set.CompletedOn > workout.WorkoutEnd)
+                    set.CompletedOn = workout.WorkoutEnd;
+
+                if (set.CompletedOn < workout.WorkoutStart)
+                    set.CompletedOn = workout.WorkoutStart;
             }
         }
 
