@@ -7,15 +7,18 @@ public static class AppSettingsReducer
 {
     [ReducerMethod]
     public static AppSettingsState OnSetSettings(AppSettingsState state, SetSettingsAction action) =>
-        state with 
-        { 
+        state with
+        {
             AzureBlobBackupContainerSASURI = action.Settings.AzureBlobBackupContainerSASURI,
             TargetBodyParts = action.Settings.TargetBodyParts.OrderBy(x => x).ToImmutableArray(),
             Equipment = action.Settings.Equipment.OrderBy(x => x).ToImmutableArray(),
             SetType = action.Settings.SetType
         };
 
-
+    [ReducerMethod]
+    public static AppSettingsState OnUpdateAzureBlobBackupContainerSASURI(
+        AppSettingsState state, UpdateAzureBlobBackupContainerSASURIAction action) =>
+        state with { AzureBlobBackupContainerSASURI = action.URI };
 
     //[ReducerMethod]
     //public static AppSettingsState OnUpdateSettings(AppSettingsState state, UpdateSettingsAction action) =>

@@ -36,9 +36,9 @@ public class AppSettingsEffects
     public async Task OnSetAzureBlobBackupContainerSASURI
         (UpdateAzureBlobBackupContainerSASURIAction action, IDispatcher dispatcher)
     {
-        var current = await GetSettings();
-        var updated = current with { AzureBlobBackupContainerSASURI = action.URI };
-        await _clientStorage.AppSettings.SetAsync(updated);
+        await UpdateSettings(settings =>
+            settings with { AzureBlobBackupContainerSASURI = action.URI }, dispatcher);
+
         _snackbar.Add("Backup SAS URI Updated", Severity.Success);
     }
 
