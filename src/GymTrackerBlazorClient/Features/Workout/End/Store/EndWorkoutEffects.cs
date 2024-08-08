@@ -51,6 +51,13 @@ public class EndWorkoutEffects
     }
 
     [EffectMethod]
+    public async Task OnAbandonWorkout(AbandonWorkoutAction action, IDispatcher dispatcher)
+    {
+        await _clientStorage.CurrentWorkout.DeleteAsync();
+        _navigationManager.NavigateTo("/");
+    }
+
+    [EffectMethod]
     public async Task OnConfirmEndWorkout(ConfirmEndWorkoutAction action, IDispatcher dispatcher)
     {
         var workout = await _clientStorage.CurrentWorkout.GetAsync();
@@ -90,6 +97,6 @@ public class EndWorkoutEffects
         await _clientStorage.Workouts.UpsertAsync(workout);
         await _clientStorage.CurrentWorkout.DeleteAsync();
 
-        _navigationManager.NavigateTo($"/");
+        _navigationManager.NavigateTo("/");
     }
 }

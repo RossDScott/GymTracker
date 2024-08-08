@@ -9,48 +9,55 @@
 @inject IDispatcher Dispatcher
 @inject IClientStorage ClientStorage
 
-<MudContainer Class="pa-3 ma-0">
-    @if (_hasExistingWorkout)
-    {
-        <MudButton Class="mr-2" Variant="Variant.Outlined"
-                   Color="Color.Default"
-                   Style="height: 200px; width: 200px"
-                   OnClick="HandleContinueWorkout">
-            Continue Workout
-        </MudButton>
-    }
+<div class="d-flex flex-row fullWidth fullHeight">
+    <div class="pa-3 d-flex flex-column" style="width: 70%; height: 30%;">
+        <div class="pa-3 d-flex flex-row flex-wrap gap-4 fullWidth">
+            @if (_hasExistingWorkout)
+            {
+                <MudButton Class="homeButton" Variant="Variant.Outlined"
+                           Color="Color.Default"
+                           OnClick="HandleContinueWorkout">
+                    Continue Workout
+                </MudButton>
+            }
 
-    <MudButton Variant="Variant.Outlined"
-               Color="Color.Default"
-               Style="height: 200px; width: 200px"
-               OnClick="HandleStartWorkout">
-        New Workout
-    </MudButton>
+            <MudButton Class="homeButton" Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       OnClick="HandleStartWorkout">
+                New Workout
+            </MudButton>
 
-    <MudButton Class="ml-2"
-               Variant="Variant.Outlined"
-               Color="Color.Default"
-               Style="height: 200px; width: 200px"
-               OnClick="HandleManageExercises">
-        Manage Exercises
-    </MudButton>
+            <MudButton Class="homeButton"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       OnClick="HandleManageExercises">
+                Manage Exercises
+            </MudButton>
 
-    <MudButton Class="ml-2"
-               Variant="Variant.Outlined"
-               Color="Color.Default"
-               Style="height: 200px; width: 200px"
-               OnClick="HandleManageWorkoutPlans">
-        Workout Plans
-    </MudButton>
+            <MudButton Class="homeButton"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       OnClick="HandleManageWorkoutPlans">
+                Workout Plans
+            </MudButton>
 
-    <MudButton Class="ml-2"
-               Variant="Variant.Outlined"
-               Color="Color.Default"
-               Style="height: 200px; width: 200px"
-               OnClick="HandleManageSettings">
-        Settings
-    </MudButton>
-</MudContainer>
+            <MudButton Class="homeButton"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       OnClick="HandleManageSettings">
+                Settings
+            </MudButton>
+        </div>
+        <div class="pa-3">
+            Charts here
+        </div>
+    </div>
+    <div class="pa-3">
+        History
+    </div>
+
+</div>
+
 
 @code {
     bool _hasExistingWorkout = false;

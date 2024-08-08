@@ -6,81 +6,87 @@
 
 @inject IDispatcher Dispatcher
 @inject IState<EndWorkoutState> State
-
-<MudGrid>
-    <MudItem xs="3">
-        <MudDatePicker Label="Start Date" @bind-Date="State.Value.WorkoutStartDate" />
-    </MudItem>
-    <MudItem xs="3">
-        <MudTimePicker Label="Start Time" @bind-Time="State.Value.WorkoutStartTime" />
-    </MudItem>
-</MudGrid>
-<MudGrid>
-    <MudItem xs="3">
-        <MudDatePicker Label="End Date" @bind-Date="State.Value.WorkoutEndDate" />
-    </MudItem>
-    <MudItem xs="3">
-        <MudTimePicker Label="End Time" @bind-Time="State.Value.WorkoutEndTime" />
-    </MudItem>
-</MudGrid>
-
-<div>
-    
-    
-</div>
-<div>
-    <MudText Typo="Typo.subtitle1">Duration: @State.Value.Duration.ToString(@"hh\:mm")</MudText>
-</div>
-<div>
-    <MudText Typo="Typo.subtitle1">Total Volume: @State.Value.TotalVolumeMessage</MudText>
-    @if(State.Value.PreviousStatistics != null)
-    {
-        <MudText Typo="Typo.subtitle1">Previous Total Volume: @State.Value.PreviousStatistics.PreviousWorkout.TotalWeightVolumeWithMeasure</MudText>
-    }
-</div>
+@inject IDialogService DialogService
 
 <div class="ma-3">
     <MudGrid>
-        <MudItem xs="5"></MudItem>
-        <MudItem xs="6"><MudText Typo="Typo.h6">Next Workout Plan</MudText></MudItem></MudGrid>
-    <MudGrid>
-        <MudItem Class="name" xs="3"><MudText Typo="Typo.h6">Exercise</MudText></MudItem>
-        <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6" Align="Align.Left">Completed</MudText></MudItem>
-        <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Target</MudText></MudItem>
-        <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Max</MudText></MudItem>
-        <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Progression</MudText></MudItem>
+        <MudItem xs="3">
+            <MudDatePicker Label="Start Date" @bind-Date="State.Value.WorkoutStartDate" />
+        </MudItem>
+        <MudItem xs="3">
+            <MudTimePicker Label="Start Time" @bind-Time="State.Value.WorkoutStartTime" />
+        </MudItem>
     </MudGrid>
-    @foreach (var exercise in State.Value.ExerciseList)
-    {
-        <MudGrid>
-            <MudItem Class="name" xs="3">@exercise.ExerciseName</MudItem>
-            <MudItem Class="ma-2" xs="2">
-                @foreach (var set in exercise.CompletedSets)
-                {
-                    <MudText Typo="Typo.body2" Align="Align.Left">
-                        @set.GetMeasureText(exercise.MetricType)
-                    </MudText>
-                }
-            </MudItem>
-            @GetItem(exercise, ProgressType.Previous)
-            @GetItem(exercise, ProgressType.MaxSet)
-            @GetItem(exercise, ProgressType.AutoProgress)
-        </MudGrid>
-    }
-</div>
+    <MudGrid>
+        <MudItem xs="3">
+            <MudDatePicker Label="End Date" @bind-Date="State.Value.WorkoutEndDate" />
+        </MudItem>
+        <MudItem xs="3">
+            <MudTimePicker Label="End Time" @bind-Time="State.Value.WorkoutEndTime" />
+        </MudItem>
+    </MudGrid>
 
-<div>
-    <MudButton 
-        Variant="Variant.Filled"
-        OnClick="() => Dispatcher.Dispatch(new CancelEndWorkoutAction())">
-        Cancel
-    </MudButton>
-    <MudButton 
-        Variant="Variant.Filled" 
-        Color="Color.Primary"
-        OnClick="() => Dispatcher.Dispatch(new ConfirmEndWorkoutAction())">
-        Confirm End
-    </MudButton>
+    <div>
+        <MudText Typo="Typo.subtitle1">Duration: @State.Value.Duration.ToString(@"hh\:mm")</MudText>
+    </div>
+    <div>
+        <MudText Typo="Typo.subtitle1">Total Volume: @State.Value.TotalVolumeMessage</MudText>
+        @if(State.Value.PreviousStatistics != null)
+        {
+            <MudText Typo="Typo.subtitle1">Previous Total Volume: @State.Value.PreviousStatistics.PreviousWorkout.TotalWeightVolumeWithMeasure</MudText>
+        }
+    </div>
+
+    <div class="mt-3">
+        <MudGrid>
+            <MudItem xs="5"></MudItem>
+            <MudItem xs="6"><MudText Typo="Typo.h6">Next Workout Plan</MudText></MudItem></MudGrid>
+        <MudGrid>
+            <MudItem Class="name" xs="3"><MudText Typo="Typo.h6">Exercise</MudText></MudItem>
+            <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6" Align="Align.Left">Completed</MudText></MudItem>
+            <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Target</MudText></MudItem>
+            <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Max</MudText></MudItem>
+            <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Progression</MudText></MudItem>
+        </MudGrid>
+        @foreach (var exercise in State.Value.ExerciseList)
+        {
+            <MudGrid>
+                <MudItem Class="name" xs="3">@exercise.ExerciseName</MudItem>
+                <MudItem Class="ma-2" xs="2">
+                    @foreach (var set in exercise.CompletedSets)
+                    {
+                        <MudText Typo="Typo.body2" Align="Align.Left">
+                            @set.GetMeasureText(exercise.MetricType)
+                        </MudText>
+                    }
+                </MudItem>
+                @GetItem(exercise, ProgressType.Previous)
+                @GetItem(exercise, ProgressType.MaxSet)
+                @GetItem(exercise, ProgressType.AutoProgress)
+            </MudGrid>
+        }
+    </div>
+
+    <div class="mt-3">
+        <MudButton 
+            Variant="Variant.Filled"
+            OnClick="() => Dispatcher.Dispatch(new CancelEndWorkoutAction())">
+            Back to workout
+        </MudButton>
+        <MudButton 
+            Variant="Variant.Filled"
+            OnClick="OpenConfirmAbandon"
+            Class="ml-2">
+            Abandon workout
+        </MudButton>
+        <MudButton 
+            Variant="Variant.Filled" 
+            Color="Color.Primary"
+            OnClick="() => Dispatcher.Dispatch(new ConfirmEndWorkoutAction())"
+            Class="ml-2">
+            Confirm End
+        </MudButton>
+    </div>
 </div>
 
 <style>
@@ -125,5 +131,16 @@
     void OnItemClick(ExerciseDetail exerciseDetail, ProgressType progressType)
     {
         Dispatcher.Dispatch(new SetSelectedProgressAction(exerciseDetail.WorkoutExerciseId, progressType));
+    }
+
+    private async Task OpenConfirmAbandon()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<ConfirmAbandonWorkout>("Simple Dialog", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+            Dispatcher.Dispatch(new AbandonWorkoutAction());
     }
 }

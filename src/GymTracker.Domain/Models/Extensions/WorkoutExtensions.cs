@@ -1,4 +1,5 @@
 ﻿using GymTracker.Domain.Models.Statistics;
+using System.Collections.Immutable;
 
 namespace GymTracker.Domain.Models.Extensions;
 public static class WorkoutExtensions
@@ -8,8 +9,17 @@ public static class WorkoutExtensions
         {
             WorkoutId = workout.Id,
             CompletedOn = workout.WorkoutEnd!.Value,
+            TotalTime = workout.WorkoutEnd.Value - workout.WorkoutStart,
             TotalWeightVolume = workout.GetWeightTotalVolume(),
-            TotalWeightVolumeWithMeasure = workout.GetWeightTotalVolumeWithMeasure()
+            TotalWeightVolumeWithMeasure = workout.GetWeightTotalVolumeWithMeasure(),
+            Exercises = workout.Exercises
+                               .Select(x => new WorkoutExerciseStatistics
+                               {
+                                   ExerciseName = x.Exercise.Name,
+                                   MaxSet = x.Sets.Select(s => s.Metrics)
+                                                  .GetMaxSet(x.Exercise.MetricType)
+                               }).ToImmutableArray()
+
         };
 
     public static decimal GetWeightTotalVolume(this Workout workout)

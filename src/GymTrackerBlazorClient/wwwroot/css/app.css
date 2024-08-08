@@ -10,6 +10,11 @@
     text-align: center;
 }
 
+.homeButton{
+    width: 130px;
+    height: 130px;
+}
+
 .numericInput input{
     text-align: right;
     width: 2.5em!important;
