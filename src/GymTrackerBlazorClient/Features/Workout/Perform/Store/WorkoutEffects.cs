@@ -26,7 +26,6 @@ public class WorkoutEffects
         await _clientStorage.CurrentWorkout.SetAsync(workout);
 
         dispatcher.Dispatch(new SetWorkoutAction(workout));
-
         _navigationManager.NavigateTo($"/workout/perform");
     }
 

@@ -1,0 +1,52 @@
+﻿@using GymTracker.BlazorClient.Features.Home.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Store
+
+@inherits FluxorComponent
+
+@inject NavigationManager NavigationManager
+@inject IState<HomeState> State
+@inject IDispatcher Dispatcher
+
+@if (State.Value.HasExistingWorkout)
+{
+    <MudButton Class="homeButton" Variant="Variant.Outlined"
+               Color="Color.Default"
+               OnClick="HandleContinueWorkout">
+        Continue Workout
+    </MudButton>
+}
+
+<MudButton Class="homeButton" Variant="Variant.Outlined"
+           Color="Color.Default"
+           OnClick="HandleStartWorkout">
+    New Workout
+</MudButton>
+
+<MudButton Class="homeButton"
+           Variant="Variant.Outlined"
+           Color="Color.Default"
+           OnClick="HandleManageExercises">
+    Manage Exercises
+</MudButton>
+
+<MudButton Class="homeButton"
+           Variant="Variant.Outlined"
+           Color="Color.Default"
+           OnClick="HandleManageWorkoutPlans">
+    Workout Plans
+</MudButton>
+
+<MudButton Class="homeButton"
+           Variant="Variant.Outlined"
+           Color="Color.Default"
+           OnClick="HandleManageSettings">
+    Settings
+</MudButton>
+
+@code {
+    void HandleManageExercises() => NavigationManager.NavigateTo("exercises");
+    void HandleManageWorkoutPlans() => NavigationManager.NavigateTo("workout-plans");
+    void HandleManageSettings() => NavigationManager.NavigateTo("settings");
+    void HandleStartWorkout() => NavigationManager.NavigateTo("workout/new");
+    void HandleContinueWorkout() => Dispatcher.Dispatch(new ContinueWorkoutAction());
+}

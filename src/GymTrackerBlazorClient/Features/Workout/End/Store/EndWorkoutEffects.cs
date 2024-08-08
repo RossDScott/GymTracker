@@ -12,18 +12,15 @@ public class EndWorkoutEffects
     private readonly IClientStorage _clientStorage;
     private readonly NavigationManager _navigationManager;
     private readonly IState<EndWorkoutState> _state;
-    private readonly IDispatcher _dispatcher;
 
     public EndWorkoutEffects(
         IClientStorage clientStorage,
         NavigationManager navigationManager,
-        IState<EndWorkoutState> state,
-        IDispatcher dispatcher)
+        IState<EndWorkoutState> state)
     {
         _clientStorage = clientStorage;
         _navigationManager = navigationManager;
         _state = state;
-        _dispatcher = dispatcher;
     }
 
     [EffectMethod]
@@ -33,8 +30,8 @@ public class EndWorkoutEffects
         ArgumentNullException.ThrowIfNull(workout, nameof(workout));
         var workoutStatistics = await _clientStorage.WorkoutPlanStatistics.FindOrDefaultByIdAsync(workout.Plan.Id);
 
-        _dispatcher.Dispatch(new SetEndWorkoutAction(workout, workoutStatistics));
-        _dispatcher.Dispatch(new SetBreadcrumbAction(new[]
+        dispatcher.Dispatch(new SetEndWorkoutAction(workout, workoutStatistics));
+        dispatcher.Dispatch(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Workout", "/workout/end", false, Icons.Material.Filled.SportsMartialArts),
             new BreadcrumbItem("End", "/workout/end", false, Icons.Material.Filled.Close)

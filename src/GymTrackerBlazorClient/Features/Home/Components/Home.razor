@@ -2,6 +2,7 @@
 
 @using Fluxor
 @using GymTracker.BlazorClient.Features.AppBar.Store;
+@using GymTracker.BlazorClient.Features.Home.Store
 @using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 @using GymTracker.LocalStorage.Core;
 
@@ -12,72 +13,23 @@
 <div class="d-flex flex-row fullWidth fullHeight">
     <div class="pa-3 d-flex flex-column" style="width: 70%; height: 30%;">
         <div class="pa-3 d-flex flex-row flex-wrap gap-4 fullWidth">
-            @if (_hasExistingWorkout)
-            {
-                <MudButton Class="homeButton" Variant="Variant.Outlined"
-                           Color="Color.Default"
-                           OnClick="HandleContinueWorkout">
-                    Continue Workout
-                </MudButton>
-            }
-
-            <MudButton Class="homeButton" Variant="Variant.Outlined"
-                       Color="Color.Default"
-                       OnClick="HandleStartWorkout">
-                New Workout
-            </MudButton>
-
-            <MudButton Class="homeButton"
-                       Variant="Variant.Outlined"
-                       Color="Color.Default"
-                       OnClick="HandleManageExercises">
-                Manage Exercises
-            </MudButton>
-
-            <MudButton Class="homeButton"
-                       Variant="Variant.Outlined"
-                       Color="Color.Default"
-                       OnClick="HandleManageWorkoutPlans">
-                Workout Plans
-            </MudButton>
-
-            <MudButton Class="homeButton"
-                       Variant="Variant.Outlined"
-                       Color="Color.Default"
-                       OnClick="HandleManageSettings">
-                Settings
-            </MudButton>
+            <Buttons></Buttons>
         </div>
         <div class="pa-3">
             Charts here
         </div>
     </div>
     <div class="pa-3">
-        History
+        <WorkoutHistory></WorkoutHistory>
     </div>
-
 </div>
 
-
 @code {
-    bool _hasExistingWorkout = false;
-
     protected override void OnInitialized()
     {
         Dispatcher.Dispatch(new ResetBreadcrumbsToHomeAction());
+        Dispatcher.Dispatch(new InitaliseHomeAction());
 
-        //NavigationManager.NavigateTo("workout/perform");
         base.OnInitialized();
     }
-
-    protected override async Task OnInitializedAsync()
-    {
-        _hasExistingWorkout = await ClientStorage.CurrentWorkout.GetAsync() is not null;
-    }
-
-    void HandleManageExercises() => NavigationManager.NavigateTo("exercises");
-    void HandleManageWorkoutPlans() => NavigationManager.NavigateTo("workout-plans");
-    void HandleManageSettings() => NavigationManager.NavigateTo("settings");
-    void HandleStartWorkout() => NavigationManager.NavigateTo("workout/new");
-    void HandleContinueWorkout() => Dispatcher.Dispatch(new ContinueWorkoutAction());
 }
