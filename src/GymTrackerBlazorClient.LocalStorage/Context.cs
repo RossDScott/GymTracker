@@ -15,7 +15,7 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
 
     public IKeyListItem<ExerciseStatistic> ExerciseStatistics { get; init; } = default!;
     public IKeyListItem<WorkoutPlanStatistics> WorkoutPlanStatistics { get; init; } = default!;
-
+    public IKeyListItem<WorkoutStatistics> WorkoutStatistics { get; init; } = default!;
 
     public ClientStorageContext()
     {

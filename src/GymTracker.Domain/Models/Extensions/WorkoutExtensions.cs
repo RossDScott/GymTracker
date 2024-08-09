@@ -8,6 +8,8 @@ public static class WorkoutExtensions
         => new WorkoutStatistics
         {
             WorkoutId = workout.Id,
+            WorkoutPlanId = workout.Plan.Id,
+            WorkoutPlanName = workout.Plan.Name,
             CompletedOn = workout.WorkoutEnd!.Value,
             TotalTime = workout.WorkoutEnd.Value - workout.WorkoutStart,
             TotalWeightVolume = workout.GetWeightTotalVolume(),
@@ -16,6 +18,7 @@ public static class WorkoutExtensions
                                .Select(x => new WorkoutExerciseStatistics
                                {
                                    ExerciseName = x.Exercise.Name,
+                                   MetricType = x.Exercise.MetricType,
                                    MaxSet = x.Sets.Select(s => s.Metrics)
                                                   .GetMaxSet(x.Exercise.MetricType)
                                }).ToImmutableArray()

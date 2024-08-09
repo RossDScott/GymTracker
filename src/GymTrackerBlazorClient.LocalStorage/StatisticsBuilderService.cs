@@ -20,7 +20,7 @@ public class StatisticsBuilderService : ITrigger
         _localStorageContex.Workouts.SubscribeToChanges(WorkoutsChanged);
     }
 
-    public void WorkoutsChanged(ICollection<Workout> workouts)
+    public async Task WorkoutsChanged(ICollection<Workout> workouts)
     {
         var completedWorkouts = workouts
                                 .Where(x => x.WorkoutEnd != null)
@@ -54,7 +54,7 @@ public class StatisticsBuilderService : ITrigger
                 .ToList()
             }).ToList();
 
-        _localStorageContex.ExerciseStatistics.SetAsync(exerciseStatistics);
+        await _localStorageContex.ExerciseStatistics.SetAsync(exerciseStatistics);
 
         var sixMonthsAgo = DateTimeOffset.Now.AddMonths(-6);
         var workoutPlanStatistics = completedWorkouts
@@ -69,10 +69,14 @@ public class StatisticsBuilderService : ITrigger
                         .Where(x => x.WorkoutEnd > sixMonthsAgo)
                         .Select(x => x.GetWeightTotalVolume())
                         .DefaultIfEmpty()
-                        .Max(),
-                History = plan.Select(x => x.ToWorkoutStatistics()).ToList(),
+                        .Max()
             })
             .ToList();
-        _localStorageContex.WorkoutPlanStatistics.SetAsync(workoutPlanStatistics);
+        await _localStorageContex.WorkoutPlanStatistics.SetAsync(workoutPlanStatistics);
+
+        var workoutStatistics = completedWorkouts
+                                    .Select(x => x.ToWorkoutStatistics())
+                                    .ToList();
+        await _localStorageContex.WorkoutStatistics.SetAsync(workoutStatistics);
     }
 }

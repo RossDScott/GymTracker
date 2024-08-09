@@ -65,12 +65,12 @@ public class KeyItem<T> : IKeyItem<T>
         _cacheData = default;
     }
 
-    public void SubscribeToChanges(Action<T> callback)
+    public void SubscribeToChanges(Func<T, Task> callback)
     {
-        LocalStorage.Changed += (_, args) =>
+        LocalStorage.Changed += async (_, args) =>
         {
             if (args.Key == Config.Key)
-                callback((T)args.NewValue);
+                await callback((T)args.NewValue);
         };
     }
 

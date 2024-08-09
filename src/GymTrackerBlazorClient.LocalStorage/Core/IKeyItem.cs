@@ -17,7 +17,7 @@ public interface IKeyItem<T> : IKeyItem
     ValueTask<T> GetOrDefaultAsync(Func<T> defaultConstructor);
     ValueTask<T> GetOrDefaultAsync();
     ValueTask SetAsync(T item);
-    void SubscribeToChanges(Action<T> callback);
+    void SubscribeToChanges(Func<T, Task> callback);
 
     void Configure(Action<KeyConfig<T>> configureSettings);
 }

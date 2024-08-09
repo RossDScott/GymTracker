@@ -12,4 +12,5 @@ public interface IClientStorage
 
     IKeyListItem<ExerciseStatistic> ExerciseStatistics { get; init; }
     IKeyListItem<WorkoutPlanStatistics> WorkoutPlanStatistics { get; init; }
+    IKeyListItem<WorkoutStatistics> WorkoutStatistics { get; init; }
 }

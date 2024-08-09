@@ -4,14 +4,11 @@
 @using GymTracker.BlazorClient.Features.AppBar.Store;
 @using GymTracker.BlazorClient.Features.Home.Store
 @using GymTracker.BlazorClient.Features.Workout.Perform.Store;
-@using GymTracker.LocalStorage.Core;
 
-@inject NavigationManager NavigationManager
 @inject IDispatcher Dispatcher
-@inject IClientStorage ClientStorage
 
 <div class="d-flex flex-row fullWidth fullHeight">
-    <div class="pa-3 d-flex flex-column" style="width: 70%; height: 30%;">
+    <div class="pa-3 d-flex flex-column fullHeight" style="width: 70%; height: 30%;">
         <div class="pa-3 d-flex flex-row flex-wrap gap-4 fullWidth">
             <Buttons></Buttons>
         </div>
@@ -19,7 +16,7 @@
             Charts here
         </div>
     </div>
-    <div class="pa-3">
+    <div class="pa-3 fullHeight" style="width: 30%">
         <WorkoutHistory></WorkoutHistory>
     </div>
 </div>
