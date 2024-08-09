@@ -7,7 +7,7 @@
 @inject IState<HistoryState> State
 
 <div class="fullHeight">
-    <div>
+     <div>
         <MudText Typo="Typo.h6" Class="px-1">History - 3 Months</MudText>
         <MudDivider Class="mb-1" />
 
@@ -25,8 +25,10 @@
 
         <MudDivider Class="my-3" />
     </div>
-
-    <div class="" style="overflow-y: auto; height: 550px">
+    <div class="" style="overflow-y: auto; height: 430px;">
+        @for(var i = 0; i < 20; i++)
+        {
+          
         @foreach (var workout in State.Value.History)
         {
             <div class="px-2 d-flex justify-space-between">
@@ -48,7 +50,8 @@
             </div>
             <MudDivider DividerType="DividerType.Middle" Class="my-1" />
         }
-    </div>
+        }
+    </div> 
 </div>
 
 
