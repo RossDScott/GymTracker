@@ -3,7 +3,6 @@
 @inject IDispatcher Dispatcher
 
 <div class="d-flex flex-column buttons">
-    @Value
     @foreach (var increment in UpDownState.AvailableIncrements)
     {
         @incrementOption(increment)

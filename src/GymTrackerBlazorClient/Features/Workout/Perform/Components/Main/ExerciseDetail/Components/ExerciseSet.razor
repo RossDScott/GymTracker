@@ -13,14 +13,16 @@
         <MudItem xs="1" class="text-center pt-2 py-0 d-flex align-content-center flex-wrap">
             <MudIconButton Icon="@completedCircleIcon" Class="ma-0 pa-0" OnClick="handleToggleCompleted" />
         </MudItem>
+        <MudItem xs="1" class="text-center pt-2 py-0 d-flex align-content-center flex-wrap">
+                <MudIconButton Icon="@Icons.Material.Outlined.Delete" Class="ma-0 pa-0" OnClick="handleDeleteSet" />
+        </MudItem>
 
-
-            <MudItem xs="1" Class="pa-0 absolute" Style="right: 35px; top: 2px">
-                @if (IsSelected)
-            {
-                <UpDownIncrement @bind-Value="WeightIncrement" @bind-Value:after="handleWeightIncrementChange"></UpDownIncrement>
-            }
-            </MudItem>
+        <MudItem xs="1" Class="pa-0 absolute" Style="right: 35px; top: 2px">
+        @if (IsSelected)
+        {
+            <UpDownIncrement @bind-Value="WeightIncrement" @bind-Value:after="handleWeightIncrementChange"></UpDownIncrement>
+        }
+        </MudItem>
         
 
     </MudGrid>
@@ -51,5 +53,6 @@
     }
 
     private void handleToggleCompleted() => Dispatcher.Dispatch(new ToggleSetCompletedAction(WorkoutExerciseId, Set.Id, true));
+    private void handleDeleteSet() => Dispatcher.Dispatch(new DeleteSetAction(WorkoutExerciseId, Set.Id));
     private void handleWeightIncrementChange() => Dispatcher.Dispatch(new SetWeightIncrementAction(WorkoutExerciseId, WeightIncrement));
 }

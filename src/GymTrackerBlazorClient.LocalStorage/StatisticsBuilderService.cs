@@ -33,7 +33,7 @@ public class StatisticsBuilderService : ITrigger
             {
                 ExerciseId = ex.Exercise.Id,
                 WorkoutEnd = wo.WorkoutEnd!.Value,
-                Sets = ex.Sets
+                ex.Sets
             }))
             .GroupBy(x => x.ExerciseId)
             .ToList();

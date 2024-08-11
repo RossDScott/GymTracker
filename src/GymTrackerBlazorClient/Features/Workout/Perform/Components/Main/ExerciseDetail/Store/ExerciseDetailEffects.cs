@@ -20,7 +20,7 @@ public class ExerciseDetailEffects
     }
 
     [EffectMethod]
-    public async Task OnSetSelectedExerciseAction(SetSelectedExerciseAction action, IDispatcher dispatcher)
+    public async Task OnSetSelectedExercise(SetSelectedExerciseAction action, IDispatcher dispatcher)
     {
         var workout = await _clientStorage.CurrentWorkout.GetAsync();
         var exercise = workout!.Exercises.Single(x => x.Id == action.ExerciseId);
@@ -29,7 +29,7 @@ public class ExerciseDetailEffects
     }
 
     [EffectMethod]
-    public async Task OnSetSetDataAction(SetSetDataAction action, IDispatcher dispatcher)
+    public async Task OnSetSetData(SetSetDataAction action, IDispatcher dispatcher)
     {
         var workout = await _clientStorage.CurrentWorkout.GetAsync();
         var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
@@ -65,7 +65,7 @@ public class ExerciseDetailEffects
     }
 
     [EffectMethod]
-    public async Task OnToggleSetCompletedAction(ToggleSetCompletedAction action, IDispatcher dispatcher)
+    public async Task OnToggleSetCompleted(ToggleSetCompletedAction action, IDispatcher dispatcher)
     {
         var workout = await _clientStorage.CurrentWorkout.GetAsync();
         var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
@@ -102,6 +102,19 @@ public class ExerciseDetailEffects
             set.Metrics.Time = null;
             set.CompletedOn = null;
         }
+
+        await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+    }
+
+    [EffectMethod]
+    public async Task OnDeleteSet(DeleteSetAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
+        var set = exercise.Sets.Single(x => x.Id == action.SetId);
+
+        exercise.Sets.Remove(set);
 
         await _clientStorage.CurrentWorkout.SetAsync(workout);
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));

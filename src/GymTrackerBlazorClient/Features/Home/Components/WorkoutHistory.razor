@@ -21,7 +21,15 @@
                 {
                     <div class="d-flex justify-space-between">
                         <MudText Typo="Typo.subtitle2">@exercise.ExerciseName</MudText>
-                        <MudText Typo="Typo.subtitle2">@exercise.MaxSet?.GetMeasureText(exercise.MetricType)</MudText>
+                        @if(exercise.AnyCompleted)
+                        {
+                            <MudText Typo="Typo.subtitle2">@exercise.MaxSet?.GetMeasureText(exercise.MetricType)</MudText>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.subtitle2">Not completed</MudText>
+                        }
+
                     </div>
                 }
             </div>

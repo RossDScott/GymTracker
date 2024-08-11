@@ -20,9 +20,10 @@ public static class WorkoutExtensions
                                    ExerciseName = x.Exercise.Name,
                                    MetricType = x.Exercise.MetricType,
                                    MaxSet = x.Sets.Select(s => s.Metrics)
-                                                  .GetMaxSet(x.Exercise.MetricType)
+                                                  .GetMaxSet(x.Exercise.MetricType),
+                                   AllCompleted = x.Sets.All(s => s.Completed),
+                                   AnyCompleted = x.Sets.Any(s => s.Completed)
                                }).ToImmutableArray()
-
         };
 
     public static decimal GetWeightTotalVolume(this Workout workout)
