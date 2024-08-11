@@ -74,7 +74,7 @@ public static class EndWorkoutReducers
         }
 
         var maxSet = workoutExercise.GetMaxSet();
-        if (maxSet != null)
+        if (maxSet != null && workoutExercise.Sets.All(x => x.Completed))
         {
             progressSets.Add(new ProgressSet { ProgressType = ProgressType.MaxSet, Metrics = maxSet, Selected = false });
 
