@@ -13,6 +13,8 @@ public record ExerciseDetailState
     public Guid? SelectedSetId { get; init; }
 
     public ImmutableList<Set> Sets { get; init; } = ImmutableList<Set>.Empty;
+
+    public ImmutableArray<string> SetTypes { get; set; }
 }
 
 public record Set

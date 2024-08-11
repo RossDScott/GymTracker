@@ -26,6 +26,9 @@ public class ExerciseDetailEffects
         var exercise = workout!.Exercises.Single(x => x.Id == action.ExerciseId);
 
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+
+        var settings = await _clientStorage.AppSettings.GetAsync();
+        dispatcher.DispatchWithDelay(new SetSetTypesAction(settings!.SetType));
     }
 
     [EffectMethod]

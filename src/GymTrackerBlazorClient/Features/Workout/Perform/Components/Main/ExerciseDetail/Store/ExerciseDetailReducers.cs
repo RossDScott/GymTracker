@@ -6,6 +6,12 @@ namespace GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.Exerc
 public static class ExerciseDetailReducers
 {
     [ReducerMethod]
+    public static ExerciseDetailState OnSetSetTypesAction(ExerciseDetailState state, SetSetTypesAction action)
+    {
+        return state with { SetTypes = action.SetTypes };
+    }
+
+    [ReducerMethod]
     public static ExerciseDetailState OnSetExerciseDetailAction(ExerciseDetailState state, SetExerciseDetailAction action)
     {
         return state with
