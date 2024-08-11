@@ -65,6 +65,8 @@ public static class EndWorkoutReducers
     {
         var metricType = workoutExercise.Exercise.MetricType;
         var progressSets = new List<ProgressSet>();
+        var completedAll = workoutExercise.Sets.All(x => x.Completed);
+        var completedAny = workoutExercise.Sets.Any(x => x.Completed);
 
         if (workoutExercise.PlannedExercise != null)
         {
@@ -74,26 +76,29 @@ public static class EndWorkoutReducers
         }
 
         var maxSet = workoutExercise.GetMaxSet();
-        if (maxSet != null && workoutExercise.Sets.All(x => x.Completed))
+        if (maxSet != null)
         {
             progressSets.Add(new ProgressSet { ProgressType = ProgressType.MaxSet, Metrics = maxSet, Selected = false });
 
-            if (metricType == MetricType.Weight && workoutExercise.PlannedExercise != null)
+            if (completedAll)
             {
-                ExerciseSetMetrics progressSet;
-                if (maxSet.Reps >= workoutExercise.PlannedExercise.TargetRepsUpper)
+                if (metricType == MetricType.Weight && workoutExercise.PlannedExercise != null)
                 {
-                    progressSet = maxSet with
+                    ExerciseSetMetrics progressSet;
+                    if (maxSet.Reps >= workoutExercise.PlannedExercise.TargetRepsUpper)
                     {
-                        Reps = workoutExercise.PlannedExercise.TargetRepsLower,
-                        Weight = maxSet.Weight + workoutExercise.PlannedExercise.TargetWeightIncrement
-                    };
+                        progressSet = maxSet with
+                        {
+                            Reps = workoutExercise.PlannedExercise.TargetRepsLower,
+                            Weight = maxSet.Weight + workoutExercise.PlannedExercise.TargetWeightIncrement
+                        };
+                    }
+                    else
+                    {
+                        progressSet = maxSet with { Reps = maxSet.Reps + 1 };
+                    }
+                    progressSets.Add(new ProgressSet { ProgressType = ProgressType.AutoProgress, Metrics = progressSet, Selected = true });
                 }
-                else
-                {
-                    progressSet = maxSet with { Reps = maxSet.Reps + 1 };
-                }
-                progressSets.Add(new ProgressSet { ProgressType = ProgressType.AutoProgress, Metrics = progressSet, Selected = true });
             }
         }
 
@@ -104,6 +109,9 @@ public static class EndWorkoutReducers
 
             if (selectedProgress != null && previousProgress != null &&
                 selectedProgress.Metrics.ToStandardMeasure(metricType) < previousProgress.Metrics.ToStandardMeasure(metricType))
+                selectedProgress = previousProgress;
+
+            if (!completedAny)
                 selectedProgress = previousProgress;
 
             selectedProgress ??= previousProgress;
