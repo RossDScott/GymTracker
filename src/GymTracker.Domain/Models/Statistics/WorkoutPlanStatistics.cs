@@ -28,6 +28,6 @@ public record WorkoutExerciseStatistics
     public required string ExerciseName { get; set; }
     public required ExerciseSetMetrics? MaxSet { get; set; }
     public MetricType MetricType { get; set; }
-    public bool AllCompleted { get; set; } = false;
-    public bool AnyCompleted { get; set; } = false;
+    public required bool AllCompleted { get; set; }
+    public required bool AnyCompleted { get; set; }
 }
