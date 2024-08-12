@@ -1,9 +1,9 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
 
-<MudItem xs="2" Class="textCenter">@Set.TargetWeight Kg</MudItem>
-<MudItem xs="1" Class="textCenter mr-5">@Set.TargetReps</MudItem>
-<MudItem xs="2" Class="textCenter">@Set.ActualWeight Kg</MudItem>
-<MudItem xs="1" Class="textCenter mr-5">@Set.ActualReps</MudItem>
+<MudItem xs="2" Class="textCenter"><MudText Typo="Typo.subtitle1">@Set.TargetWeight Kg</MudText></MudItem>
+<MudItem xs="1" Class="textCenter mr-5"><MudText Typo="Typo.subtitle1">@Set.TargetReps</MudText></MudItem>
+<MudItem xs="2" Class="textCenter"><MudText Typo="Typo.subtitle1">@Set.ActualWeight Kg</MudText></MudItem>
+<MudItem xs="1" Class="textCenter mr-5"><MudText Typo="Typo.subtitle1">@Set.ActualReps</MudText></MudItem>
 
 @code {
     [Parameter, EditorRequired]

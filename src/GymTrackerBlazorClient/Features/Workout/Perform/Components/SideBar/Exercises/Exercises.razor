@@ -20,7 +20,7 @@
             Value="exercise.Id" 
             Dense="true"
             @onclick="() => Dispatcher.Dispatch(new SetSelectedExerciseAction(exercise.Id))">
-            <MudText Typo="Typo.subtitle2">@exercise.Name</MudText>
+            <MudText Typo="Typo.subtitle1">@exercise.Name</MudText>
         </MudListItem>;
 }
 
