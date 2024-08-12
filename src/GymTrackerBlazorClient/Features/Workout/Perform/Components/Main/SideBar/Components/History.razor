@@ -26,9 +26,6 @@
         <MudDivider Class="my-3" />
     </div>
     <div class="" style="overflow-y: auto; height: 430px;">
-        @for(var i = 0; i < 20; i++)
-        {
-          
         @foreach (var workout in State.Value.History)
         {
             <div class="px-2 d-flex justify-space-between">
@@ -49,7 +46,6 @@
                 </div>
             </div>
             <MudDivider DividerType="DividerType.Middle" Class="my-1" />
-        }
         }
     </div> 
 </div>
