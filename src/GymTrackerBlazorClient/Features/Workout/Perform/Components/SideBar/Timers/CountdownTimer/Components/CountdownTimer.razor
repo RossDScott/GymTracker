@@ -26,19 +26,17 @@
     <MudText Typo="Typo.h4" Class="pulsate">Times Up!</MudText>
 }
 
-@if (!State.Value.TimesUp)
-{
-    <div class="d-flex">
-        <ControlButtons
+<div class="d-flex" style="visibility: @(State.Value.TimesUp ? "hidden" : "visible")">
+    <ControlButtons
         CanPause="true"
         IsPaused="@State.Value.IsPaused"
         IsRunning="@(State.Value.StartTime is not null)"
         OnStart="@handleStart"
         OnPause="@handlePause"
         OnReset="@handleReset">
-        </ControlButtons>
-    </div>
-}
+    </ControlButtons>
+</div>
+
 @code{
     RenderFragment startTimerFace() => State.Value.IsEditing
         ? @<MudText Typo="Typo.h4"><input @ref="timeInput" @bind="StartDurationInputBindProxy" @bind:event="onchange" type="time" step="1" min="00:00:01" max="00:59:59"></MudText>
