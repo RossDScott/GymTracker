@@ -122,4 +122,41 @@ public class ExerciseDetailEffects
         await _clientStorage.CurrentWorkout.SetAsync(workout);
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
     }
+
+    [EffectMethod]
+    public async Task OnAddSet(AddSetAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
+
+        var order = exercise.Sets
+                            .OrderByDescending(x => x.Order)
+                            .FirstOrDefault()?
+                            .Order + 1 ?? 0;
+
+
+        var previousForSetType = exercise.Sets
+                                      .Where(x => x.SetType == action.SetType)
+                                      .OrderByDescending(x => x.OrderForSetType)
+                                      .FirstOrDefault();
+
+        var orderForSetType = previousForSetType?.OrderForSetType + 1 ?? 0;
+        PlannedExerciseSet? plannedExerciseSet = previousForSetType?.PlannedExerciseSet;
+
+        if (plannedExerciseSet != null)
+            plannedExerciseSet = plannedExerciseSet with { Id = Guid.NewGuid() };
+
+        var newSet = new WorkoutExerciseSet(null)
+        {
+            SetType = action.SetType,
+            Order = order,
+            OrderForSetType = orderForSetType,
+            PlannedExerciseSet = plannedExerciseSet
+        };
+
+        exercise.Sets.Add(newSet);
+
+        await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+    }
 }
