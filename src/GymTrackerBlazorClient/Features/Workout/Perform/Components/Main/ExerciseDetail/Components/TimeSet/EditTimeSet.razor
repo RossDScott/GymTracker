@@ -1,0 +1,29 @@
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
+@using GymTracker.BlazorClient.Features.Common.UpDownNumericEditor
+
+@inject IDispatcher Dispatcher
+
+<MudItem xs="3" Class="d-flex py-0 mr-4 textCenter flex-column">
+    <MudNumericField HideSpinButtons="true"
+                     @bind-Value="EditSet.TargetTime"
+                     @bind-Value:after="handleRowDataChange"
+                     Variant="Variant.Text" Min="0" Max="999"
+                     Adornment="Adornment.End" AdornmentText="Seconds" />
+</MudItem>
+<MudItem xs="3" class="textCenter py-0 mr-4">
+    <MudNumericField HideSpinButtons="true"
+                     @bind-Value="EditSet.ActualTime"
+                     @bind-Value:after="handleRowDataChange"
+                     Variant="Variant.Text" Min="0" Max="999"
+                     Adornment="Adornment.End" AdornmentText="Seconds" />
+</MudItem>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid WorkoutExerciseId { get; set; }
+
+    [Parameter, EditorRequired]
+    public EditSet EditSet { get; set; } = default!;
+
+    private void handleRowDataChange() => Dispatcher.Dispatch(new SetSetDataAction(WorkoutExerciseId, EditSet));
+}

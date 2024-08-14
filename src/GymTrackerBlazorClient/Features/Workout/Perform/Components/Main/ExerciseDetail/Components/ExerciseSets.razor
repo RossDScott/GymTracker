@@ -1,4 +1,5 @@
 ﻿@using GymTracker.BlazorClient.Features.Common.ListItemFieldEditor
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Components.TimeSet
 @using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Components.WeightSet
 @using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
 @using GymTracker.Domain.Models
@@ -16,48 +17,58 @@
         <MudItem xs="1" Class=""></MudItem>
         <MudItem xs="1" Class=""></MudItem>
     </MudGrid>
-    <MudGrid Class="fullWidth ma-0" Style="font-weight: bold">
-        <MudItem xs="2"></MudItem>
-        <MudItem xs="2" Class="pa-0 textCenter">Weight</MudItem>
-        <MudItem xs="1" Class="pa-0 mr-6 textCenter">Reps</MudItem>
-        <MudItem xs="2" Class="pa-0 textCenter">Weight</MudItem>
-        <MudItem xs="1" Class="pa-0 mr-6 textCenter">Reps</MudItem>
-        <MudItem xs="1" Class=""></MudItem>
-        <MudItem xs="1" Class=""></MudItem>
-    </MudGrid>
 
-    @if(State.Value.MetricType == MetricType.Weight)
+    @foreach (var set in State.Value.Sets)
     {
-        @foreach(var set in State.Value.Sets)
-        {
-            <ExerciseSet 
-                Set="set"
-                WorkoutExerciseId="State.Value.WorkoutExerciseId"
-                WeightIncrement="State.Value.WeightIncrement"
-                IsSelected="State.Value.SelectedSetId == set.Id">
-                <ViewRow Context="viewWeightSet">
-                    <ViewWeightSet Set="viewWeightSet"></ViewWeightSet>
-                </ViewRow>
-                <EditRow Context="editWeightSet">
-                    <EditWeightSet 
-                        EditSet="editWeightSet"
-                        WeightIncrement="State.Value.WeightIncrement"
-                        WorkoutExerciseId="State.Value.WorkoutExerciseId"></EditWeightSet>
-                </EditRow>
-            </ExerciseSet>
-        }
+        <ExerciseSet 
+            Set="set"
+            WorkoutExerciseId="State.Value.WorkoutExerciseId"
+            WeightIncrement="State.Value.WeightIncrement"
+            IsSelected="State.Value.SelectedSetId == set.Id">
+            <ViewRow Context="viewSet">
+                @ViewSet(State.Value.MetricType, viewSet)
+            </ViewRow>
+            <EditRow Context="editSet">
+                @EditSet(State.Value.MetricType, editSet, State.Value.WorkoutExerciseId, State.Value.WeightIncrement)
+            </EditRow>
+        </ExerciseSet>
     }
+
     <div class="d-flex">
         <span class="ml-auto">
             <AddFromList Label="Set Type"
-                         Large="true"
-                         List="State.Value.SetTypes"
-                         OnAddItem="HandleAddRow"></AddFromList>
+            Large="true"
+            List="State.Value.SetTypes"
+            OnAddItem="HandleAddRow"></AddFromList>
         </span>
 
     </div>
 </div>
 
 @code {
+    RenderFragment Header(MetricType metricType) => metricType switch
+    {
+        MetricType.Weight => @<HeaderWeightSet></HeaderWeightSet>,
+        MetricType.Time => @<HeaderTimeSet></HeaderTimeSet>,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+
+    RenderFragment ViewSet(MetricType metricType, Set viewSet) => metricType switch 
+    {
+        MetricType.Weight => @<ViewWeightSet Set="viewSet"></ViewWeightSet>,
+        MetricType.Time => @<ViewTimeSet Set="viewSet"></ViewTimeSet>,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+
+    RenderFragment EditSet(MetricType metricType, EditSet editSet, Guid workoutExerciseId, decimal weightIncrement) => metricType switch
+    {
+        MetricType.Weight => @<EditWeightSet EditSet="editSet"
+                                             WeightIncrement="weightIncrement"
+                                             WorkoutExerciseId="workoutExerciseId"></EditWeightSet>,
+        MetricType.Time => @<EditTimeSet EditSet="editSet"
+                                         WorkoutExerciseId="workoutExerciseId"></EditTimeSet>,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+
     void HandleAddRow(string SetType) => Dispatcher.Dispatch(new AddSetAction(State.Value.WorkoutExerciseId, SetType));
 }
