@@ -6,7 +6,7 @@
 @inject IDispatcher Dispatcher
 @inject ISnackbar Snackbar
 
-<MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
+<MudThemeProvider @ref="@_mudThemeProvider" Theme="MyCustomTheme" @bind-IsDarkMode="@_isDarkMode" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -26,6 +26,14 @@
 @code {
     private bool _isDarkMode;
     private MudThemeProvider _mudThemeProvider = new();
+    MudTheme MyCustomTheme = new MudTheme()
+    {
+        Typography = new Typography
+        {
+            Subtitle1 = new Subtitle1 {FontSize = "1.1rem;"},
+            Subtitle2 = new Subtitle2 {FontSize = "0.9rem;"}
+        }
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -36,6 +44,7 @@
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
             Snackbar.Configuration.ClearAfterNavigation = true;
             Snackbar.Configuration.VisibleStateDuration = 3000;
+
 
             StateHasChanged();
         }

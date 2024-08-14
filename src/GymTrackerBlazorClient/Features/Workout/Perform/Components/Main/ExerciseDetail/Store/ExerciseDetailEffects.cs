@@ -42,10 +42,12 @@ public class ExerciseDetailEffects
         {
             set.PlannedExerciseSet.TargetMetrics.Weight = action.EditSet.TargetWeight;
             set.PlannedExerciseSet.TargetMetrics.Reps = action.EditSet.TargetReps;
+            set.PlannedExerciseSet.TargetMetrics.Time = action.EditSet.TargetTime;
         }
 
         set.Metrics.Weight = action.EditSet.ActualWeight;
         set.Metrics.Reps = action.EditSet.ActualReps;
+        set.Metrics.Time = action.EditSet.ActualTime;
 
         await _clientStorage.CurrentWorkout.SetAsync(workout);
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
