@@ -18,7 +18,7 @@
 }
 @if(State.Value.ShowCountdownDuration)
 {
-    <MudText Typo="Typo.h4">@State.Value.Duration.ToString(@"mm\:ss\:fff")</MudText>
+    <MudText Typo="Typo.h4">@State.Value.Duration.ToString(@"mm\:ss\:f")</MudText>
 }
 
 @if(State.Value.TimesUp)
@@ -40,7 +40,7 @@
 @code{
     RenderFragment startTimerFace() => State.Value.IsEditing
         ? @<MudText Typo="Typo.h4"><input @ref="timeInput" @bind="StartDurationInputBindProxy" @bind:event="onchange" type="time" step="1" min="00:00:01" max="00:59:59"></MudText>
-        : @<MudText @onclick="handleStartEditTime" Typo="Typo.h4">@State.Value.StartDuration.ToString(@"mm\:ss\:fff")</MudText>;
+        : @<MudText @onclick="handleStartEditTime" Typo="Typo.h4">@State.Value.StartDuration.ToString(@"mm\:ss\:f")</MudText>;
 }
 
 @code {
