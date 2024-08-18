@@ -1,0 +1,61 @@
+﻿@using GymTracker.BlazorClient.Features.History.WorkoutHistory.Store
+@inherits FluxorComponent
+@inject IState<WorkoutHistoryState> State
+
+<table>
+    <thead>
+        <tr>
+            <th>Exercise</th>
+            <th>Set</th>
+            @foreach(var date in State.Value.Dates)
+            {
+                <th>@date.ToString(@"dd/MM/yy")</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var exercise in State.Value.Exercises)
+        {
+            @foreach (var set in exercise.SetNames.Select((name, index) => (name, index)))
+            {
+                <tr>
+                    @if(set.index == 0)
+                    {
+                        <td rowspan="@(exercise.SetNames.Length +1)">@exercise.ExerciseName</td>
+                    }
+                    
+                    <td>@set.name</td>
+                    
+                    @foreach (var date in State.Value.Dates)
+                    {
+                        var setRecord = exercise.Records
+                                                .FirstOrDefault(x => x.Date == date)?
+                                                .Sets.SingleOrDefault(x => x.SetName == set.name);
+
+                        <td>@setRecord?.Measure</td>
+                    }
+                </tr>
+            }
+            <tr>
+                <td>Total</td>
+                @foreach (var date in State.Value.Dates)
+                {
+                    var dateRecord = exercise.Records.FirstOrDefault(x => x.Date == date);
+
+                    <td>@dateRecord?.TotalVolume</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+<style>
+    table, th, td {
+        border: 1px solid;
+        padding: 4px;
+    }
+</style>
+
+
+@code {
+
+}

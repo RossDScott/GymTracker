@@ -26,6 +26,14 @@ public static class ExerciseSetMetricsExtensions
     public static string GetWeightTotalVolumeWithMeasure(this IEnumerable<ExerciseSetMetrics> sets)
         => $"{sets.Select(x => x.Weight * x.Reps).Sum()} Kg";
 
+    public static string GetTotalVolumeWithMeasure(this IEnumerable<ExerciseSetMetrics> sets, MetricType metricType)
+        => metricType switch
+        {
+            MetricType.Weight => $"{sets.Select(x => x.Weight * x.Reps).Sum()} Kg",
+            MetricType.Time => $"{sets.Select(x => x.Time ?? 0).Sum()} Seconds",
+            _ => throw new ArgumentOutOfRangeException(nameof(metricType))
+        };
+
     public static decimal GetWeightTotalVolume(this IEnumerable<ExerciseSetMetrics> sets)
         => sets.Select(x => (x.Weight ?? 0) * (x.Reps ?? 0)).Sum();
 
