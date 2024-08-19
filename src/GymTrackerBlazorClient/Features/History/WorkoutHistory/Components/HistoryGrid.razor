@@ -3,14 +3,13 @@
 @inject IState<WorkoutHistoryState> State
 @inject IDispatcher Dispatcher
 
-<div class="d-flex">
-    <div style="width: 30%">
-        <MudSelect Class=""
-                   Label="Workout Plan"
-                   Variant="Variant.Outlined"
-                   AnchorOrigin="Origin.BottomCenter"
-                   Value="State.Value.SelectedWorkoutPlanId"
-                   ValueChanged="(Guid id) => HandleSelectWorkoutPlan(id)">
+<div class="d-flex flex-row">
+    <div class="ml-auto" style="width: 30%">
+        <MudSelect  Dense="true"
+                    DisableUnderLine="true"
+                    AnchorOrigin="Origin.BottomCenter"
+                    Value="State.Value.SelectedWorkoutPlanId"
+                    ValueChanged="(Guid id) => HandleSelectWorkoutPlan(id)">
 
             @foreach (var item in State.Value.WorkoutPlans)
             {
@@ -18,12 +17,14 @@
             }
         </MudSelect>
     </div>
-    <div>
-
+    <div class="ml-2">
+        <MudDateRangePicker Margin="Margin.Dense" 
+                            DisableUnderLine="true"
+                            PlaceholderStart="Start Date" PlaceholderEnd="End Date" />
     </div>
 </div>
 
-<table>
+<table class="mt-3">
     <thead>
         <tr>
             <th>Exercise</th>
@@ -69,6 +70,7 @@
         }
     </tbody>
 </table>
+
 <style>
     table, th, td {
         border: 1px solid;
