@@ -52,6 +52,10 @@
     </tbody>
 </table>
 
+<div class="d-flex flex-column align-center fullWidth">
+    <MudPagination Color="Color.Primary" Count="4" @bind-Selected="@_selected" />
+</div>
+
 <style>
     table, th, td {
         border: 1px solid;
@@ -71,5 +75,7 @@
 </style>
 
 @code {
+    int _selected = 3;
+
     void HandleSelectWorkoutPlan(Guid id) => Dispatcher.Dispatch(new SetWorkoutPlanIdAction(id));
 }
