@@ -6,7 +6,7 @@
 @inject IDispatcher Dispatcher
 
 <div class="fullWidth fullHeight pa-3">
-    <MudTabs Outlined="true" Centered="true" HeaderPosition="TabHeaderPosition.After" Class="fullWidth">
+    <MudTabs Outlined="true" Centered="false" HeaderPosition="TabHeaderPosition.After" Class="fullWidth fullHeight">
         <Header>
             <div class="d-flex flex-row fullWidth">
                 <div class="ml-auto mr-3" style="width: min-content">
@@ -30,10 +30,10 @@
             </div>
         </Header>
         <ChildContent>
-            <MudTabPanel Icon="@Icons.Material.Filled.GridOn">
+            <MudTabPanel Icon="@Icons.Material.Filled.GridOn" Class="fullHeight">
                 <HistoryGrid></HistoryGrid>
             </MudTabPanel>
-            <MudTabPanel Icon="@Icons.Material.Filled.ShowChart" />
+            <MudTabPanel Icon="@Icons.Material.Filled.ShowChart" Class="fullHeight" />
         </ChildContent>
 
     </MudTabs>
