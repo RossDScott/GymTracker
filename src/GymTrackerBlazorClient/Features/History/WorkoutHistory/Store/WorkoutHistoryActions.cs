@@ -8,3 +8,4 @@ public record SetInitialDataAction(IEnumerable<WorkoutPlan> WorkoutPlans, Guid W
 public record ViewWorkoutHistoryAction(Guid WorkoutId);
 public record SetWorkoutPlanIdAction(Guid Id);
 public record SetWorkoutHistoryAction(IEnumerable<Models.Workout> Workouts);
+public record SetPageAction(int page);

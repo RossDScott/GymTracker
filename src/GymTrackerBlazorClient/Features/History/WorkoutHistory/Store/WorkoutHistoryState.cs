@@ -12,6 +12,14 @@ public record WorkoutHistoryState
     public ImmutableArray<ListItem> WorkoutPlans { get; init; } = ImmutableArray<ListItem>.Empty;
     public ImmutableArray<DateOnly> Dates { get; init; } = ImmutableArray<DateOnly>.Empty;
     public ImmutableArray<Exercise> Exercises { get; init; } = ImmutableArray<Exercise>.Empty;
+    public int PageSize { get; init; } = 2;
+    public int PageCount => (int)Math.Ceiling((decimal)Dates.Length / PageSize);
+    public int SelectedPage { get; init; } = 1;
+    public ImmutableArray<DateOnly> PagedDates
+        => Dates
+            .Skip(PageSize * (SelectedPage - 1))
+            .Take(PageSize)
+            .ToImmutableArray();
 }
 
 public record Exercise

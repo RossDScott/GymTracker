@@ -77,4 +77,8 @@ public static class WorkoutHistoryReducers
                             }).ToImmutableArray()
         };
     }
+
+    [ReducerMethod]
+    public static WorkoutHistoryState OnSetPage(WorkoutHistoryState state, SetPageAction action)
+        => state with { SelectedPage = action.page };
 }

@@ -9,14 +9,14 @@
             <tr>
                 <th>Exercise</th>
                 <th>Set</th>
-                @foreach(var date in State.Value.Dates)
+                @foreach (var date in State.Value.PagedDates)
                 {
                     <th>@date.ToString(@"dd/MM/yy")</th>
                 }
             </tr>
         </thead>
         <tbody>
-            @foreach(var exercise in State.Value.Exercises)
+            @foreach (var exercise in State.Value.Exercises)
             {
                 @foreach (var set in exercise.SetNames.Select((name, index) => (name, index)))
                 {
@@ -27,8 +27,8 @@
                         }
                     
                         <td>@set.name</td>
-                    
-                        @foreach (var date in State.Value.Dates)
+
+                        @foreach (var date in State.Value.PagedDates)
                         {
                             var setRecord = exercise.Records
                                                     .FirstOrDefault(x => x.Date == date)?
@@ -40,7 +40,7 @@
                 }
                 <tr class="boldCell">
                     <td>Total</td>
-                    @foreach (var date in State.Value.Dates)
+                    @foreach (var date in State.Value.PagedDates)
                     {
                         var dateRecord = exercise.Records.FirstOrDefault(x => x.Date == date);
 
@@ -52,7 +52,10 @@
     </table>
 
     <div class="d-flex flex-column align-center fullWidth mt-2">
-        <MudPagination Color="Color.Primary" Count="4" @bind-Selected="@_selected" />
+        <MudPagination Color="Color.Primary" 
+                       Count="@(State.Value.PageCount)" 
+                       Selected="@State.Value.SelectedPage"
+                       SelectedChanged="HandleSetPage" />
     </div>
 </div>
 <style>
@@ -74,7 +77,6 @@
 </style>
 
 @code {
-    int _selected = 3;
-
     void HandleSelectWorkoutPlan(Guid id) => Dispatcher.Dispatch(new SetWorkoutPlanIdAction(id));
+    void HandleSetPage(int page) => Dispatcher.Dispatch(new SetPageAction(page));
 }
