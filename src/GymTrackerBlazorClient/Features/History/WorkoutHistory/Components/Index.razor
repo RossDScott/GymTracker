@@ -1,14 +1,44 @@
 ﻿@page "/history/workouthistory"
+@using GymTracker.BlazorClient.Features.History.WorkoutHistory.Store
+
+@inherits FluxorComponent
+@inject IState<WorkoutHistoryState> State
+@inject IDispatcher Dispatcher
 
 <div class="fullWidth fullHeight pa-3">
-    <MudTabs Outlined="true" Centered="true" Class="fullWidth">
-        <MudTabPanel Icon="@Icons.Material.Filled.GridOn">
-            <HistoryGrid></HistoryGrid>
-        </MudTabPanel>
-        <MudTabPanel Icon="@Icons.Material.Filled.ShowChart" />
+    <MudTabs Outlined="true" Centered="true" HeaderPosition="TabHeaderPosition.After" Class="fullWidth">
+        <Header>
+            <div class="d-flex flex-row fullWidth">
+                <div class="ml-auto mr-3" style="width: min-content">
+                    <MudSelect Dense="true"
+                               DisableUnderLine="true"
+                               AnchorOrigin="Origin.BottomCenter"
+                               Value="State.Value.SelectedWorkoutPlanId"
+                               ValueChanged="(Guid id) => HandleSelectWorkoutPlan(id)">
+
+                        @foreach (var item in State.Value.WorkoutPlans)
+                        {
+                            <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </div>
+                <div class="ml-2">
+                    <MudDateRangePicker Margin="Margin.Dense"
+                                        DisableUnderLine="true"
+                                        PlaceholderStart="Start Date" PlaceholderEnd="End Date" />
+                </div>
+            </div>
+        </Header>
+        <ChildContent>
+            <MudTabPanel Icon="@Icons.Material.Filled.GridOn">
+                <HistoryGrid></HistoryGrid>
+            </MudTabPanel>
+            <MudTabPanel Icon="@Icons.Material.Filled.ShowChart" />
+        </ChildContent>
+
     </MudTabs>
 </div>
 
 @code {
-
+    void HandleSelectWorkoutPlan(Guid id) => Dispatcher.Dispatch(new SetWorkoutPlanIdAction(id));
 }

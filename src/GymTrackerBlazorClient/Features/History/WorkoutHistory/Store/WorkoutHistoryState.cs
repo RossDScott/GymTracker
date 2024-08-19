@@ -7,6 +7,7 @@ namespace GymTracker.BlazorClient.Features.History.WorkoutHistory.Store;
 [FeatureState]
 public record WorkoutHistoryState
 {
+    public bool Initalised { get; init; } = false;
     public Guid SelectedWorkoutPlanId { get; init; }
     public ImmutableArray<ListItem> WorkoutPlans { get; init; } = ImmutableArray<ListItem>.Empty;
     public ImmutableArray<DateOnly> Dates { get; init; } = ImmutableArray<DateOnly>.Empty;

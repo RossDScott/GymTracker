@@ -11,6 +11,7 @@ public static class WorkoutHistoryReducers
     public static WorkoutHistoryState OnSetInitialData(WorkoutHistoryState state, SetInitialDataAction action)
         => state with
         {
+            Initalised = true,
             WorkoutPlans = action.WorkoutPlans
                                  .Select(x => new ListItem(x.Id, x.Name))
                                  .ToImmutableArray()
