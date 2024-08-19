@@ -1,4 +1,5 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Features.Common;
 using GymTracker.Domain.Models.Extensions;
 using System.Collections.Immutable;
 
@@ -6,6 +7,15 @@ namespace GymTracker.BlazorClient.Features.History.WorkoutHistory.Store;
 
 public static class WorkoutHistoryReducers
 {
+    [ReducerMethod]
+    public static WorkoutHistoryState OnSetInitialData(WorkoutHistoryState state, SetInitialDataAction action)
+        => state with
+        {
+            WorkoutPlans = action.WorkoutPlans
+                                 .Select(x => new ListItem(x.Id, x.Name))
+                                 .ToImmutableArray()
+        };
+
     [ReducerMethod]
     public static WorkoutHistoryState OnSetWorkoutPlanId(WorkoutHistoryState state, SetWorkoutPlanIdAction action)
         => state with { SelectedWorkoutPlanId = action.Id };
