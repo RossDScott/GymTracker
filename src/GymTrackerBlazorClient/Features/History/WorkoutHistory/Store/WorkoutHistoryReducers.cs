@@ -1,5 +1,4 @@
 ﻿using Fluxor;
-using GymTracker.Domain.Models;
 using GymTracker.Domain.Models.Extensions;
 using System.Collections.Immutable;
 
@@ -48,7 +47,6 @@ public static class WorkoutHistoryReducers
                                             {
                                                 Date = woe.WorkoutEnd,
                                                 Sets = woe.Exercise.Sets
-                                                                   .Where(s => s.SetType == DefaultData.SetType.Set)
                                                                    .Select(s => new Set
                                                                    {
                                                                        SetName = s.ToSetTypeAndSequence(),
@@ -57,7 +55,14 @@ public static class WorkoutHistoryReducers
                                                 TotalVolume = woe.Exercise.Sets
                                                                           .Select(x => x.Metrics)
                                                                           .GetTotalVolumeWithMeasure(woe.Exercise.Exercise.MetricType)
-                                            }).ToImmutableArray()
+                                            }).ToImmutableArray(),
+                                SetNames = workoutExercises
+                                            .Where(x => x.Exercise.Exercise.Id == exercise.Id)
+                                            .SelectMany(x => x.Exercise.Sets)
+                                            .DistinctBy(x => x.Order)
+                                            .OrderBy(x => x.Order)
+                                            .Select(x => x.ToSetTypeAndSequence())
+                                            .ToImmutableArray()
                             }).ToImmutableArray()
         };
     }

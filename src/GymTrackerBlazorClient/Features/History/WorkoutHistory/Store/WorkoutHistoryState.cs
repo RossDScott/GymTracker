@@ -16,13 +16,7 @@ public record WorkoutHistoryState
 public record Exercise
 {
     public required string ExerciseName { get; init; }
-    public ImmutableArray<string> SetNames
-        => Records
-            .SelectMany(x => x.Sets)
-            .Select(x => x.SetName)
-            .Distinct()
-            .Order()
-            .ToImmutableArray();
+    public required ImmutableArray<string> SetNames { get; init; }
     public required ImmutableArray<ExerciseRecord> Records { get; set; }
 }
 

@@ -2,6 +2,22 @@
 @inherits FluxorComponent
 @inject IState<WorkoutHistoryState> State
 
+<div>
+    <div>
+        <MudSelect Class=""
+                   Label="Workout Plan"
+                   Variant="Variant.Outlined"
+                   AnchorOrigin="Origin.BottomCenter"
+                   Value="State.Value.SelectedWorkoutPlanId">
+
+            @foreach (var item in State.Value.WorkoutPlans)
+            {
+                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+            }
+        </MudSelect>
+    </div>
+</div>
+
 <table>
     <thead>
         <tr>
@@ -21,7 +37,7 @@
                 <tr>
                     @if(set.index == 0)
                     {
-                        <td rowspan="@(exercise.SetNames.Length +1)">@exercise.ExerciseName</td>
+                        <td class="boldCell" rowspan="@(exercise.SetNames.Length +1)">@exercise.ExerciseName</td>
                     }
                     
                     <td>@set.name</td>
@@ -36,7 +52,7 @@
                     }
                 </tr>
             }
-            <tr>
+            <tr class="boldCell">
                 <td>Total</td>
                 @foreach (var date in State.Value.Dates)
                 {
@@ -52,6 +68,17 @@
     table, th, td {
         border: 1px solid;
         padding: 4px;
+    }
+    table{
+        border-collapse: collapse;
+        width: 100%
+    }
+    thead{
+        font-weight: bold;
+    }
+
+    .boldCell{
+        font-weight: bold;
     }
 </style>
 
