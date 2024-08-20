@@ -44,7 +44,7 @@
                     {
                         var dateRecord = exercise.Records.FirstOrDefault(x => x.Date == date);
 
-                        <td>@dateRecord?.TotalVolume</td>
+                        <td>@dateRecord?.TotalVolumeWithMeasure</td>
                     }
                 </tr>
             }
@@ -104,6 +104,5 @@
 </style>
 
 @code {
-    void HandleSelectWorkoutPlan(Guid id) => Dispatcher.Dispatch(new SetWorkoutPlanIdAction(id));
     void HandleSetPage(int page) => Dispatcher.Dispatch(new SetPageAction(page));
 }

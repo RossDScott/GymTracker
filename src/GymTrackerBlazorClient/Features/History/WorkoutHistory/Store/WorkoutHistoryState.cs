@@ -48,7 +48,8 @@ public record ExerciseRecord
 {
     public required DateOnly Date { get; init; }
     public required ImmutableArray<Set> Sets { get; init; }
-    public required string TotalVolume { get; set; }
+    public required string TotalVolumeWithMeasure { get; init; }
+    public decimal TotalVolume { get; init; }
 }
 
 public record Set

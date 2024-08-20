@@ -84,9 +84,12 @@ public static class WorkoutHistoryReducers
                                                                        SetName = s.ToSetTypeAndSequence(),
                                                                        Measure = s.Metrics.ToFormattedMetric(woe.Exercise.Exercise.MetricType)
                                                                    }).ToImmutableArray(),
-                                                TotalVolume = woe.Exercise.Sets
+                                                TotalVolumeWithMeasure = woe.Exercise.Sets
                                                                           .Select(x => x.Metrics)
-                                                                          .GetTotalVolumeWithMeasure(woe.Exercise.Exercise.MetricType)
+                                                                          .GetTotalVolumeWithMeasure(woe.Exercise.Exercise.MetricType),
+                                                TotalVolume = woe.Exercise.Sets
+                                                    .Select(x => x.Metrics)
+                                                    .GetTotalVolume(woe.Exercise.Exercise.MetricType)
                                             }).ToImmutableArray(),
                                 SetNames = workoutExercises
                                             .Where(x => x.Exercise.Exercise.Id == exercise.Id)

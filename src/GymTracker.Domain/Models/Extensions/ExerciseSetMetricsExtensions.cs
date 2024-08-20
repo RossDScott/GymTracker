@@ -34,6 +34,14 @@ public static class ExerciseSetMetricsExtensions
             _ => throw new ArgumentOutOfRangeException(nameof(metricType))
         };
 
+    public static decimal GetTotalVolume(this IEnumerable<ExerciseSetMetrics> sets, MetricType metricType)
+        => metricType switch
+        {
+            MetricType.Weight => sets.Select(x => x.Weight ?? 0 * x.Reps ?? 0).Sum(),
+            MetricType.Time => sets.Select(x => x.Time ?? 0).Sum(),
+            _ => throw new ArgumentOutOfRangeException(nameof(metricType))
+        };
+
     public static decimal GetWeightTotalVolume(this IEnumerable<ExerciseSetMetrics> sets)
         => sets.Select(x => (x.Weight ?? 0) * (x.Reps ?? 0)).Sum();
 
