@@ -11,7 +11,7 @@ public record WorkoutHistoryState
 {
     public bool Initalised { get; init; } = false;
     public Guid SelectedWorkoutPlanId { get; init; }
-    public DateRange WorkoutDateRange { get; init; } = new DateRange(DateTime.Now.AddMonths(-2), DateTime.Now);
+    public DateRange WorkoutDateRange { get; init; } = new DateRange(DateTime.Now.AddMonths(-1), DateTime.Now);
     public ImmutableArray<ListItem> WorkoutPlans { get; init; } = ImmutableArray<ListItem>.Empty;
     public ImmutableArray<DateOnly> Dates { get; init; } = ImmutableArray<DateOnly>.Empty;
     public ImmutableArray<Exercise> FilteredExercises { get; init; } = ImmutableArray<Exercise>.Empty;

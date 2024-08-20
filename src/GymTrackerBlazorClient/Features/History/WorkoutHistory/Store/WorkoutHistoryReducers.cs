@@ -36,6 +36,10 @@ public static class WorkoutHistoryReducers
         => CalculateFilter(state with { SelectedWorkoutPlanId = action.Id });
 
     [ReducerMethod]
+    public static WorkoutHistoryState OnSetDateRange(WorkoutHistoryState state, SetDateRangeAction action)
+        => CalculateFilter(state with { WorkoutDateRange = action.DateRange });
+
+    [ReducerMethod]
     public static WorkoutHistoryState OnSetPage(WorkoutHistoryState state, SetPageAction action)
         => state with { SelectedPage = action.Page };
 
