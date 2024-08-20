@@ -16,7 +16,7 @@ public record WorkoutHistoryState
     public ImmutableArray<DateOnly> Dates { get; init; } = ImmutableArray<DateOnly>.Empty;
     public ImmutableArray<Exercise> FilteredExercises { get; init; } = ImmutableArray<Exercise>.Empty;
     public ImmutableArray<Models.Workout> Workouts { get; init; } = ImmutableArray<Models.Workout>.Empty;
-    public int PageSize { get; init; } = 2;
+    public int PageSize { get; init; } = 5;
     public int PageCount => (int)Math.Ceiling((decimal)Dates.Length / PageSize);
     public int SelectedPage { get; init; } = 1;
 
