@@ -1,6 +1,8 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Features.Common;
+using MudBlazor;
 using System.Collections.Immutable;
+using Models = GymTracker.Domain.Models;
 
 namespace GymTracker.BlazorClient.Features.History.WorkoutHistory.Store;
 
@@ -9,13 +11,16 @@ public record WorkoutHistoryState
 {
     public bool Initalised { get; init; } = false;
     public Guid SelectedWorkoutPlanId { get; init; }
+    public DateRange WorkoutDateRange { get; init; } = new DateRange(DateTime.Now.AddMonths(-2), DateTime.Now);
     public ImmutableArray<ListItem> WorkoutPlans { get; init; } = ImmutableArray<ListItem>.Empty;
     public ImmutableArray<DateOnly> Dates { get; init; } = ImmutableArray<DateOnly>.Empty;
-    public ImmutableArray<Exercise> Exercises { get; init; } = ImmutableArray<Exercise>.Empty;
+    public ImmutableArray<Exercise> FilteredExercises { get; init; } = ImmutableArray<Exercise>.Empty;
+    public ImmutableArray<Models.Workout> Workouts { get; init; } = ImmutableArray<Models.Workout>.Empty;
     public int PageSize { get; init; } = 2;
     public int PageCount => (int)Math.Ceiling((decimal)Dates.Length / PageSize);
     public int SelectedPage { get; init; } = 1;
-    public ImmutableArray<DateOnly> PagedDates
+
+    public ImmutableArray<DateOnly> FilteredAndPagedDates
         => Dates
             .Skip(PageSize * (SelectedPage - 1))
             .Take(PageSize)

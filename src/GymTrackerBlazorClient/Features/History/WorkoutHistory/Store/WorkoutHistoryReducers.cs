@@ -9,46 +9,64 @@ public static class WorkoutHistoryReducers
 {
     [ReducerMethod]
     public static WorkoutHistoryState OnSetInitialData(WorkoutHistoryState state, SetInitialDataAction action)
-        => state with
-        {
-            Initalised = true,
-            WorkoutPlans = action.WorkoutPlans
-                                 .Select(x => new ListItem(x.Id, x.Name))
-                                 .ToImmutableArray()
-        };
-
-    [ReducerMethod]
-    public static WorkoutHistoryState OnSetWorkoutPlanId(WorkoutHistoryState state, SetWorkoutPlanIdAction action)
-        => state with { SelectedWorkoutPlanId = action.Id };
-
-    [ReducerMethod]
-    public static WorkoutHistoryState OnSetWorkoutHistory(WorkoutHistoryState state, SetWorkoutHistoryAction action)
     {
         var sixMonthsAgo = DateTimeOffset.Now.AddMonths(-6);
         var workouts = action.Workouts
                                 .Where(x => x.WorkoutEnd > sixMonthsAgo)
-                                .ToList();
+                                .ToImmutableArray();
 
-        var exercises = workouts
-                            .SelectMany(x => x.Exercises.Select(x => x.Exercise))
-                            .DistinctBy(x => x.Id)
-                            .ToList();
+        var workoutPlans = action.WorkoutPlans
+                                 .Select(x => new ListItem(x.Id, x.Name))
+                                 .ToImmutableArray();
 
-        var workoutExercises = workouts
-                                .Where(x => x.WorkoutEnd != null)
-                                .SelectMany(wo => wo.Exercises
-                                                    .Select(x => new { WorkoutEnd = DateOnly.FromDateTime(wo.WorkoutEnd!.Value.Date), Exercise = x }))
-                                .OrderByDescending(x => x.WorkoutEnd)
-                                .ToList();
-
-        return state with
+        state = state with
         {
-            Dates = workoutExercises
-                    .Select(x => x.WorkoutEnd)
-                    .Distinct()
-                    .OrderDescending()
-                    .ToImmutableArray(),
-            Exercises = exercises
+            Initalised = true,
+            WorkoutPlans = workoutPlans,
+            SelectedWorkoutPlanId = workoutPlans.First().Id,
+            Workouts = workouts,
+
+        };
+
+        return CalculateFilter(state);
+    }
+
+    [ReducerMethod]
+    public static WorkoutHistoryState OnSetWorkoutPlanId(WorkoutHistoryState state, SetWorkoutPlanIdAction action)
+        => CalculateFilter(state with { SelectedWorkoutPlanId = action.Id });
+
+    [ReducerMethod]
+    public static WorkoutHistoryState OnSetPage(WorkoutHistoryState state, SetPageAction action)
+        => state with { SelectedPage = action.Page };
+
+    private static WorkoutHistoryState CalculateFilter(WorkoutHistoryState state)
+    {
+        var filteredWorkouts = state.Workouts
+                                    .Where(x =>
+                                                x.WorkoutEnd != null &&
+                                                x.WorkoutEnd > state.WorkoutDateRange.Start &&
+                                                x.WorkoutEnd < state.WorkoutDateRange.End)
+                                    .Where(x => x.Plan.Id == state.SelectedWorkoutPlanId)
+                                    .OrderByDescending(x => x.WorkoutEnd)
+                                    .ToList();
+
+        var dates = filteredWorkouts
+                        .SelectMany(wo => wo.Exercises
+                                            .Select(x => DateOnly.FromDateTime(wo.WorkoutEnd!.Value.Date)))
+                        .Distinct()
+                        .ToImmutableArray();
+
+        var workoutExercises = filteredWorkouts
+                        .SelectMany(wo => wo.Exercises
+                                            .Select(x => new { WorkoutEnd = DateOnly.FromDateTime(wo.WorkoutEnd!.Value.Date), Exercise = x }))
+                        .ToList();
+
+        var exercises = filteredWorkouts
+                        .SelectMany(x => x.Exercises.Select(x => x.Exercise))
+                        .DistinctBy(x => x.Id)
+                        .ToList();
+
+        var filteredExercises = exercises
                             .Select(exercise => new Exercise
                             {
                                 ExerciseName = exercise.Name,
@@ -74,11 +92,8 @@ public static class WorkoutHistoryReducers
                                             .OrderBy(x => x.Order)
                                             .Select(x => x.ToSetTypeAndSequence())
                                             .ToImmutableArray()
-                            }).ToImmutableArray()
-        };
-    }
+                            }).ToImmutableArray();
 
-    [ReducerMethod]
-    public static WorkoutHistoryState OnSetPage(WorkoutHistoryState state, SetPageAction action)
-        => state with { SelectedPage = action.page };
+        return state with { Dates = dates, FilteredExercises = filteredExercises };
+    }
 }

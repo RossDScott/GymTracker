@@ -9,14 +9,14 @@
             <tr>
                 <th>Exercise</th>
                 <th>Set</th>
-                @foreach (var date in State.Value.PagedDates)
+                @foreach (var date in State.Value.FilteredAndPagedDates)
                 {
                     <th>@date.ToString(@"dd/MM/yy")</th>
                 }
             </tr>
         </thead>
         <tbody>
-            @foreach (var exercise in State.Value.Exercises)
+            @foreach (var exercise in State.Value.FilteredExercises)
             {
                 @foreach (var set in exercise.SetNames.Select((name, index) => (name, index)))
                 {
@@ -28,7 +28,7 @@
                     
                         <td>@set.name</td>
 
-                        @foreach (var date in State.Value.PagedDates)
+                        @foreach (var date in State.Value.FilteredAndPagedDates)
                         {
                             var setRecord = exercise.Records
                                                     .FirstOrDefault(x => x.Date == date)?
@@ -40,7 +40,7 @@
                 }
                 <tr class="boldCell">
                     <td>Total</td>
-                    @foreach (var date in State.Value.PagedDates)
+                    @foreach (var date in State.Value.FilteredAndPagedDates)
                     {
                         var dateRecord = exercise.Records.FirstOrDefault(x => x.Date == date);
 

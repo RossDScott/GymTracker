@@ -25,7 +25,10 @@
                 <div class="ml-2">
                     <MudDateRangePicker Margin="Margin.Dense"
                                         DisableUnderLine="true"
-                                        PlaceholderStart="Start Date" PlaceholderEnd="End Date" />
+                                        PlaceholderStart="Start Date" 
+                                        PlaceholderEnd="End Date"
+                                        DateRange="@State.Value.WorkoutDateRange"
+                                        DateRangeChanged="HandleSetDateRange" />
                 </div>
             </div>
         </Header>
@@ -41,4 +44,5 @@
 
 @code {
     void HandleSelectWorkoutPlan(Guid id) => Dispatcher.Dispatch(new SetWorkoutPlanIdAction(id));
+    void HandleSetDateRange(DateRange dateRange) => Dispatcher.Dispatch(new SetDateRangeAction(dateRange));
 }

@@ -23,7 +23,9 @@ public class WorkoutHistoryEffects
     private async Task Initialise(IDispatcher dispatcher)
     {
         var plans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
-        dispatcher.Dispatch(new SetInitialDataAction(plans, plans.First().Id));
+        var workouts = await _clientStorage.Workouts.GetOrDefaultAsync();
+
+        dispatcher.Dispatch(new SetInitialDataAction(plans, workouts));
     }
 
     [EffectMethod]
@@ -35,14 +37,5 @@ public class WorkoutHistoryEffects
         var workout = await _clientStorage.Workouts.FindByIdAsync(action.WorkoutId);
         dispatcher.Dispatch(new SetWorkoutPlanIdAction(workout.Plan.Id));
         _navigationManager.NavigateTo("history/workouthistory");
-    }
-
-    [EffectMethod]
-    public async Task OnSetWorkoutPlanId(SetWorkoutPlanIdAction action, IDispatcher dispatcher)
-    {
-        var workouts = await _clientStorage.Workouts.GetOrDefaultAsync();
-        var workoutsForPlan = workouts.Where(x => x.Plan.Id == action.Id).ToList();
-
-        dispatcher.Dispatch(new SetWorkoutHistoryAction(workoutsForPlan));
     }
 }
