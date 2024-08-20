@@ -30,8 +30,10 @@ public record WorkoutHistoryState
     public string GetTotalVolumeForDate(DateOnly date)
     {
         var dateTime = date.ToDateTime(TimeOnly.MinValue);
-        return Workouts.First(x => x.WorkoutEnd!.Value.Date == dateTime)
-                                    .GetWeightTotalVolumeWithMeasure();
+        return Workouts
+                .Where(x => x.Plan.Id == SelectedWorkoutPlanId)
+                .First(x => x.WorkoutEnd!.Value.Date == dateTime)
+                .GetWeightTotalVolumeWithMeasure();
     }
 }
 
