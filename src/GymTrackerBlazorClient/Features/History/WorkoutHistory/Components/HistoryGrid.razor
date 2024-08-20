@@ -20,7 +20,7 @@
             {
                 @foreach (var set in exercise.SetNames.Select((name, index) => (name, index)))
                 {
-                    <tr>
+                    <tr class="exerciseRow @(set.index == 0 ? "exerciseRowStart": "" )">
                         @if(set.index == 0)
                         {
                             <td class="boldCell" rowspan="@(exercise.SetNames.Length +1)">@exercise.ExerciseName</td>
@@ -38,7 +38,7 @@
                         }
                     </tr>
                 }
-                <tr class="boldCell">
+                <tr class="boldCell exerciseRowEnd">
                     <td>Total</td>
                     @foreach (var date in State.Value.FilteredAndPagedDates)
                     {
@@ -49,6 +49,16 @@
                 </tr>
             }
         </tbody>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th>Total</th>
+                @foreach (var date in State.Value.FilteredAndPagedDates)
+                {
+                    <th>@State.Value.GetTotalVolumeForDate(date)</th>
+                }
+            </tr>
+        </tfoot>
     </table>
 
     <div class="d-flex flex-column align-center fullWidth mt-2">
@@ -59,8 +69,12 @@
     </div>
 </div>
 <style>
-    table, th, td {
+    table {
         border: 1px solid;
+        padding: 4px;
+    }
+    th, td {
+        border: 0.6px solid;
         padding: 4px;
     }
     table{
@@ -74,6 +88,15 @@
     .boldCell{
         font-weight: bold;
     }
+
+    tr.exerciseRowStart {
+        border-top: 2px solid;
+    }
+
+    tr.exerciseRowEnd {
+        border-bottom: 2px solid;
+    }
+
 </style>
 
 @code {

@@ -1,5 +1,6 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Features.Common;
+using GymTracker.Domain.Models.Extensions;
 using MudBlazor;
 using System.Collections.Immutable;
 using Models = GymTracker.Domain.Models;
@@ -25,6 +26,13 @@ public record WorkoutHistoryState
             .Skip(PageSize * (SelectedPage - 1))
             .Take(PageSize)
             .ToImmutableArray();
+
+    public string GetTotalVolumeForDate(DateOnly date)
+    {
+        var dateTime = date.ToDateTime(TimeOnly.MinValue);
+        return Workouts.First(x => x.WorkoutEnd!.Value.Date == dateTime)
+                                    .GetWeightTotalVolumeWithMeasure();
+    }
 }
 
 public record Exercise

@@ -12,7 +12,7 @@ public static class WorkoutHistoryReducers
     {
         var sixMonthsAgo = DateTimeOffset.Now.AddMonths(-6);
         var workouts = action.Workouts
-                                .Where(x => x.WorkoutEnd > sixMonthsAgo)
+                                .Where(x => x.WorkoutEnd.HasValue && x.WorkoutEnd > sixMonthsAgo)
                                 .ToImmutableArray();
 
         var workoutPlans = action.WorkoutPlans
@@ -47,7 +47,6 @@ public static class WorkoutHistoryReducers
     {
         var filteredWorkouts = state.Workouts
                                     .Where(x =>
-                                                x.WorkoutEnd != null &&
                                                 x.WorkoutEnd > state.WorkoutDateRange.Start &&
                                                 x.WorkoutEnd < state.WorkoutDateRange.End)
                                     .Where(x => x.Plan.Id == state.SelectedWorkoutPlanId)
