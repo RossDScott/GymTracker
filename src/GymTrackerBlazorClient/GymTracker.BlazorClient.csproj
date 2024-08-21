@@ -16,6 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Blazor-ApexCharts" Version="3.4.0" />
 		<PackageReference Include="FluentValidation" Version="11.7.1" />
 		<PackageReference Include="Fluxor.Blazor.Web" Version="5.9.0" />
 		<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" />

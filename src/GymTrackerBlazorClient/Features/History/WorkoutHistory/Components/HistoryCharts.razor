@@ -22,11 +22,10 @@
                         <MudChart 
                             ChartType="ChartType.Line"
                             ChartSeries="@exercise.ChartSeries"
-                            @bind-SelectedIndex="Index"
                             XAxisLabels="@State.Value.ChartDateXAxisLabels"
                             Width="100%"
                             Height="250px"
-                            ChartOptions="@Options" />
+                            ChartOptions="@Options"  />
                     </td>
 
 
@@ -74,13 +73,10 @@
 </style>
 
 @code {
-    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
-    public ChartOptions Options = new ChartOptions { DisableLegend = true };
-
-    public List<ChartSeries> Series = new List<ChartSeries>()
-    {
-        new ChartSeries() { Name = "Fossil", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70, 90, 79, 72, 69, 62, 62, 55, 65, 70 } },
-        new ChartSeries() { Name = "Renewable", Data = new double[] { 10, 41, 35, 51, 49, 62, 69, 91, 148, 90, 79, 72, 69, 62, 62, 55, 65, 70 } },
+    public ChartOptions Options = new ChartOptions 
+    { 
+        DisableLegend = true,
+        
+    
     };
-    public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "a", "b", "c", "d", "e", "f", "g", "h", "i" };
 }
