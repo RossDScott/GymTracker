@@ -15,6 +15,7 @@ public record WorkoutHistoryState
     public DateRange WorkoutDateRange { get; init; } = new DateRange(DateTime.Now.AddMonths(-1), DateTime.Now);
     public ImmutableArray<ListItem> WorkoutPlans { get; init; } = ImmutableArray<ListItem>.Empty;
     public ImmutableArray<DateOnly> Dates { get; init; } = ImmutableArray<DateOnly>.Empty;
+    public string[] ChartDateXAxisLabels => Dates.Select(s => s.ToString("dd/MM")).ToArray();
     public ImmutableArray<Exercise> FilteredExercises { get; init; } = ImmutableArray<Exercise>.Empty;
     public ImmutableArray<Models.Workout> Workouts { get; init; } = ImmutableArray<Models.Workout>.Empty;
     public int PageSize { get; init; } = 5;
@@ -42,6 +43,10 @@ public record Exercise
     public required string ExerciseName { get; init; }
     public required ImmutableArray<string> SetNames { get; init; }
     public required ImmutableArray<ExerciseRecord> Records { get; set; }
+    public List<ChartSeries> ChartSeries => new List<ChartSeries>
+    {
+        new ChartSeries { Name = ExerciseName, Data = Records.Select(x => (double) x.TotalVolume).ToArray() }
+    };
 }
 
 public record ExerciseRecord

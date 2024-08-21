@@ -37,7 +37,7 @@ public static class ExerciseSetMetricsExtensions
     public static decimal GetTotalVolume(this IEnumerable<ExerciseSetMetrics> sets, MetricType metricType)
         => metricType switch
         {
-            MetricType.Weight => sets.Select(x => x.Weight ?? 0 * x.Reps ?? 0).Sum(),
+            MetricType.Weight => sets.Select(x => (x.Weight ?? 0) * (x.Reps ?? 0)).Sum(),
             MetricType.Time => sets.Select(x => x.Time ?? 0).Sum(),
             _ => throw new ArgumentOutOfRangeException(nameof(metricType))
         };
