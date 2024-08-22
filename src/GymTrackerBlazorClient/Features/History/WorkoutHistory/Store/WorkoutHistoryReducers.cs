@@ -1,7 +1,7 @@
-﻿using Fluxor;
+﻿using System.Collections.Immutable;
+using Fluxor;
 using GymTracker.BlazorClient.Features.Common;
 using GymTracker.Domain.Models.Extensions;
-using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.History.WorkoutHistory.Store;
 
@@ -55,13 +55,13 @@ public static class WorkoutHistoryReducers
 
         var dates = filteredWorkouts
                         .SelectMany(wo => wo.Exercises
-                                            .Select(x => DateOnly.FromDateTime(wo.WorkoutEnd!.Value.Date)))
+                                            .Select(x => wo.WorkoutEnd!.Value))
                         .Distinct()
                         .ToImmutableArray();
 
         var workoutExercises = filteredWorkouts
                         .SelectMany(wo => wo.Exercises
-                                            .Select(x => new { WorkoutEnd = DateOnly.FromDateTime(wo.WorkoutEnd!.Value.Date), Exercise = x }))
+                                            .Select(x => new { WorkoutEnd = wo.WorkoutEnd!.Value, Exercise = x }))
                         .ToList();
 
         var exercises = filteredWorkouts

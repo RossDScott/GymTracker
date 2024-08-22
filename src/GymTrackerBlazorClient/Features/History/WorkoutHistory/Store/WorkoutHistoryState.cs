@@ -1,8 +1,8 @@
-﻿using Fluxor;
+﻿using System.Collections.Immutable;
+using Fluxor;
 using GymTracker.BlazorClient.Features.Common;
 using GymTracker.Domain.Models.Extensions;
 using MudBlazor;
-using System.Collections.Immutable;
 using Models = GymTracker.Domain.Models;
 
 namespace GymTracker.BlazorClient.Features.History.WorkoutHistory.Store;
@@ -14,7 +14,7 @@ public record WorkoutHistoryState
     public Guid SelectedWorkoutPlanId { get; init; }
     public DateRange WorkoutDateRange { get; init; } = new DateRange(DateTime.Now.AddMonths(-1), DateTime.Now);
     public ImmutableArray<ListItem> WorkoutPlans { get; init; } = ImmutableArray<ListItem>.Empty;
-    public ImmutableArray<DateOnly> Dates { get; init; } = ImmutableArray<DateOnly>.Empty;
+    public ImmutableArray<DateTimeOffset> Dates { get; init; } = ImmutableArray<DateTimeOffset>.Empty;
     public string[] ChartDateXAxisLabels => Dates.Select(s => s.ToString("dd/MM")).ToArray();
     public ImmutableArray<Exercise> FilteredExercises { get; init; } = ImmutableArray<Exercise>.Empty;
     public ImmutableArray<Models.Workout> Workouts { get; init; } = ImmutableArray<Models.Workout>.Empty;
@@ -22,18 +22,17 @@ public record WorkoutHistoryState
     public int PageCount => (int)Math.Ceiling((decimal)Dates.Length / PageSize);
     public int SelectedPage { get; init; } = 1;
 
-    public ImmutableArray<DateOnly> FilteredAndPagedDates
+    public ImmutableArray<DateTimeOffset> FilteredAndPagedDates
         => Dates
             .Skip(PageSize * (SelectedPage - 1))
             .Take(PageSize)
             .ToImmutableArray();
 
-    public string GetTotalVolumeForDate(DateOnly date)
+    public string GetTotalVolumeForDate(DateTimeOffset date)
     {
-        var dateTime = date.ToDateTime(TimeOnly.MinValue);
         return Workouts
                 .Where(x => x.Plan.Id == SelectedWorkoutPlanId)
-                .First(x => x.WorkoutEnd!.Value.Date == dateTime)
+                .First(x => x.WorkoutEnd!.Value == date)
                 .GetWeightTotalVolumeWithMeasure();
     }
 }
@@ -51,7 +50,7 @@ public record Exercise
 
 public record ExerciseRecord
 {
-    public required DateOnly Date { get; init; }
+    public required DateTimeOffset Date { get; init; }
     public required ImmutableArray<Set> Sets { get; init; }
     public required string TotalVolumeWithMeasure { get; init; }
     public decimal TotalVolume { get; init; }

@@ -1,7 +1,5 @@
-﻿@using GymTracker.BlazorClient.Features.History.WorkoutHistory.Store
-@inherits FluxorComponent
-@inject IState<WorkoutHistoryState> State
-@inject IDispatcher Dispatcher
+﻿@using ApexCharts
+@using GymTracker.BlazorClient.Features.History.WorkoutHistory.Store
 
 <div class="d-flex flex-column justify-space-between fullHeight fullWidth">
     <table class="mt-3 mb-auto fullWidth">
@@ -12,23 +10,27 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var exercise in State.Value.FilteredExercises)
+            @foreach (var exercise in WorkoutHistory.FilteredExercises)
             {
                 <tr>
                     <td>
                         @exercise.ExerciseName
                     </td>
                     <td>
-                        <MudChart 
-                            ChartType="ChartType.Line"
-                            ChartSeries="@exercise.ChartSeries"
-                            XAxisLabels="@State.Value.ChartDateXAxisLabels"
-                            Width="100%"
-                            Height="250px"
-                            ChartOptions="@Options"  />
+                        <ApexChart TItem="ExerciseRecord"
+                                   XAxisType="XAxisType.Datetime"
+                                   Options="chartOptions">
+
+                            <ApexPointSeries TItem="ExerciseRecord"
+                                             Items="exercise.Records.OrderByDescending(x => x.Date)"
+                                             Name="Net Value"
+                                             SeriesType="SeriesType.Line"
+                                             XValue="@(e => e.Date)"
+                                             YValue="@(e => e.TotalVolume)"
+                                             OrderByDescending="x=>x.X"/>
+
+                        </ApexChart>
                     </td>
-
-
                 </tr>
             }
         </tbody>
@@ -39,6 +41,8 @@
         border: 1px solid;
         padding: 3px;
         font-size: 0.83rem;
+        border-collapse: collapse;
+        width: 100%
     }
 
     th, td {
@@ -46,25 +50,8 @@
         padding: 3px;
     }
 
-    table {
-        border-collapse: collapse;
-        width: 100%
-    }
-
     thead {
         font-weight: bold;
-    }
-
-    .boldCell {
-        font-weight: bold;
-    }
-
-    tr.exerciseRowStart {
-        border-top: 2px solid;
-    }
-
-    tr.exerciseRowEnd {
-        border-bottom: 2px solid;
     }
 
     .mud-tabs-panels {
@@ -73,10 +60,27 @@
 </style>
 
 @code {
-    public ChartOptions Options = new ChartOptions 
-    { 
-        DisableLegend = true,
-        
-    
-    };
+    [Parameter, EditorRequired]
+    public WorkoutHistoryState WorkoutHistory { get; set; }
+
+    ApexChartOptions<ExerciseRecord> chartOptions;
+
+    protected override void OnInitialized()
+    {
+        chartOptions = new ApexChartOptions<ExerciseRecord>
+        {
+            Chart = new Chart
+            {
+                Background = "#32333d",
+                Toolbar = new Toolbar
+                {
+                    Show = false
+                },
+                ForeColor = "#fff",
+                Width = "100%",
+                Height= "200px"
+            },
+            Colors = new List<string> { "#77B6EA" },
+        };
+    }
 }

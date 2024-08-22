@@ -1,6 +1,4 @@
 ﻿@using GymTracker.BlazorClient.Features.History.WorkoutHistory.Store
-@inherits FluxorComponent
-@inject IState<WorkoutHistoryState> State
 @inject IDispatcher Dispatcher
 
 <div class="d-flex flex-column justify-space-between fullHeight fullWidth">
@@ -9,14 +7,14 @@
             <tr>
                 <th>Exercise</th>
                 <th>Set</th>
-                @foreach (var date in State.Value.FilteredAndPagedDates)
+                @foreach (var date in WorkoutHistory.FilteredAndPagedDates)
                 {
                     <th>@date.ToString(@"dd/MM/yy")</th>
                 }
             </tr>
         </thead>
         <tbody>
-            @foreach (var exercise in State.Value.FilteredExercises)
+            @foreach (var exercise in WorkoutHistory.FilteredExercises)
             {
                 @foreach (var set in exercise.SetNames.Select((name, index) => (name, index)))
                 {
@@ -28,7 +26,7 @@
                     
                         <td>@set.name</td>
 
-                        @foreach (var date in State.Value.FilteredAndPagedDates)
+                        @foreach (var date in WorkoutHistory.FilteredAndPagedDates)
                         {
                             var setRecord = exercise.Records
                                                     .FirstOrDefault(x => x.Date == date)?
@@ -40,7 +38,7 @@
                 }
                 <tr class="boldCell exerciseRowEnd">
                     <td>Total</td>
-                    @foreach (var date in State.Value.FilteredAndPagedDates)
+                    @foreach (var date in WorkoutHistory.FilteredAndPagedDates)
                     {
                         var dateRecord = exercise.Records.FirstOrDefault(x => x.Date == date);
 
@@ -53,9 +51,9 @@
             <tr>
                 <th></th>
                 <th>Total</th>
-                @foreach (var date in State.Value.FilteredAndPagedDates)
+                @foreach (var date in WorkoutHistory.FilteredAndPagedDates)
                 {
-                    <th>@State.Value.GetTotalVolumeForDate(date)</th>
+                    <th>@WorkoutHistory.GetTotalVolumeForDate(date)</th>
                 }
             </tr>
         </tfoot>
@@ -63,8 +61,8 @@
 
     <div class="d-flex flex-column align-center fullWidth mt-2">
         <MudPagination Color="Color.Primary" 
-                       Count="@(State.Value.PageCount)" 
-                       Selected="@State.Value.SelectedPage"
+                       Count="@(WorkoutHistory.PageCount)"
+                       Selected="@WorkoutHistory.SelectedPage"
                        SelectedChanged="HandleSetPage" />
     </div>
 </div>
@@ -104,5 +102,8 @@
 </style>
 
 @code {
+    [Parameter, EditorRequired]
+    public WorkoutHistoryState WorkoutHistory { get; set; } = default!;
+
     void HandleSetPage(int page) => Dispatcher.Dispatch(new SetPageAction(page));
 }
