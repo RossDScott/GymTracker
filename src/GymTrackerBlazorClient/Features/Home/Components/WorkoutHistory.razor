@@ -11,7 +11,7 @@
 <div class="fullHeight" style="overflow-y: auto">
     @foreach(var historyItem in State.Value.CompletedWorkouts)
     {
-        <MudPaper Class="pa-3 mb-2" Elevation="1" @onclick="() => HandleViewHistory(historyItem.WorkoutId)">
+        <MudPaper Class="pa-3 mb-2" Elevation="1" @onclick="() => HandleViewHistory(historyItem.WorkoutPlanId)">
             <div class="d-flex justify-space-between">
                 <MudText Typo="Typo.subtitle1">@historyItem.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
                 <MudText Typo="Typo.subtitle1">@historyItem.WorkoutPlanName</MudText>
@@ -43,5 +43,5 @@
 </div>
 
 @code {
-    void HandleViewHistory(Guid workoutId) => Dispatcher.Dispatch(new ViewWorkoutHistoryAction(workoutId));
+    void HandleViewHistory(Guid workoutPlanId) => Dispatcher.Dispatch(new ViewWorkoutHistoryAction(workoutPlanId));
 }

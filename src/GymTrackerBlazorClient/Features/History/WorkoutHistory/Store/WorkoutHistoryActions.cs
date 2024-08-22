@@ -8,7 +8,7 @@ public record InitialiseAction();
 public record SetInitialDataAction(
     IEnumerable<WorkoutPlan> WorkoutPlans,
     IEnumerable<Models.Workout> Workouts);
-public record ViewWorkoutHistoryAction(Guid WorkoutId);
+public record ViewWorkoutHistoryAction(Guid WorkoutPlanId);
 public record SetWorkoutPlanIdAction(Guid Id);
 public record SetDateRangeAction(DateRange DateRange);
 public record SetPageAction(int Page);

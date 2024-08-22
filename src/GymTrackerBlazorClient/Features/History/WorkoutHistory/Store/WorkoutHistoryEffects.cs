@@ -1,4 +1,5 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Extensions;
 using GymTracker.LocalStorage.Core;
 using Microsoft.AspNetCore.Components;
 
@@ -20,7 +21,8 @@ public class WorkoutHistoryEffects
         _state = state;
     }
 
-    private async Task Initialise(IDispatcher dispatcher)
+    [EffectMethod]
+    public async Task OnInitialise(InitialiseAction action, IDispatcher dispatcher)
     {
         var plans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
         var workouts = await _clientStorage.Workouts.GetOrDefaultAsync();
@@ -32,10 +34,9 @@ public class WorkoutHistoryEffects
     public async Task OnViewWorkoutHistory(ViewWorkoutHistoryAction action, IDispatcher dispatcher)
     {
         if (!_state.Value.Initalised)
-            await Initialise(dispatcher);
+            dispatcher.Dispatch(new InitialiseAction());
 
-        var workout = await _clientStorage.Workouts.FindByIdAsync(action.WorkoutId);
-        dispatcher.Dispatch(new SetWorkoutPlanIdAction(workout.Plan.Id));
         _navigationManager.NavigateTo("history/workouthistory");
+        dispatcher.DispatchWithDelay(new SetWorkoutPlanIdAction(action.WorkoutPlanId));
     }
 }
