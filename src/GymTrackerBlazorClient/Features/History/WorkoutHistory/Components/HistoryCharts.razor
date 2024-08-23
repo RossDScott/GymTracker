@@ -19,7 +19,7 @@
                     <td>
                         <ApexChart TItem="ExerciseRecord"
                                    XAxisType="XAxisType.Datetime"
-                                   Options="chartOptions">
+                                   Options="exercise.ChartOptions">
 
                             <ApexPointSeries TItem="ExerciseRecord"
                                              Items="exercise.Records.OrderByDescending(x => x.Date)"
@@ -61,26 +61,5 @@
 
 @code {
     [Parameter, EditorRequired]
-    public WorkoutHistoryState WorkoutHistory { get; set; }
-
-    ApexChartOptions<ExerciseRecord> chartOptions;
-
-    protected override void OnInitialized()
-    {
-        chartOptions = new ApexChartOptions<ExerciseRecord>
-        {
-            Chart = new Chart
-            {
-                Background = "#32333d",
-                Toolbar = new Toolbar
-                {
-                    Show = false
-                },
-                ForeColor = "#fff",
-                Width = "100%",
-                Height= "200px"
-            },
-            Colors = new List<string> { "#77B6EA" },
-        };
-    }
+    public WorkoutHistoryState WorkoutHistory { get; set; } = default!;
 }
