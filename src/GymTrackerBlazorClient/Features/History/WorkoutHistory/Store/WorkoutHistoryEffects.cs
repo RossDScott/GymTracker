@@ -34,9 +34,9 @@ public class WorkoutHistoryEffects
     public async Task OnViewWorkoutHistory(ViewWorkoutHistoryAction action, IDispatcher dispatcher)
     {
         if (!_state.Value.Initalised)
-            dispatcher.Dispatch(new InitialiseAction());
+            dispatcher.DispatchWithDelay(new InitialiseAction());
 
         _navigationManager.NavigateTo("history/workouthistory");
-        dispatcher.DispatchWithDelay(new SetWorkoutPlanIdAction(action.WorkoutPlanId));
+        dispatcher.DispatchWithDelay(new SetWorkoutPlanIdAction(action.WorkoutPlanId), 2);
     }
 }
