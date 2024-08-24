@@ -52,5 +52,5 @@ public static class ExerciseSetMetricsExtensions
             MetricType.Time => $"{set.Time ?? 0}",
             MetricType.TimeAndDistance => set.Distance?.ToString() ?? "",
             _ => throw new ArgumentException()
-        }).WithFormattedMetricMeasureMetric(metricType, set.ToStandardMeasure(metricType));
+        }).WithFormattedMetricMeasureMetric(metricType);
 }

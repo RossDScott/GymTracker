@@ -18,7 +18,7 @@ public record EndWorkoutState
         WorkoutStartDate!.Value.Date.Add(WorkoutStartTime!.Value);
     public required string TotalVolumeMessage { get; init; }
     public required ImmutableArray<ExerciseDetail> ExerciseList { get; init; }
-    public WorkoutPlanStatistics? PreviousStatistics { get; init; } = null;
+    public WorkoutPlanStatistic? PreviousStatistics { get; init; } = null;
 }
 
 public record ExerciseDetail

@@ -15,4 +15,5 @@ public record Exercise
     public string[] Equipment { get; set; } = Array.Empty<string>();
     public TimeSpan DefaultRestInterval { get; set; } = DefaultData.DefaultRestInterval;
     public bool IsAcitve { get; set; } = true;
+    public bool ShowChartOnHomepage { get; set; } = false;
 }

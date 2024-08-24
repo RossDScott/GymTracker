@@ -53,6 +53,11 @@
                 Label="Is Active" 
                 LabelPosition="LabelPosition.Start"
                 CheckedChanged="(bool isActive) => HandleIsActiveChanged(isActive)" />
+
+            <MudSwitch Checked="_showChartOnHomePage"
+                       Label="Show Chart on Homepage"
+                       LabelPosition="LabelPosition.Start"
+                       CheckedChanged="(bool show) => HandleShowChartOnHomePage(show)" />
         </MudStack>
     </MudForm>
 </MudPaper>
@@ -81,6 +86,7 @@
     ImmutableArray<string> _bodyTargets = ImmutableArray<string>.Empty;
     ImmutableArray<string> _equipment = ImmutableArray<string>.Empty;
     bool _isActive = true;
+    bool _showChartOnHomePage = false;
 
     protected override void OnParametersSet()
     {
@@ -89,6 +95,7 @@
         _bodyTargets = ExerciseDetail.BodyTarget;
         _equipment = ExerciseDetail.Equipment;
         _isActive = ExerciseDetail.IsActive;
+        _showChartOnHomePage = ExerciseDetail.ShowChartOnHomepage;
 
         _form?.ResetValidation();
 
@@ -131,6 +138,12 @@
         await HandleUpdateExercise();
     }
 
+    async Task HandleShowChartOnHomePage(bool show)
+    {
+        _showChartOnHomePage = show;
+        await HandleUpdateExercise();
+    }
+
     async Task HandleUpdateExercise()
     {
         await _form.Validate();
@@ -144,7 +157,8 @@
                 MetricType = _metricType,
                 BodyTarget = _bodyTargets,
                 Equipment = _equipment,
-                IsActive = _isActive
+                IsActive = _isActive,
+                ShowChartOnHomepage = _showChartOnHomePage
             };
 
         await OnExerciseUpdated.InvokeAsync(updateDTO);

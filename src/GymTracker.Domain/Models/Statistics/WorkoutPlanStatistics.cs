@@ -1,16 +1,16 @@
 ﻿using System.Collections.Immutable;
 
 namespace GymTracker.Domain.Models.Statistics;
-public record WorkoutPlanStatistics
+public record WorkoutPlanStatistic
 {
     public required Guid WorkoutPlanId { get; init; }
 
-    public required WorkoutStatistics PreviousWorkout { get; init; }
+    public required WorkoutStatistic PreviousWorkout { get; init; }
 
     public decimal BestWeightTotalVolumeIn6Months { get; init; }
 }
 
-public record WorkoutStatistics
+public record WorkoutStatistic
 {
     public required Guid WorkoutId { get; init; }
     public required Guid WorkoutPlanId { get; init; }

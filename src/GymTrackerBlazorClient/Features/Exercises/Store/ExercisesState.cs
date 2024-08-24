@@ -25,6 +25,7 @@ public record DetailItem
     public ImmutableArray<string> BodyTarget { get; init; } = ImmutableArray<string>.Empty;
     public ImmutableArray<string> Equipment { get; init; } = ImmutableArray<string>.Empty;
     public bool IsActive { get; set; } = true;
+    public bool ShowChartOnHomepage { get; set; } = false;
 }
 
 public enum ActiveFilterOption

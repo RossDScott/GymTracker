@@ -18,49 +18,66 @@ public class StatisticsBuilderService : ITrigger
     public void Subscribe()
     {
         _localStorageContex.Workouts.SubscribeToChanges(WorkoutsChanged);
+        _localStorageContex.Exercises.SubscribeToChanges(async _ =>
+        {
+            var workouts = await _localStorageContex.Workouts.GetOrDefaultAsync();
+            await WorkoutsChanged(workouts);
+        });
     }
 
     public async Task WorkoutsChanged(ICollection<Workout> workouts)
     {
+        var exercises = await _localStorageContex.Exercises.GetOrDefaultAsync();
         var completedWorkouts = workouts
                                 .Where(x => x.WorkoutEnd != null)
                                 .OrderByDescending(x => x.WorkoutEnd)
                                 .ToList();
 
-        var exercises = completedWorkouts
+        var completedExercises = completedWorkouts
             .SelectMany(wo => wo.Exercises
             .Select(ex => new
             {
                 ExerciseId = ex.Exercise.Id,
+                Name = ex.Exercise.Name,
                 WorkoutEnd = wo.WorkoutEnd!.Value,
-                ex.Sets
+                ex.Sets,
+                ShowChartOnHomePage = ex.Exercise.ShowChartOnHomepage
             }))
             .GroupBy(x => x.ExerciseId)
-            .ToList();
-
-        var exerciseStatistics = exercises
-            .Select(exercise => new ExerciseStatistic
+            .Select(completedExercise =>
             {
-                ExerciseId = exercise.Key,
-                Logs = exercise.Select(completedExercise => new ExerciseLog
+                var exercise = exercises.Single(x => x.Id == completedExercise.Key);
+                return new ExerciseStatistic
                 {
-                    WorkoutDateTime = completedExercise.WorkoutEnd,
-                    Sets = completedExercise.Sets
-                        .Where(x => x.SetType == DefaultData.SetType.Set && x.Completed)
-                        .Select(x => x.Metrics)
-                        .ToList()
-                })
-                .Where(x => x.Sets.Any())
-                .ToList()
+                    ExerciseId = completedExercise.Key,
+                    ExerciseName = exercise.Name,
+                    Logs = completedExercise
+                        .Select(completedExercise => new ExerciseLog
+                        {
+                            WorkoutDateTime = completedExercise.WorkoutEnd,
+                            Sets = completedExercise.Sets
+                                .Where(x => x.SetType == DefaultData.SetType.Set && x.Completed)
+                                .Select(x => x.Metrics)
+                                .ToList(),
+                            TotalVolume = completedExercise.Sets
+                                .Where(x => x.Completed)
+                                .Select(x => x.Metrics)
+                                .GetTotalVolume(exercise.MetricType)
+                        })
+                        .Where(x => x.Sets.Any())
+                        .ToList(),
+                    ShowChartOnHomePage = exercise.ShowChartOnHomepage,
+                    ExerciseMetric = exercise.MetricType.ToMetricDescription()
+                };
             }).ToList();
 
-        await _localStorageContex.ExerciseStatistics.SetAsync(exerciseStatistics);
+        await _localStorageContex.ExerciseStatistics.SetAsync(completedExercises);
 
         var sixMonthsAgo = DateTimeOffset.Now.AddMonths(-6);
         var workoutPlanStatistics = completedWorkouts
             .GroupBy(x => x.Plan.Id)
             .Where(x => x.Any())
-            .Select(plan => new WorkoutPlanStatistics
+            .Select(plan => new WorkoutPlanStatistic
             {
                 WorkoutPlanId = plan.Key,
                 PreviousWorkout = plan.First().ToWorkoutStatistics(),

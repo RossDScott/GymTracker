@@ -4,8 +4,8 @@ using System.Collections.Immutable;
 namespace GymTracker.Domain.Models.Extensions;
 public static class WorkoutExtensions
 {
-    public static WorkoutStatistics ToWorkoutStatistics(this Workout workout)
-        => new WorkoutStatistics
+    public static WorkoutStatistic ToWorkoutStatistics(this Workout workout)
+        => new WorkoutStatistic
         {
             WorkoutId = workout.Id,
             WorkoutPlanId = workout.Plan.Id,

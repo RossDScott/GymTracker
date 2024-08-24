@@ -1,7 +1,7 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Features.Common;
 using GymTracker.Domain.Models;
 using System.Collections.Immutable;
-using GymTracker.BlazorClient.Features.Common;
 
 namespace GymTracker.BlazorClient.Features.Exercises.Store;
 
@@ -27,33 +27,33 @@ public static class ExercisesReducers
             },
             SelectedExercise = null
         }.FilterExercises();
-        
+
         return initialState;
     }
 
     [ReducerMethod]
     public static ExercisesState OnSetExercises(ExercisesState state, SetExercisesAction action) =>
-        FilterExercises(state with 
-            { OriginalList = action.Exercises.ToImmutableArray() });
+        FilterExercises(state with
+        { OriginalList = action.Exercises.ToImmutableArray() });
 
     [ReducerMethod]
     public static ExercisesState OnSetExercise(ExercisesState state, SetExerciseAction action) =>
-        state with 
-        { 
-            SelectedExercise = action.Exercise.ToDetailItem() 
+        state with
+        {
+            SelectedExercise = action.Exercise.ToDetailItem()
         };
 
     [ReducerMethod]
     public static ExercisesState OnCreateNewExercise(ExercisesState state, CreateNewExerciseAction action) =>
-        state with 
-        { 
-            SelectedExercise = new DetailItem { Id = Guid.NewGuid(), MetricType = MetricType.Weight } 
+        state with
+        {
+            SelectedExercise = new DetailItem { Id = Guid.NewGuid(), MetricType = MetricType.Weight }
         };
 
     [ReducerMethod]
     public static ExercisesState OnUpdateFilter(ExercisesState state, UpdateFilterAction action) =>
-        FilterExercises(state with 
-            { Filter = action.Filter });
+        FilterExercises(state with
+        { Filter = action.Filter });
 
     private static ExercisesState FilterExercises(this ExercisesState state)
     {
@@ -94,6 +94,7 @@ public static class ExercisesReducers
             MetricType = exercise.MetricType,
             BodyTarget = exercise.BodyTarget.ToImmutableArray(),
             Equipment = exercise.Equipment.ToImmutableArray(),
-            IsActive = exercise.IsAcitve
+            IsActive = exercise.IsAcitve,
+            ShowChartOnHomepage = exercise.ShowChartOnHomepage,
         };
 }

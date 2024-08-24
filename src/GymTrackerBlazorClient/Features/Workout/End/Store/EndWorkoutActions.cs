@@ -6,5 +6,5 @@ public record EndWorkoutAction();
 public record ConfirmEndWorkoutAction();
 public record CancelEndWorkoutAction();
 public record AbandonWorkoutAction();
-public record SetEndWorkoutAction(Models.Workout Workout, Models.Statistics.WorkoutPlanStatistics? PreviousStatistics);
+public record SetEndWorkoutAction(Models.Workout Workout, Models.Statistics.WorkoutPlanStatistic? PreviousStatistics);
 public record SetSelectedProgressAction(Guid workoutExerciseId, ProgressType progressType);

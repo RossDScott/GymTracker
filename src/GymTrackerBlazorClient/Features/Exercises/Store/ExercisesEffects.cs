@@ -74,6 +74,7 @@ public class ExercisesEffects
         exercise.BodyTarget = updateDTO.BodyTarget.ToArray();
         exercise.Equipment = updateDTO.Equipment.ToArray();
         exercise.IsAcitve = updateDTO.IsActive;
+        exercise.ShowChartOnHomepage = updateDTO.ShowChartOnHomepage;
 
         var response = await _clientStorage.Exercises.UpsertAsync(exercise);
         dispatcher.Dispatch(new SetExercisesAction(exercises));

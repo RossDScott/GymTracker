@@ -1,4 +1,5 @@
-﻿using Fluxor;
+﻿using ApexCharts;
+using Fluxor;
 using GymTracker.BlazorClient.Features.Workout.End.Store;
 using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 using GymTracker.Domain.Models.Statistics;
@@ -11,12 +12,35 @@ namespace GymTracker.BlazorClient.Features.Home.Store;
 public record HomeState
 {
     public bool HasExistingWorkout { get; init; } = false;
-    public ImmutableArray<WorkoutStatistics> CompletedWorkouts { get; init; } = ImmutableArray<WorkoutStatistics>.Empty;
+    public ImmutableArray<WorkoutStatistic> CompletedWorkouts { get; init; } = ImmutableArray<WorkoutStatistic>.Empty;
+    public ImmutableArray<ChartState> Charts { get; init; } = ImmutableArray<ChartState>.Empty;
+}
+
+public record ChartState
+{
+    public required ExerciseStatistic ExerciseStatistic { get; init; }
+    public ApexChartOptions<ExerciseLog> ChartOptions
+    => new()
+    {
+        Chart = new Chart
+        {
+            Background = "#32333d",
+            Toolbar = new Toolbar
+            {
+                Show = false
+            },
+            ForeColor = "#fff",
+            Width = "100%",
+            Height = "200px"
+        },
+        Colors = new List<string> { "#77B6EA" },
+    };
 }
 
 public record InitaliseHomeAction();
 public record SetHasExistingWorkoutAction(bool HasExistingWorkout);
-public record SetCompletedWorkoutsAction(IEnumerable<WorkoutStatistics> Statistics);
+public record SetWorkoutStatisticsDataAction(IEnumerable<WorkoutStatistic> Statistics);
+public record SetExerciseStatisticsDataAction(IEnumerable<ExerciseStatistic> Statistics);
 
 public class HomeEffects
 {
@@ -28,7 +52,13 @@ public class HomeEffects
 
         clientStorage.WorkoutStatistics.SubscribeToChanges((stats) =>
         {
-            dispatcher.Dispatch(new SetCompletedWorkoutsAction(stats));
+            dispatcher.Dispatch(new SetWorkoutStatisticsDataAction(stats));
+            return Task.CompletedTask;
+        });
+
+        clientStorage.ExerciseStatistics.SubscribeToChanges((stats) =>
+        {
+            dispatcher.Dispatch(new SetExerciseStatisticsDataAction(stats));
             return Task.CompletedTask;
         });
     }
@@ -39,9 +69,13 @@ public class HomeEffects
         var hasExistingWorkout = await _clientStorage.CurrentWorkout.GetAsync() is not null;
         dispatcher.Dispatch(new SetHasExistingWorkoutAction(hasExistingWorkout));
 
-        var statistics = await _clientStorage.WorkoutStatistics.GetAsync();
-        if (statistics != null)
-            dispatcher.Dispatch(new SetCompletedWorkoutsAction(statistics));
+        var workouts = await _clientStorage.WorkoutStatistics.GetAsync();
+        if (workouts != null)
+            dispatcher.Dispatch(new SetWorkoutStatisticsDataAction(workouts));
+
+        var exercises = await _clientStorage.ExerciseStatistics.GetAsync();
+        if (exercises != null)
+            dispatcher.Dispatch(new SetExerciseStatisticsDataAction(exercises));
     }
 
     [EffectMethod]
@@ -65,13 +99,23 @@ public class HomeEffects
             => state with { HasExistingWorkout = action.HasExistingWorkout };
 
         [ReducerMethod]
-        public static HomeState OnSetCompletedWorkouts(HomeState state, SetCompletedWorkoutsAction action)
+        public static HomeState OnSetCompletedWorkouts(HomeState state, SetWorkoutStatisticsDataAction action)
             => state with
             {
                 CompletedWorkouts = action.Statistics
                                             .OrderByDescending(x => x.CompletedOn)
                                             .Take(20)
                                             .ToImmutableArray()
+            };
+
+        [ReducerMethod]
+        public static HomeState OnSetExerciseStatisticsData(HomeState state, SetExerciseStatisticsDataAction action)
+            => state with
+            {
+                Charts = action.Statistics
+                    .Where(x => x.ShowChartOnHomePage)
+                    .Select(x => new ChartState { ExerciseStatistic = x })
+                    .ToImmutableArray()
             };
     }
 }
