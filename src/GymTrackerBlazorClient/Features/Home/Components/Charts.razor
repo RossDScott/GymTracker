@@ -5,26 +5,24 @@
 
 @inject IState<HomeState> State
 
-<div class="d-flex">
-    @foreach (var chart in State.Value.Charts)
-    {
-        <div style="width: 400px">
-            @chart.ExerciseStatistic.ExerciseName
-            <ApexChart TItem="ExerciseLog"
-                       XAxisType="XAxisType.Datetime"
-                       Options="chart.ChartOptions">
+@foreach (var chart in State.Value.Charts)
+{
+    <div style="width: 400px">
+        @chart.ExerciseStatistic.ExerciseName
+        <ApexChart TItem="ExerciseLog"
+                    XAxisType="XAxisType.Datetime"
+                    Options="chart.ChartOptions">
 
-                <ApexPointSeries TItem="ExerciseLog"
-                                 Items="chart.ExerciseStatistic.Logs"
-                                 Name="Net Value"
-                                 SeriesType="SeriesType.Line"
-                                 XValue="@(e => e.WorkoutDateTime)"
-                                 YValue="@(e => e.TotalVolume)"
-                                 OrderByDescending="x=>x.X" />
-            </ApexChart>
-        </div>
-    }
-</div>
+            <ApexPointSeries TItem="ExerciseLog"
+                                Items="chart.ExerciseStatistic.Logs"
+                                Name="Net Value"
+                                SeriesType="SeriesType.Line"
+                                XValue="@(e => e.WorkoutDateTime)"
+                                YValue="@(e => e.TotalVolume)"
+                                OrderByDescending="x=>x.X" />
+        </ApexChart>
+    </div>
+}
 
 @code {
 
