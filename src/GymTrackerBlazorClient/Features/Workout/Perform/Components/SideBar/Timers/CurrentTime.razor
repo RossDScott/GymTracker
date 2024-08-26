@@ -1,7 +1,7 @@
 ﻿@using System.Timers
 
-<MudText Typo="Typo.subtitle1">Current Time</MudText>
-<MudText Typo="Typo.h4">@currentTime.ToString("HH:mm")</MudText>
+<MudText Typo="Typo.caption">Current Time</MudText>
+<MudText Typo="Typo.h3">@currentTime.ToString("HH:mm")</MudText>
 
 @code {
     private TimeOnly currentTime = TimeOnly.FromDateTime(DateTime.Now);

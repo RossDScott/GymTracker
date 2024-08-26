@@ -5,8 +5,8 @@
 @inject IDispatcher Dispatcher
 @inject IState<StopwatchState> State
 
-<MudText Typo="Typo.subtitle1">Stopwatch</MudText>
-<MudText Typo="Typo.h4">@State.Value.Duration.ToString(@"mm\:ss\:f")</MudText>
+<MudText Typo="Typo.caption">Stopwatch</MudText>
+<MudText Typo="Typo.h3">@State.Value.Duration.ToString(@"mm\:ss\:f")</MudText>
 
 <div class="d-flex">
     <ControlButtons

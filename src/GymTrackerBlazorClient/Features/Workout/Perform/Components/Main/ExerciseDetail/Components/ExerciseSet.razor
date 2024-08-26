@@ -42,7 +42,7 @@
     private EditSet editSet = default!;
 
     private string selectedClass => IsSelected ? "selected" : "";
-    private string completedCircleIcon => Set.Completed ? Icons.Material.Filled.Circle : @Icons.Material.Outlined.Circle;
+    private string completedCircleIcon => Set.Completed ? Icons.Material.Filled.CheckCircle : @Icons.Material.Outlined.Circle;
 
     protected override void OnParametersSet()
     {
