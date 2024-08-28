@@ -12,7 +12,7 @@
 </script>
 
 <MudText Typo="Typo.caption">Countdown</MudText>
-@* @if(State.Value.ShowStartTimerFace)
+@if(State.Value.ShowStartTimerFace)
 {
     @startTimerFace()
 }
@@ -20,11 +20,10 @@
 {
     <MudText Typo="Typo.h3">@State.Value.Duration.ToString(@"mm\:ss\:f")</MudText>
 }
-
 @if(State.Value.TimesUp)
-{ *@
+{
     <MudText Typo="Typo.h3" Class="pulsate">Times Up!</MudText>
-@* } *@
+}
 
 <div class="d-flex" style="visibility: @(State.Value.TimesUp ? "hidden" : "visible")">
     <ControlButtons

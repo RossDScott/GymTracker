@@ -8,6 +8,8 @@ public static class ExerciseSetMetricsExtensions
         => metricType switch
         {
             MetricType.Weight => metrics.MaxBy(x => (x.Weight ?? 0) * (x.Reps ?? 0)),
+            MetricType.Time => metrics.MaxBy(x => x.Time ?? 0),
+            MetricType.TimeAndDistance => metrics.MaxBy(x => x.Distance ?? 0),
             _ => throw new ArgumentOutOfRangeException(nameof(metricType))
         };
 
