@@ -1,7 +1,8 @@
-﻿using System.Collections.Immutable;
-using Fluxor;
+﻿using Fluxor;
 using GymTracker.BlazorClient.Features.Common;
 using GymTracker.Domain.Models.Extensions;
+using MudBlazor;
+using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.History.WorkoutHistory.Store;
 
@@ -25,7 +26,7 @@ public static class WorkoutHistoryReducers
             WorkoutPlans = workoutPlans,
             SelectedWorkoutPlanId = workoutPlans.First().Id,
             Workouts = workouts,
-
+            WorkoutDateRange = new DateRange(DateTime.Now.AddMonths(-1), DateTime.Now)
         };
 
         return CalculateFilter(state);
