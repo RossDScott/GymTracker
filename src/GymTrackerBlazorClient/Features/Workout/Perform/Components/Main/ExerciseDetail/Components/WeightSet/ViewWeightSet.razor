@@ -1,9 +1,24 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
 
-<MudItem xs="2" Class="textCenter"><MudText Typo="Typo.subtitle1">@Set.TargetWeight Kg</MudText></MudItem>
-<MudItem xs="1" Class="textCenter mr-5"><MudText Typo="Typo.subtitle1">@Set.TargetReps</MudText></MudItem>
-<MudItem xs="2" Class="textCenter"><MudText Typo="Typo.subtitle1">@Set.ActualWeight Kg</MudText></MudItem>
-<MudItem xs="1" Class="textCenter mr-5"><MudText Typo="Typo.subtitle1">@Set.ActualReps</MudText></MudItem>
+<MudItem xs="1" Class="textCenter relative">
+    <MudText Typo="Typo.subtitle1">@Set.TargetReps</MudText>
+    <span class="x">x</span>
+</MudItem>
+<MudItem xs="2" Class="textCenter mr-5"><MudText Typo="Typo.subtitle1">@Set.TargetWeight Kg</MudText></MudItem>
+<MudItem xs="1" Class="textCenter relative">
+    <MudText Typo="Typo.subtitle1">@Set.ActualReps</MudText>
+    <span class="x">x</span>
+</MudItem>
+<MudItem xs="2" Class="textCenter mr-5"><MudText Typo="Typo.subtitle1">@Set.ActualWeight Kg</MudText></MudItem>
+
+<style>
+    .x {
+        position: absolute;
+        float: left;
+        top: 18px;
+        left: 72px;
+    }
+</style>
 
 @code {
     [Parameter, EditorRequired]
