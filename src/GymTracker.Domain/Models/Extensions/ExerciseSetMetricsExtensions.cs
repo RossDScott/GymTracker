@@ -31,13 +31,9 @@ public static class ExerciseSetMetricsExtensions
         => $"{sets.Sum(x => x.Weight * x.Reps)} Kg";
 
     public static string GetTotalVolumeWithMeasure(this IEnumerable<ExerciseSetMetrics> sets, MetricType metricType)
-        => metricType switch
-        {
-            MetricType.Weight => $"{sets.Sum(x => x.Weight * x.Reps)} Kg",
-            MetricType.Time => $"{sets.Sum(x => x.Time ?? 0)} Seconds",
-            MetricType.Reps => $"{sets.Sum(x => x.Reps ?? 0)} Reps",
-            _ => throw new ArgumentOutOfRangeException(nameof(metricType))
-        };
+        => GetTotalVolume(sets, metricType)
+            .ToString()
+            .WithFormattedMetricMeasureMetric(metricType);
 
     public static decimal GetTotalVolume(this IEnumerable<ExerciseSetMetrics> sets, MetricType metricType)
         => metricType switch
@@ -47,9 +43,6 @@ public static class ExerciseSetMetricsExtensions
             MetricType.Reps => sets.Sum(x => x.Reps ?? 0),
             _ => throw new ArgumentOutOfRangeException(nameof(metricType))
         };
-
-    public static decimal GetWeightTotalVolume(this IEnumerable<ExerciseSetMetrics> sets)
-        => sets.Sum(x => (x.Weight ?? 0) * (x.Reps ?? 0));
 
     public static string ToFormattedMetric(this ExerciseSetMetrics set, MetricType metricType)
         => (metricType switch

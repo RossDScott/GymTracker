@@ -32,7 +32,7 @@ public static class WorkoutExtensions
             .Where(x => x.Exercise.MetricType == MetricType.Weight)
             .SelectMany(x => x.Sets)
             .Select(x => x.Metrics)
-            .GetWeightTotalVolume();
+            .GetTotalVolume(MetricType.Weight);
 
     public static string GetWeightTotalVolumeWithMeasure(this Workout workout)
         => workout
