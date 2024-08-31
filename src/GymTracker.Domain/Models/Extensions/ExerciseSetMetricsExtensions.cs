@@ -48,9 +48,9 @@ public static class ExerciseSetMetricsExtensions
         => (metricType switch
         {
             MetricType.Weight => $"{set.Reps ?? 0} x {set.Weight ?? 0}",
-            MetricType.Time => $"{set.Time ?? 0}",
-            MetricType.TimeAndDistance => set.Distance?.ToString() ?? "",
-            MetricType.Reps => set.Reps?.ToString() ?? "",
+            MetricType.Time => set.Time?.ToString() ?? "0",
+            MetricType.TimeAndDistance => set.Distance?.ToString() ?? "0",
+            MetricType.Reps => set.Reps?.ToString() ?? "0",
             _ => throw new ArgumentException()
         }).WithFormattedMetricMeasureMetric(metricType);
 }
