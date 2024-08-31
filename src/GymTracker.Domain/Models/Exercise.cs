@@ -3,7 +3,8 @@ public enum MetricType
 {
     Weight,
     Time,
-    TimeAndDistance
+    TimeAndDistance,
+    Reps
 }
 
 public record Exercise

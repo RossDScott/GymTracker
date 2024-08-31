@@ -1,0 +1,22 @@
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
+@using GymTracker.BlazorClient.Features.Common.UpDownNumericEditor
+
+@inject IDispatcher Dispatcher
+<MudItem xs="1"></MudItem>
+<MudItem xs="1" Class="d-flex flex-column py-0 textCenter">
+    <UpDownIntegerEditor @bind-Value="EditSet.TargetReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
+</MudItem>
+<MudItem xs="2"></MudItem>
+<MudItem xs="1" class="textCenter mr-16 ml-4 py-0">
+    <UpDownIntegerEditor @bind-Value="EditSet.ActualReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
+</MudItem>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid WorkoutExerciseId { get; set; }
+
+    [Parameter, EditorRequired]
+    public EditSet EditSet { get; set; } = default!;
+
+    private void handleRowDataChange() => Dispatcher.Dispatch(new SetSetDataAction(WorkoutExerciseId, EditSet));
+}

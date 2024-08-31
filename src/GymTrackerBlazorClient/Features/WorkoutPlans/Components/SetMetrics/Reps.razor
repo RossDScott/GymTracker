@@ -1,0 +1,18 @@
+﻿@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+
+<MudItem xs="3">
+    <MudTextField @bind-Value="Set.Reps"
+                  DebounceInterval="500"
+                  OnDebounceIntervalElapsed="OnUpdateSet"
+                  Label="Reps"
+                  Variant="Variant.Text"
+                  Margin="Margin.Dense"></MudTextField>
+</MudItem>
+
+@code {
+    [Parameter, EditorRequired]
+    public PlannedSetDetail Set { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnUpdateSet { get; set; }
+}

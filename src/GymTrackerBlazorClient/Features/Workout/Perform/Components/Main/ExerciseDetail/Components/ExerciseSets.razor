@@ -1,4 +1,5 @@
 ﻿@using GymTracker.BlazorClient.Features.Common.ListItemFieldEditor
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Components.RepSet
 @using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Components.TimeSet
 @using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Components.WeightSet
 @using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
@@ -52,6 +53,7 @@
     {
         MetricType.Weight => @<HeaderWeightSet></HeaderWeightSet>,
         MetricType.Time => @<HeaderTimeSet></HeaderTimeSet>,
+        MetricType.Reps => @<HeaderRepSet></HeaderRepSet>,
         _ => throw new ArgumentOutOfRangeException()
     };
 
@@ -59,6 +61,7 @@
     {
         MetricType.Weight => @<ViewWeightSet Set="viewSet"></ViewWeightSet>,
         MetricType.Time => @<ViewTimeSet Set="viewSet"></ViewTimeSet>,
+        MetricType.Reps => @<ViewRepSet Set="viewSet"></ViewRepSet>,
         _ => throw new ArgumentOutOfRangeException()
     };
 
@@ -69,6 +72,8 @@
                                              WorkoutExerciseId="workoutExerciseId"></EditWeightSet>,
         MetricType.Time => @<EditTimeSet EditSet="editSet"
                                          WorkoutExerciseId="workoutExerciseId"></EditTimeSet>,
+        MetricType.Reps => @<EditRepSet EditSet="editSet"
+                                        WorkoutExerciseId="workoutExerciseId"></EditRepSet>,
         _ => throw new ArgumentOutOfRangeException()
     };
 

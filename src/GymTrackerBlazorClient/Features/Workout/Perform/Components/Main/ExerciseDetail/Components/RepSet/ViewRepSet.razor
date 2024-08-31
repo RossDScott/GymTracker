@@ -1,0 +1,24 @@
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
+
+<MudItem xs="3" Class="ps-0 py-0 mr-0 textCenter">
+    <MudText Typo="Typo.subtitle1">@Set.TargetReps</MudText>
+</MudItem>
+<MudItem xs="3" Class="ps-12 py-0 mr-4 textCenter">
+    @targetOrCompletedReps
+</MudItem>
+<style>
+    .notCompleted{
+        opacity: 0.1;
+    }
+</style>
+
+@code {
+        [Parameter, EditorRequired]
+        public Set Set { get; set; } = default!;
+
+        string completedClass => Set.Completed ? "" : "notCompleted";
+
+        RenderFragment targetOrCompletedReps => Set.Completed
+            ? @<MudText Typo="Typo.subtitle1">@Set.ActualReps</MudText>
+            : @<MudText Class="notCompleted" Typo="Typo.subtitle1">@Set.TargetReps</MudText>;
+}
