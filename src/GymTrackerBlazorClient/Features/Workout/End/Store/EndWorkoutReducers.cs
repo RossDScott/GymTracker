@@ -80,11 +80,12 @@ public static class EndWorkoutReducers
         {
             progressSets.Add(new ProgressSet { ProgressType = ProgressType.MaxSet, Metrics = maxSet, Selected = false });
 
-            if (completedAll)
+            if (completedAll && workoutExercise.PlannedExercise != null)
             {
-                if (metricType == MetricType.Weight && workoutExercise.PlannedExercise != null)
+                ExerciseSetMetrics? progressSet = null;
+
+                if (metricType == MetricType.Weight)
                 {
-                    ExerciseSetMetrics progressSet;
                     if (maxSet.Reps >= workoutExercise.PlannedExercise.TargetRepsUpper)
                     {
                         progressSet = maxSet with
@@ -97,8 +98,15 @@ public static class EndWorkoutReducers
                     {
                         progressSet = maxSet with { Reps = maxSet.Reps + 1 };
                     }
-                    progressSets.Add(new ProgressSet { ProgressType = ProgressType.AutoProgress, Metrics = progressSet, Selected = true });
                 }
+
+                if (metricType == MetricType.Reps)
+                {
+                    progressSet = maxSet with { Reps = maxSet.Reps + 1 };
+                }
+
+                if (progressSet != null)
+                    progressSets.Add(new ProgressSet { ProgressType = ProgressType.AutoProgress, Metrics = progressSet, Selected = true });
             }
         }
 
@@ -122,6 +130,4 @@ public static class EndWorkoutReducers
 
         return progressSets.ToImmutableArray();
     }
-
-
 }

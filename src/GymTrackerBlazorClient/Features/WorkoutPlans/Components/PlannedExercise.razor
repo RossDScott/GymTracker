@@ -1,6 +1,7 @@
 ﻿@using GymTracker.BlazorClient.Features.Common.UpDownNumericEditor.Store
 @using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
 @using System.Collections.Immutable;
+@using GymTracker.Domain.Models
 
 @inject IState<WorkoutPlansState> State
 @inject IDispatcher Dispatcher
@@ -44,24 +45,27 @@
                        Size="Size.Small"
                        Label="Auto Start Rest Timer" LabelPosition="LabelPosition.Start" />
 
-            @if(Exercise.MetricType == Domain.Models.MetricType.Weight)
+            @if(Exercise.MetricType is MetricType.Weight or MetricType.Reps)
             {
                 <MudField Variant="Variant.Outlined" Label="Progression" InnerPadding="false">
                     <div Class="d-flex flex-row">
-                        <MudNumericField @bind-Value="_model.TargetRepsLower"
-                                         @bind-Value:after="HandleChange"
-                                         Label="Min Reps"
-                                         Variant="Variant.Text"
-                                         DisableUnderLine="true"
-                                         HideSpinButtons="true"
-                                         Min="0" Max="99" />
-                        <MudNumericField @bind-Value="_model.TargetRepsUpper"
-                                         @bind-Value:after="HandleChange"
-                                         Label="Max Reps"
-                                         Variant="Variant.Text"
-                                         DisableUnderLine="true"
-                                         HideSpinButtons="true"
-                                         Min="0" Max="99" />
+                        @if(Exercise.MetricType is MetricType.Weight)
+                        {
+                            <MudNumericField @bind-Value="_model.TargetRepsLower"
+                                             @bind-Value:after="HandleChange"
+                                             Label="Min Reps"
+                                             Variant="Variant.Text"
+                                             DisableUnderLine="true"
+                                             HideSpinButtons="true"
+                                             Min="0" Max="99" />
+                            <MudNumericField @bind-Value="_model.TargetRepsUpper"
+                                             @bind-Value:after="HandleChange"
+                                             Label="Max Reps"
+                                             Variant="Variant.Text"
+                                             DisableUnderLine="true"
+                                             HideSpinButtons="true"
+                                             Min="0" Max="99" />
+                        }
                         <MudSelect DisableUnderLine="true"
                                    Dense="true"
                                    T="decimal"
