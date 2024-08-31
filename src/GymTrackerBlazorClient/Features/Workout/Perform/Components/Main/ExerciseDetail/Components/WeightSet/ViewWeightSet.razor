@@ -6,21 +6,33 @@
 </MudItem>
 <MudItem xs="2" Class="textCenter mr-5"><MudText Typo="Typo.subtitle1">@Set.TargetWeight Kg</MudText></MudItem>
 <MudItem xs="1" Class="textCenter relative">
-    <MudText Typo="Typo.subtitle1">@Set.ActualReps</MudText>
-    <span class="x">x</span>
+    @targetOrCompletedReps
+    <span class="x @(Set.Completed ? "" : "notCompleted")">x</span>
 </MudItem>
-<MudItem xs="2" Class="textCenter mr-5"><MudText Typo="Typo.subtitle1">@Set.ActualWeight Kg</MudText></MudItem>
-
+<MudItem xs="2" Class="textCenter mr-5">@targetOrCompletedWeight</MudItem>
 <style>
     .x {
         position: absolute;
         float: left;
-        top: 18px;
-        left: 72px;
+        top: 17px;
+        left: 73px;
+    }
+    .notCompleted{
+        opacity: 0.1;
     }
 </style>
 
 @code {
-    [Parameter, EditorRequired]
-    public Set Set { get; set; } = default!;
+        [Parameter, EditorRequired]
+        public Set Set { get; set; } = default!;
+
+        string completedClass => Set.Completed ? "" : "notCompleted";
+
+        RenderFragment targetOrCompletedReps => Set.Completed
+            ? @<MudText Typo="Typo.subtitle1">@Set.ActualReps</MudText>
+            : @<MudText Class="notCompleted" Typo="Typo.subtitle1">@Set.TargetReps</MudText>;
+
+        RenderFragment targetOrCompletedWeight => Set.Completed
+            ? @<MudText Typo="Typo.subtitle1">@Set.ActualWeight</MudText>
+            : @<MudText Class="notCompleted" Typo="Typo.subtitle1">@Set.TargetWeight</MudText>;
 }
