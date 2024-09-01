@@ -1,10 +1,9 @@
 ﻿using GymTracker.Domain.Models;
 using GymTracker.Domain.Models.Extensions;
 using GymTracker.Domain.Models.Statistics;
-using GymTracker.LocalStorage;
 using GymTracker.LocalStorage.Core;
 
-namespace GymTracker.BlazorClient.Services;
+namespace GymTracker.LocalStorage.Triggers;
 
 public class StatisticsBuilderService : ITrigger
 {
@@ -38,7 +37,7 @@ public class StatisticsBuilderService : ITrigger
             .Select(ex => new
             {
                 ExerciseId = ex.Exercise.Id,
-                Name = ex.Exercise.Name,
+                ex.Exercise.Name,
                 WorkoutEnd = wo.WorkoutEnd!.Value,
                 ex.Sets,
                 ShowChartOnHomePage = ex.Exercise.ShowChartOnHomepage

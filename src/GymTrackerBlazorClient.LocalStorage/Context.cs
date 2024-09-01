@@ -1,7 +1,7 @@
-﻿using GymTracker.BlazorClient.Services;
-using GymTracker.Domain.Models;
+﻿using GymTracker.Domain.Models;
 using GymTracker.Domain.Models.Statistics;
 using GymTracker.LocalStorage.Core;
+using GymTracker.LocalStorage.Triggers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GymTracker.LocalStorage;
@@ -41,6 +41,7 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
         });
 
         AddTrigger(new StatisticsBuilderService(this));
+        AddTrigger(new ExerciseUpdateTrigger(this));
 
         base.Configure();
     }

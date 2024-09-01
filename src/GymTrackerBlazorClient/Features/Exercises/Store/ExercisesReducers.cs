@@ -18,7 +18,7 @@ public static class ExercisesReducers
         {
             TargetBodyParts = targetBodyParts,
             Equipment = action.Equipment.OrderBy(x => x).ToImmutableArray(),
-            OriginalList = action.Exercises.ToImmutableArray(),
+            OriginalList = action.Exercises.OrderBy(x => x.Name).ToImmutableArray(),
             Filter = new ExercisesFilter
             {
                 ActiveOption = ActiveFilterOption.Active,
