@@ -76,7 +76,8 @@ public static class EndWorkoutReducers
         }
 
         var maxSet = workoutExercise.GetMaxSet();
-        if (maxSet != null)
+        var minSet = workoutExercise.GetMinSet();
+        if (maxSet != null && minSet != null)
         {
             progressSets.Add(new ProgressSet { ProgressType = ProgressType.MaxSet, Metrics = maxSet, Selected = false });
 
@@ -86,23 +87,23 @@ public static class EndWorkoutReducers
 
                 if (metricType == MetricType.Weight)
                 {
-                    if (maxSet.Reps >= workoutExercise.PlannedExercise.TargetRepsUpper)
+                    if (minSet.Reps >= workoutExercise.PlannedExercise.TargetRepsUpper)
                     {
-                        progressSet = maxSet with
+                        progressSet = minSet with
                         {
                             Reps = workoutExercise.PlannedExercise.TargetRepsLower,
-                            Weight = maxSet.Weight + workoutExercise.PlannedExercise.TargetWeightIncrement
+                            Weight = minSet.Weight + workoutExercise.PlannedExercise.TargetWeightIncrement
                         };
                     }
                     else
                     {
-                        progressSet = maxSet with { Reps = maxSet.Reps + 1 };
+                        progressSet = minSet with { Reps = minSet.Reps + 1 };
                     }
                 }
 
                 if (metricType == MetricType.Reps)
                 {
-                    progressSet = maxSet with { Reps = maxSet.Reps + 1 };
+                    progressSet = minSet with { Reps = minSet.Reps + 1 };
                 }
 
                 if (progressSet != null)

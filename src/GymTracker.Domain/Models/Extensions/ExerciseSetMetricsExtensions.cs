@@ -4,6 +4,9 @@ public static class ExerciseSetMetricsExtensions
     public static ExerciseSetMetrics? GetMaxSet(this IEnumerable<ExerciseSetMetrics> metrics, MetricType metricType)
         => metrics.MaxBy(x => x.ToStandardMeasure(metricType));
 
+    public static ExerciseSetMetrics? GetMinSet(this IEnumerable<ExerciseSetMetrics> metrics, MetricType metricType)
+        => metrics.MinBy(x => x.ToStandardMeasure(metricType));
+
     public static ExerciseSetMetrics? GetMaxVolumeSet(this IEnumerable<ExerciseSetMetrics> metrics, MetricType metricType)
         => metricType switch
         {
