@@ -14,6 +14,8 @@ public static class WorkoutExtensions
             TotalTime = workout.WorkoutEnd.Value - workout.WorkoutStart,
             TotalWeightVolume = workout.GetWeightTotalVolume(),
             TotalWeightVolumeWithMeasure = workout.GetWeightTotalVolumeWithMeasure(),
+            IsRepsOnly = workout.Exercises.All(x => x.Exercise.MetricType == MetricType.Reps),
+            TotalReps = workout.GetTotalReps(),
             Exercises = workout.Exercises
                                .Select(x => new WorkoutExerciseStatistics
                                {
@@ -41,4 +43,11 @@ public static class WorkoutExtensions
             .SelectMany(x => x.Sets)
             .Select(x => x.Metrics)
             .GetWeightTotalVolumeWithMeasure();
+
+    public static int GetTotalReps(this Workout workout)
+        => workout
+            .Exercises
+            .Where(x => x.Exercise.MetricType == MetricType.Reps)
+            .SelectMany(x => x.Sets)
+            .Sum(x => x.Metrics.Reps ?? 0);
 }

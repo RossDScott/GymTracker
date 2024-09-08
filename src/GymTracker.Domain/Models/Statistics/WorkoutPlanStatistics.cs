@@ -19,6 +19,8 @@ public record WorkoutStatistic
     public required TimeSpan TotalTime { get; init; }
     public required decimal TotalWeightVolume { get; init; }
     public required string TotalWeightVolumeWithMeasure { get; init; }
+    public int TotalReps { get; init; } = 0;
+    public bool IsRepsOnly { get; set; } = false;
 
     public required ImmutableArray<WorkoutExerciseStatistics> Exercises { get; init; }
 }
