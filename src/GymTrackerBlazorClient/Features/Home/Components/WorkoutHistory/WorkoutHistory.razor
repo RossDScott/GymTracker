@@ -1,0 +1,34 @@
+﻿@using GymTracker.BlazorClient.Features.History.WorkoutHistory.Store
+@using GymTracker.BlazorClient.Features.Home.Store
+@using GymTracker.Domain.Models
+@using GymTracker.Domain.Models.Extensions
+@using GymTracker.Domain.Models.Statistics
+
+@inherits FluxorComponent
+
+@inject NavigationManager NavigationManager
+@inject IState<HomeState> State
+@inject IDispatcher Dispatcher
+
+<div class="fullHeight" style="overflow-y: auto">
+    @foreach(var historyItem in State.Value.CompletedWorkouts)
+    {
+        <MudPaper Class="pa-3 mb-2" Elevation="1" @onclick="() => HandleViewHistory(historyItem.WorkoutPlanId)">
+            <div class="d-flex justify-space-between">
+                <MudText Typo="Typo.subtitle1">@historyItem.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
+                <MudText Typo="Typo.subtitle1">@historyItem.WorkoutPlanName</MudText>
+            </div>
+
+            @WorkoutView(historyItem)
+           
+        </MudPaper>
+    }
+</div>
+
+@code {
+    RenderFragment WorkoutView(WorkoutStatistic workout) => workout.IsRepsOnly && workout.Exercises.Count() == 1
+        ?@<SingleExerciseReps WorkoutStatistic="workout"></SingleExerciseReps>
+        :@<StandardExercises WorkoutStatistic="workout"></StandardExercises>;
+
+    void HandleViewHistory(Guid workoutPlanId) => Dispatcher.Dispatch(new ViewWorkoutHistoryAction(workoutPlanId));
+}

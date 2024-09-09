@@ -1,0 +1,21 @@
+﻿@using GymTracker.Domain.Models
+@using GymTracker.Domain.Models.Extensions
+@using GymTracker.Domain.Models.Statistics
+
+<div>
+    <div class="d-flex justify-space-between">
+        <MudText Typo="Typo.subtitle2">Max Set</MudText>
+        <MudText Typo="Typo.subtitle2">@SingleExercise.MaxSet?.GetMeasureText(SingleExercise.MetricType)</MudText>
+    </div>
+    <div class="d-flex justify-space-between">
+        <MudText Typo="Typo.subtitle2">Total</MudText>
+        <MudText Typo="Typo.subtitle2">@WorkoutStatistic.TotalReps @MetricType.Reps.ToMetricDescription()</MudText>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public WorkoutStatistic WorkoutStatistic { get; set; } = default!;
+
+    WorkoutExerciseStatistics SingleExercise => WorkoutStatistic.Exercises.Single();
+}

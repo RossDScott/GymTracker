@@ -1,0 +1,29 @@
+﻿@using GymTracker.Domain.Models.Extensions
+@using GymTracker.Domain.Models.Statistics
+
+<div>
+    @foreach (var exercise in WorkoutStatistic.Exercises)
+    {
+        <div class="d-flex justify-space-between">
+            <MudText Typo="Typo.subtitle2">@exercise.ExerciseName</MudText>
+                @if (exercise.AnyCompleted)
+            {
+                <MudText Typo="Typo.subtitle2">@exercise.MaxSet?.GetMeasureText(exercise.MetricType)</MudText>
+            }
+            else
+            {
+                <MudText Typo="Typo.subtitle2">Not completed</MudText>
+            }
+
+        </div>
+        <div class="d-flex justify-space-between">
+            <MudText Typo="Typo.subtitle2">Total Volume</MudText>
+            <MudText Typo="Typo.subtitle2">@WorkoutStatistic.TotalWeightVolumeWithMeasure</MudText>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public WorkoutStatistic WorkoutStatistic { get; set; } = default!;
+}
