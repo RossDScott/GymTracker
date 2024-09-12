@@ -134,8 +134,7 @@ public class ExerciseDetailEffects
         var order = exercise.Sets
                             .OrderByDescending(x => x.Order)
                             .FirstOrDefault()?
-                            .Order + 1 ?? 0;
-
+                            .Order + 1 ?? 1;
 
         var previousForSetType = exercise.Sets
                                       .Where(x => x.SetType == action.SetType)

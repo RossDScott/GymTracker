@@ -22,7 +22,7 @@ public static class ExerciseDetailReducers
                     new Set
                     {
                         Id = x.Id,
-                        Name = x.PlannedExerciseSet?.SetType ?? string.Empty,
+                        Name = x.SetType,
 
                         TargetReps = x.PlannedExerciseSet?.TargetMetrics?.Reps,
                         TargetTime = x.PlannedExerciseSet?.TargetMetrics?.Time,
