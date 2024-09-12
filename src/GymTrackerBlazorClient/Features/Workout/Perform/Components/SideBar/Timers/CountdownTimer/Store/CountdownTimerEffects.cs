@@ -34,7 +34,7 @@ public class CountdownTimerEffects
 
             Task.Run(async () =>
             {
-                await Task.Delay(3000);
+                await Task.Delay(6000);
                 _dispatcher.Dispatch(new CountdownTimerResetAction());
             });
         }

@@ -23,6 +23,7 @@
 @if(State.Value.TimesUp)
 {
     <MudText Typo="Typo.h3" Class="pulsate">Times Up!</MudText>
+    <audio autoplay controls style="display: none"><source src="/microwave-beeps-101846.mp3" /></audio>
 }
 
 <div class="d-flex" style="visibility: @(State.Value.TimesUp ? "hidden" : "visible")">
