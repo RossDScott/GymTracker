@@ -49,6 +49,8 @@ public class ExerciseDetailEffects
         set.Metrics.Reps = action.EditSet.ActualReps;
         set.Metrics.Time = action.EditSet.ActualTime;
 
+        UpdateSubsequentPlannedSets(exercise, set);
+
         await _clientStorage.CurrentWorkout.SetAsync(workout);
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
 
@@ -84,6 +86,8 @@ public class ExerciseDetailEffects
             set.Metrics.Weight = set.Metrics.Weight ?? set.PlannedExerciseSet?.TargetMetrics.Weight;
             set.Metrics.Time = set.Metrics.Time ?? set.PlannedExerciseSet?.TargetMetrics.Time;
             set.CompletedOn = DateTimeOffset.Now;
+
+            UpdateSubsequentPlannedSets(exercise, set);
 
             if (action.AutoUnselect)
                 dispatcher.DispatchWithDelay(new SetSelectedSetAction(null));
@@ -159,5 +163,22 @@ public class ExerciseDetailEffects
 
         await _clientStorage.CurrentWorkout.SetAsync(workout);
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+    }
+
+    private void UpdateSubsequentPlannedSets(WorkoutExercise exercise, WorkoutExerciseSet set)
+    {
+        if (set.SetType != DefaultData.SetType.Set)
+            return;
+
+        var subsequentSets = exercise.Sets.Where(x => x.OrderForSetType > set.OrderForSetType).ToList();
+
+        foreach (var subsequentSet in subsequentSets)
+        {
+            if (subsequentSet.PlannedExerciseSet == null) continue;
+
+            subsequentSet.PlannedExerciseSet.TargetMetrics.Reps = set.Metrics.Reps;
+            subsequentSet.PlannedExerciseSet.TargetMetrics.Distance = set.Metrics.Distance;
+            subsequentSet.PlannedExerciseSet.TargetMetrics.Weight = set.Metrics.Weight;
+        }
     }
 }
