@@ -1,4 +1,5 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Extensions;
 using GymTracker.LocalStorage.Core;
 using Microsoft.AspNetCore.Components;
 using Models = GymTracker.Domain.Models;
@@ -38,5 +39,12 @@ public class WorkoutEffects
         dispatcher.Dispatch(new SetWorkoutAction(workout));
 
         _navigationManager.NavigateTo("workout/perform");
+    }
+
+    [EffectMethod]
+    public Task OnSetWorkout(SetWorkoutAction action, IDispatcher dispatcher)
+    {
+        dispatcher.DispatchWithDelay(new SetSelectedExerciseAction(action.workout.Exercises.First().Id));
+        return Task.CompletedTask;
     }
 }
