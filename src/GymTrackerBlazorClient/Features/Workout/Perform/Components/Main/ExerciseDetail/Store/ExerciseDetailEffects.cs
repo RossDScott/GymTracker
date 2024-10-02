@@ -170,7 +170,10 @@ public class ExerciseDetailEffects
         if (set.SetType != DefaultData.SetType.Set)
             return;
 
-        var subsequentSets = exercise.Sets.Where(x => x.OrderForSetType > set.OrderForSetType).ToList();
+        var subsequentSets = exercise.Sets
+                                     .Where(x => x.SetType == DefaultData.SetType.Set)
+                                     .Where(x => x.OrderForSetType > set.OrderForSetType)
+                                     .ToList();
 
         foreach (var subsequentSet in subsequentSets)
         {
