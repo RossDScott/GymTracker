@@ -14,7 +14,7 @@
              SelectedItem="@_selectedWorkoutPlanListOrder.Name"
              OnItemClick="HandleOrderChange"></ChipSet>
 
-    <div Class="d-flex flex-row ml-2 mt-2" Style="width:100%; overflow-x:auto">
+    <div Class="d-flex flex-row flex-wrap ml-2 mt-2 fullWidth">
         @foreach (var plan in _workoutPlans)
         {
             <MudCard @onclick="_ => HandlePickWorkout(plan)" Class="mr-3" Style="min-width:200px">
@@ -60,18 +60,41 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var workoutPlans = await ClientStorage.WorkoutPlans.GetOrDefaultAsync();
-        _workoutPlans = workoutPlans
-            .Where(x => x.IsAcitve)
-            .Select(x => x.ToWorkoutPlanListItem())
-            .ToImmutableArray();
+        await bindData();
     }
 
     void HandlePickWorkout(WorkoutPlanListItem workoutPlan)
         => Dispatcher.Dispatch(new StartWorkoutAction(workoutPlan.Id));
 
-    void HandleOrderChange(ListItem listItem)
+    async Task HandleOrderChange(ListItem listItem)
     {
         _workoutPlanOrder = Enum.Parse<WorkoutListOrder>(listItem.Name);
+        await bindData();
+    }
+
+    private async Task bindData()
+    {
+        var workoutPlans = await ClientStorage.WorkoutPlans.GetOrDefaultAsync();
+        var recentWorkouts = await ClientStorage.WorkoutStatistics.GetOrDefaultAsync();
+        var latestWorkoutForPlan = recentWorkouts
+        .GroupBy(x => x.WorkoutPlanId)
+        .ToDictionary(
+            x => x.Key,
+            x => x.OrderByDescending(x => x.CompletedOn)
+                  .First()
+                  .CompletedOn.DateTime);
+
+        var workPlansVM = workoutPlans
+            .Where(x => x.IsAcitve)
+            .Select(x => x.ToWorkoutPlanListItem(latestWorkoutForPlan));
+
+        workPlansVM = _workoutPlanOrder switch
+        {
+            WorkoutListOrder.Recent => workPlansVM
+                .OrderByDescending(x => x.LastPerformedOn)
+                .Take(10),
+            _ => workPlansVM
+        };
+        _workoutPlans = workPlansVM.ToImmutableArray();
     }
 }
