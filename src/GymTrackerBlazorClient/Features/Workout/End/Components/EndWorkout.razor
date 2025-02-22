@@ -1,4 +1,5 @@
 ﻿@page "/workout/end"
+@using GymTracker.BlazorClient.Extensions
 @using GymTracker.BlazorClient.Features.Common
 @using GymTracker.BlazorClient.Features.Workout.End.Store
 @using GymTracker.Domain.Models.Extensions
@@ -86,7 +87,7 @@
         <MudButton 
             Variant="Variant.Filled" 
             Color="Color.Primary"
-            OnClick="() => Dispatcher.Dispatch(new ConfirmEndWorkoutAction())"
+            OnClick="OnConfirmEndClick"
             Disabled="SavingState.Value.IsSaving"
             Class="ml-2">
             Confirm End
@@ -136,6 +137,12 @@
     void OnItemClick(ExerciseDetail exerciseDetail, ProgressType progressType)
     {
         Dispatcher.Dispatch(new SetSelectedProgressAction(exerciseDetail.WorkoutExerciseId, progressType));
+    }
+
+    void OnConfirmEndClick()
+    {
+        Dispatcher.Dispatch(new SetIsSavingAction(true));
+        Dispatcher.DispatchWithDelay(new ConfirmEndWorkoutAction());
     }
 
     private async Task OpenConfirmAbandon()
