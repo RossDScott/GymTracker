@@ -11,7 +11,7 @@
             <div class="d-flex flex-row fullWidth">
                 <div class="ml-auto mr-3" style="width: min-content">
                     <MudSelect Dense="true"
-                               DisableUnderLine="true"
+                               Underline="false"
                                AnchorOrigin="Origin.BottomCenter"
                                Value="State.Value.SelectedWorkoutPlanId"
                                ValueChanged="(Guid id) => HandleSelectWorkoutPlan(id)">
@@ -24,7 +24,7 @@
                 </div>
                 <div class="ml-2">
                     <MudDateRangePicker Margin="Margin.Dense"
-                                        DisableUnderLine="true"
+                                        Underline="false"
                                         PlaceholderStart="Start Date" 
                                         PlaceholderEnd="End Date"
                                         DateRange="@State.Value.WorkoutDateRange"

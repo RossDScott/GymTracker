@@ -7,13 +7,13 @@
     <MudIconButton 
         Icon="@Icons.Material.Filled.AddCircle"
         Size="Large ? Size.Large : Size.Medium"
-        Style="@($"color: {Theme.Palette.InfoContrastText}")"
+        Style="@($"color: {Theme.PaletteLight.InfoContrastText}")"
         @onclick="() => _showAddItem = true">
     </MudIconButton>
 } 
 else
 {
-    <MudChip Color="Color.Info">
+    <MudChip T="string" Color="Color.Info">
         <select @bind="_selectedNewItem" style="font-size: larger">
             @if (string.IsNullOrEmpty(_selectedNewItem))
             {

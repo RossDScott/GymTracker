@@ -24,10 +24,10 @@
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent Class="pa-0">
-                    <MudList>
+                    <MudList T="string">
                         @foreach (var exercise in plan.PlannedExercises)
                         {
-                            <MudListItem OnClick="_ => HandlePickWorkout(plan)" 
+                            <MudListItem T="string" OnClick="_ => HandlePickWorkout(plan)" 
                                          Text="@exercise" 
                                          Dense="true" 
                                          Class="pb-0" />

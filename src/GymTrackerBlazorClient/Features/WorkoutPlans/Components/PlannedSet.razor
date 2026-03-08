@@ -2,7 +2,7 @@
 @using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
 @using GymTracker.Domain.Models;
 
-<MudListItem>
+<MudListItem T="string">
     <MudGrid>
         <MudItem xs="1" Class="d-flex align-content-end">
             <div Class="align-self-end" style="margin-bottom:7px">
@@ -13,7 +13,7 @@
             <MudSelect @bind-Value="Set.SetType"
                        @bind-Value:after="HandleChanged"
                        Dense="true"
-                       DisableUnderLine="true"
+                       Underline="false"
                        Class="mt-0">
                 @foreach (var set in _setTypes)
                 {

@@ -1,7 +1,7 @@
 ﻿<div class="d-flex flex-row @Class">
     @foreach (var item in List)
     {
-        <MudChip Color="Color.Default"
+        <MudChip T="string" Color="Color.Default"
                  Variant="(item.Name == SelectedItem ? Variant.Filled : Variant.Outlined)"
                  OnClick="_ => OnItemClick.InvokeAsync(item)">
                  @item.Name</MudChip>

@@ -5,7 +5,7 @@
 @inject IDispatcher Dispatcher
 @inject IState<WorkoutState> State
 
-<MudList Clickable="true" SelectedValue="State.Value.SelectedExerciseId" >
+<MudList T="Guid?" SelectedValue="State.Value.SelectedExerciseId" >
     @foreach(var item in State.Value.Workout.ExerciseList)
     {
         @renderExerciseRow(item)
@@ -16,7 +16,7 @@
 
 @code {
     RenderFragment renderExerciseRow(ListItem exercise) =>
-        @<MudListItem 
+        @<MudListItem T="Guid?"
             Value="exercise.Id" 
             Dense="true"
             @onclick="() => Dispatcher.Dispatch(new SetSelectedExerciseAction(exercise.Id))">
