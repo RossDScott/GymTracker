@@ -13,7 +13,7 @@
 
             <MudField Variant="Variant.Outlined" Label="Rest Interval" InnerPadding="false">
                 <div Class="d-flex flex-row">
-                    <MudSelect DisableUnderLine="true"
+                    <MudSelect Underline="false"
                                Dense="true"
                                T="int"
                                Label="Minutes"
@@ -25,7 +25,7 @@
                             <MudSelectItem Value="@i" />
                         }
                     </MudSelect>
-                    <MudSelect DisableUnderLine="true"
+                    <MudSelect Underline="false"
                                Dense="true"
                                T="int"
                                Label="Seconds"
@@ -40,10 +40,10 @@
                 </div>
             </MudField>
 
-            <MudSwitch @bind-Checked="_model.AutoTriggerRestTimer"
-                       @bind-Checked:after="HandleChange"
+            <MudSwitch T="bool" @bind-Value="_model.AutoTriggerRestTimer"
+                       @bind-Value:after="HandleChange"
                        Size="Size.Small"
-                       Label="Auto Start Rest Timer" LabelPosition="LabelPosition.Start" />
+                       Label="Auto Start Rest Timer" LabelPlacement="Placement.Start" />
 
             @if(Exercise.MetricType is MetricType.Weight or MetricType.Reps)
             {
@@ -55,18 +55,18 @@
                                              @bind-Value:after="HandleChange"
                                              Label="Min Reps"
                                              Variant="Variant.Text"
-                                             DisableUnderLine="true"
+                                             Underline="false"
                                              HideSpinButtons="true"
                                              Min="0" Max="99" />
                             <MudNumericField @bind-Value="_model.TargetRepsUpper"
                                              @bind-Value:after="HandleChange"
                                              Label="Max Reps"
                                              Variant="Variant.Text"
-                                             DisableUnderLine="true"
+                                             Underline="false"
                                              HideSpinButtons="true"
                                              Min="0" Max="99" />
                         }
-                        <MudSelect DisableUnderLine="true"
+                        <MudSelect Underline="false"
                                    Dense="true"
                                    T="decimal"
                                    Label="Default Increment"

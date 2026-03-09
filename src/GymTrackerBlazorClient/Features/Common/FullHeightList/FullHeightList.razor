@@ -6,10 +6,9 @@
 <div class="fullHeight" style="position: relative">
     <MudPaper Class="pa-0 fullHeight" style="overflow-y: auto; position: relative;">
         @Filter
-        <MudList 
+        <MudList T="Guid?"
             Class="z-0"
             Color="Color.Info"
-            Clickable="true"
             SelectedValue="SelectedId">
             @foreach (var (item, index) in List.LoopIndex())
             {
@@ -47,12 +46,12 @@
 
     RenderFragment RenderListItem(ListItem item, int index)
         => AutoCollapseOnSelection && SelectedId is not null
-            ? @<MudListItem OnClick="() => OnItemClick.InvokeAsync(item)"
+            ? @<MudListItem T="Guid?" OnClick="() => OnItemClick.InvokeAsync(item)"
                             Value="item.Id"
                             Style="@(item.IsAcitve ? "" : $"color: {Theme.PaletteDark.TextDisabled}")">
                     <MudText Typo="Typo.subtitle2">@item.Name</MudText>
                </MudListItem>
-            : @<MudListItem OnClick="() => OnItemClick.InvokeAsync(item)"
+            : @<MudListItem T="Guid?" OnClick="() => OnItemClick.InvokeAsync(item)"
                             Value="item.Id"
                             Style="@(item.IsAcitve ? "" : $"color: {Theme.PaletteDark.TextDisabled}")">
                 <div class="d-flex flex-row">

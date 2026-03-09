@@ -3,16 +3,16 @@
     <MudIconButton 
         Icon="@Icons.Material.Filled.AddCircle" 
         Size="Size.Medium"
-        Style="@($"color: {Theme.Palette.InfoContrastText}")"
+        Style="@($"color: {Theme.PaletteLight.InfoContrastText}")"
         @onclick="() => _showAddItem = true">
     </MudIconButton>
 } 
 else
 {
-    <MudChip Color="Color.Info">
+    <MudChip T="string" Color="Color.Info">
         <input
             type="text" 
-            style="@($"background: transparent; border: solid 1px {Theme.Palette.LinesInputs}; color:{Theme.Palette.InfoContrastText}")"
+            style="@($"background: transparent; border: solid 1px {Theme.PaletteLight.LinesInputs}; color:{Theme.PaletteLight.InfoContrastText}")"
             @bind="_newItem" @bind:event="oninput" />
         <MudIconButton
             Class="ml-1"

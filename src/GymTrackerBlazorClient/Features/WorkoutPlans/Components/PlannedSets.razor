@@ -6,7 +6,7 @@
 
 <MudField Label="Planned Sets" Variant="Variant.Outlined">
     <div class="fullHeight" style="position: relative">
-        <MudList>
+        <MudList T="string">
             @foreach (var (item, index) in _sets.LoopIndex())
             {
                 <PlannedSet Set="item" 

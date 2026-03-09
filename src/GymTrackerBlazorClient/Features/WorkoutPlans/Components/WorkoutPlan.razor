@@ -34,10 +34,10 @@
                                     => HandleChangeOrder(x.item, x.direction)">
                 </FullHeightList>
             </MudItem>
-            <MudSwitch Checked="_isActive"
+            <MudSwitch T="bool" Value="_isActive"
                        Label="Is Active"
-                       LabelPosition="LabelPosition.Start"
-                       CheckedChanged="(bool isActive) => HandleIsActiveChanged(isActive)" />
+                       LabelPlacement="Placement.Start"
+                       ValueChanged="(bool isActive) => HandleIsActiveChanged(isActive)" />
         </MudStack>
     </MudForm>
 </MudPaper>
@@ -61,21 +61,21 @@
 
     ImmutableArray<ListItem> _plannedExercises = ImmutableArray<ListItem>.Empty;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         _workoutPlanName = WorkoutPlanDetail.Name;
         _plannedExercises = WorkoutPlanDetail.PlannedExercises;
 
         _isActive = WorkoutPlanDetail.IsActive;
 
-        _form?.ResetValidation();
+        if (_form is not null) await _form.ResetValidationAsync();
 
-        base.OnParametersSet();
+        await base.OnParametersSetAsync();
     }
 
     async Task HandleUpdateWorkoutPlan()
     {
-        await _form.Validate();
+        await _form.ValidateAsync();
 
         if (!_form.IsValid)
             return;

@@ -48,16 +48,16 @@
                 OnAdd="HandleAddEquipment"
                 OnRemove="HandleRemoveEquipment"></ListEditor>
 
-            <MudSwitch 
-                Checked="_isActive" 
-                Label="Is Active" 
-                LabelPosition="LabelPosition.Start"
-                CheckedChanged="(bool isActive) => HandleIsActiveChanged(isActive)" />
+            <MudSwitch T="bool"
+                Value="_isActive"
+                Label="Is Active"
+                LabelPlacement="Placement.Start"
+                ValueChanged="(bool isActive) => HandleIsActiveChanged(isActive)" />
 
-            <MudSwitch Checked="_showChartOnHomePage"
+            <MudSwitch T="bool" Value="_showChartOnHomePage"
                        Label="Show Chart on Homepage"
-                       LabelPosition="LabelPosition.Start"
-                       CheckedChanged="(bool show) => HandleShowChartOnHomePage(show)" />
+                       LabelPlacement="Placement.Start"
+                       ValueChanged="(bool show) => HandleShowChartOnHomePage(show)" />
         </MudStack>
     </MudForm>
 </MudPaper>
@@ -88,7 +88,7 @@
     bool _isActive = true;
     bool _showChartOnHomePage = false;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         _exerciseName = ExerciseDetail.Name;
         _metricType = ExerciseDetail.MetricType;
@@ -97,9 +97,9 @@
         _isActive = ExerciseDetail.IsActive;
         _showChartOnHomePage = ExerciseDetail.ShowChartOnHomepage;
 
-        _form?.ResetValidation();
+        if (_form is not null) await _form.ResetValidationAsync();
 
-        base.OnParametersSet();
+        await base.OnParametersSetAsync();
     }
 
     async Task HandleMetricTypeChange(MetricType metricType)
@@ -146,7 +146,7 @@
 
     async Task HandleUpdateExercise()
     {
-        await _form.Validate();
+        await _form.ValidateAsync();
 
         if (!_form.IsValid)
             return;

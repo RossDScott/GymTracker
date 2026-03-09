@@ -6,7 +6,7 @@
     Variant="Variant.Outlined">
     @foreach (var item in List)
     {
-        <MudChip 
+        <MudChip T="string"
             Color="Color.Default"
             OnClose="() => HandleRemove(item)">
             @item

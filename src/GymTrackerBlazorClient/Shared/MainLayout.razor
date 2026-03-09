@@ -7,6 +7,7 @@
 @inject ISnackbar Snackbar
 
 <MudThemeProvider @ref="@_mudThemeProvider" Theme="MyCustomTheme" @bind-IsDarkMode="@_isDarkMode" />
+<MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -30,8 +31,8 @@
     {
         Typography = new Typography
         {
-            Subtitle1 = new Subtitle1 {FontSize = "1.1rem;"},
-            Subtitle2 = new Subtitle2 {FontSize = "0.9rem;"}
+            Subtitle1 = new Subtitle1Typography {FontSize = "1.1rem;"},
+            Subtitle2 = new Subtitle2Typography {FontSize = "0.9rem;"}
         }
     };
 
@@ -39,7 +40,7 @@
     {
         if (firstRender)
         {
-            _isDarkMode = await _mudThemeProvider.GetSystemPreference();
+            _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
 
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
             Snackbar.Configuration.ClearAfterNavigation = true;
