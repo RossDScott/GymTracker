@@ -8,14 +8,26 @@
 <div class="d-flex flex-column fullWidth fullHeight">
     <ExerciseSets></ExerciseSets>
 
-@*     <MudDivider DividerType="DividerType.Middle" Class="my-6 mt-auto" />
-
-    <div id="notes" class="border-top pt-3">
-        <label class="form-label">Notes</label>
-        <textarea class="form-control" rows="3"></textarea>
-    </div> *@
+    @if (nextSet is not null)
+    {
+        <div class="mt-auto pa-4">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       FullWidth="true"
+                       OnClick="HandleNext">Next</MudButton>
+        </div>
+    }
 </div>
 
 @code {
+    private Set? nextSet => State.Value.Sets.FirstOrDefault(s => !s.Completed);
 
+    private void HandleNext()
+    {
+        if (nextSet is not null)
+        {
+            Dispatcher.Dispatch(new ToggleSetCompletedAction(State.Value.WorkoutExerciseId, nextSet.Id, true));
+        }
+    }
 }
