@@ -1,8 +1,11 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Store
+@using GymTracker.BlazorClient.Features.Common
 @inherits FluxorComponent
 
 @inject IDispatcher Dispatcher
 @inject IState<ExerciseDetailState> State
+@inject IState<WorkoutState> WorkoutState
 
 
 <div class="d-flex flex-column fullWidth fullHeight">
@@ -11,11 +14,17 @@
     @if (nextSet is not null)
     {
         <div class="mt-auto pa-4">
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       Size="Size.Large"
+            <MudButton Variant="Variant.Outlined"
                        FullWidth="true"
                        OnClick="HandleNext">Next</MudButton>
+        </div>
+    }
+    else if (nextExercise is not null)
+    {
+        <div class="mt-auto pa-4">
+            <MudButton Variant="Variant.Outlined"
+                       FullWidth="true"
+                       OnClick="HandleNextExercise">Next Exercise</MudButton>
         </div>
     }
 </div>
@@ -23,11 +32,30 @@
 @code {
     private Set? nextSet => State.Value.Sets.FirstOrDefault(s => !s.Completed);
 
+    private ListItem? nextExercise
+    {
+        get
+        {
+            var list = WorkoutState.Value.Workout.ExerciseList;
+            var currentIndex = list.IndexOf(list.FirstOrDefault(e => e.Id == State.Value.WorkoutExerciseId));
+            if (currentIndex < 0 || currentIndex + 1 >= list.Length) return null;
+            return list[currentIndex + 1];
+        }
+    }
+
     private void HandleNext()
     {
         if (nextSet is not null)
         {
             Dispatcher.Dispatch(new ToggleSetCompletedAction(State.Value.WorkoutExerciseId, nextSet.Id, true));
+        }
+    }
+
+    private void HandleNextExercise()
+    {
+        if (nextExercise is not null)
+        {
+            Dispatcher.Dispatch(new SetSelectedExerciseAction(nextExercise.Id));
         }
     }
 }
