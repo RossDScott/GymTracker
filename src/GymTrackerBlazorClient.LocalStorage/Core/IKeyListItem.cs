@@ -6,6 +6,7 @@ public interface IKeyListItem<T> : IKeyItem<ICollection<T>>
     Task<T> FindByIdAsync(Guid id);
     Task<T?> FindOrDefaultByIdAsync(Guid id);
     Task<UpsertResponse> UpsertAsync(T item);
+    void SubscribeToItemUpsert(Func<T, Task> callback);
 }
 
 public enum UpsertResponse

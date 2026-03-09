@@ -1,10 +1,10 @@
-﻿using Blazored.LocalStorage;
+using GymTracker.LocalStorage.IndexedDb;
 
 namespace GymTracker.LocalStorage.Core;
 public abstract class LocalStorageContext
 {
     protected readonly IServiceProvider _serviceProvider = default!;
-    protected readonly ILocalStorageService _localStorage = default!;
+    protected readonly IIndexedDbService _indexedDb = default!;
 
     public IEnumerable<IKeyItem> Keys { get; internal set; } = Enumerable.Empty<IKeyItem>();
 
@@ -29,6 +29,9 @@ public abstract class LocalStorageContext
         trigger.Subscribe();
     }
 
-    public ValueTask DeleteAll() => _localStorage.ClearAsync();
-
+    public async ValueTask DeleteAll()
+    {
+        foreach (var key in Keys)
+            await key.DeleteAsync();
+    }
 }
