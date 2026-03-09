@@ -31,6 +31,11 @@ public class KeyListItem<T> : KeyItem<ICollection<T>>, IKeyListItem<T> where T :
 
         return existing == null ? UpsertResponse.New : UpsertResponse.Existing;
     }
+
+    public void SubscribeToItemUpsert(Func<T, Task> callback)
+    {
+        // No-op for legacy implementation - item changes go through SetAsync/SubscribeToChanges
+    }
     private void ConfigureDefaults()
     {
         Configure(x => x.DefaultConstructor = () => new List<T>());
