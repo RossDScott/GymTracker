@@ -32,5 +32,6 @@ public static class ServiceRegistration
 
         services.AddScoped<IBackupOrchestrator, BackupOrchestrator>();
         services.AddScoped<IAppSettingsProvider, AppSettingsProvider>();
+        services.AddScoped<StorageDiagnosticsService>();
     }
 }

@@ -1,6 +1,7 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
 @using GymTracker.BlazorClient.Features.Workout.Perform.Store
 @using GymTracker.BlazorClient.Features.Common
+@using GymTracker.BlazorClient.Features.Workout.End.Store
 @inherits FluxorComponent
 
 @inject IDispatcher Dispatcher
@@ -25,6 +26,14 @@
             <MudButton Variant="Variant.Outlined"
                        FullWidth="true"
                        OnClick="HandleNextExercise">Next Exercise</MudButton>
+        </div>
+    }
+    else
+    {
+        <div class="mt-auto pa-4">
+            <MudButton Variant="Variant.Outlined"
+                       FullWidth="true"
+                       OnClick="HandleEndWorkout">End Workout</MudButton>
         </div>
     }
 </div>
@@ -58,4 +67,7 @@
             Dispatcher.Dispatch(new SetSelectedExerciseAction(nextExercise.Id));
         }
     }
+
+    private void HandleEndWorkout() =>
+        Dispatcher.Dispatch(new EndWorkoutAction());
 }
