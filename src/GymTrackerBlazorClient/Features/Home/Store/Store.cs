@@ -66,16 +66,18 @@ public class HomeEffects
     [EffectMethod]
     public async Task OnInitaliseHome(InitaliseHomeAction action, IDispatcher dispatcher)
     {
-        var hasExistingWorkout = await _clientStorage.CurrentWorkout.GetAsync() is not null;
-        dispatcher.Dispatch(new SetHasExistingWorkoutAction(hasExistingWorkout));
+        var currentWorkoutTask = _clientStorage.CurrentWorkout.GetAsync();
+        var workoutsTask = _clientStorage.WorkoutStatistics.GetAsync();
+        var exercisesTask = _clientStorage.ExerciseStatistics.GetAsync();
+        await Task.WhenAll(currentWorkoutTask.AsTask(), workoutsTask.AsTask(), exercisesTask.AsTask());
 
-        var workouts = await _clientStorage.WorkoutStatistics.GetAsync();
-        if (workouts != null)
-            dispatcher.Dispatch(new SetWorkoutStatisticsDataAction(workouts));
+        dispatcher.Dispatch(new SetHasExistingWorkoutAction(currentWorkoutTask.Result is not null));
 
-        var exercises = await _clientStorage.ExerciseStatistics.GetAsync();
-        if (exercises != null)
-            dispatcher.Dispatch(new SetExerciseStatisticsDataAction(exercises));
+        if (workoutsTask.Result != null)
+            dispatcher.Dispatch(new SetWorkoutStatisticsDataAction(workoutsTask.Result));
+
+        if (exercisesTask.Result != null)
+            dispatcher.Dispatch(new SetExerciseStatisticsDataAction(exercisesTask.Result));
     }
 
     [EffectMethod]
