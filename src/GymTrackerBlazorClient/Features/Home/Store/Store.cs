@@ -66,6 +66,7 @@ public class HomeEffects
     [EffectMethod]
     public async Task OnInitaliseHome(InitaliseHomeAction action, IDispatcher dispatcher)
     {
+
         var currentWorkoutTask = _clientStorage.CurrentWorkout.GetAsync();
         var workoutsTask = _clientStorage.WorkoutStatistics.GetAsync();
         var exercisesTask = _clientStorage.ExerciseStatistics.GetAsync();
@@ -79,7 +80,7 @@ public class HomeEffects
         if (exercisesTask.Result != null)
             dispatcher.Dispatch(new SetExerciseStatisticsDataAction(exercisesTask.Result));
 
-        throw new Exception("This is a test exception to check Sentry integration");
+        
     }
 
     [EffectMethod]
