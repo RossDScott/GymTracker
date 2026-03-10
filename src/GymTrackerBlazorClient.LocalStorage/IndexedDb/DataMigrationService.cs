@@ -82,7 +82,7 @@ public class DataMigrationService
         }
     }
 
-    internal record MetaRecord
+    public record MetaRecord
     {
         public string Key { get; init; } = default!;
         public string Value { get; init; } = default!;
