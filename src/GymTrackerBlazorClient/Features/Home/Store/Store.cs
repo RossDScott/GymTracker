@@ -78,6 +78,8 @@ public class HomeEffects
 
         if (exercisesTask.Result != null)
             dispatcher.Dispatch(new SetExerciseStatisticsDataAction(exercisesTask.Result));
+
+        throw new Exception("This is a test exception to check Sentry integration");
     }
 
     [EffectMethod]

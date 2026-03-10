@@ -1,15 +1,17 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Shared;
 using System.Timers;
 
 namespace GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.Stopwatch.Store;
 
-public class StopwatchEffects
+public class StopwatchEffects : EffectsBase
 {
     private System.Timers.Timer _timer = new(1);
     private readonly IState<StopwatchState> _state;
     private IDispatcher _dispatcher;
 
-    public StopwatchEffects(IState<StopwatchState> state, IDispatcher dispatcher)
+    public StopwatchEffects(IState<StopwatchState> state, IDispatcher dispatcher, ErrorService errorService)
+        : base(errorService)
     {
         _state = state;
         _dispatcher = dispatcher;

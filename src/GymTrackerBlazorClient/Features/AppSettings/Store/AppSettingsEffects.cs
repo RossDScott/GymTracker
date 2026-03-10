@@ -1,4 +1,5 @@
 ﻿using Fluxor;
+using GymTracker.BlazorClient.Shared;
 using GymTracker.Domain;
 using GymTracker.LocalStorage;
 using MudBlazor;
@@ -6,7 +7,7 @@ using Models = GymTracker.Domain.Models;
 
 namespace GymTracker.BlazorClient.Features.AppSettings.Store;
 
-public class AppSettingsEffects
+public class AppSettingsEffects : EffectsBase
 {
     private readonly ClientStorageContext _clientStorage;
     private readonly IServiceProvider _serviceProvider;
@@ -17,7 +18,9 @@ public class AppSettingsEffects
         ClientStorageContext clientStorage,
         IServiceProvider serviceProvider,
         IBackupOrchestrator backupOrchestrator,
-        ISnackbar snackbar)
+        ISnackbar snackbar,
+        ErrorService errorService)
+        : base(errorService)
     {
         _clientStorage = clientStorage;
         _serviceProvider = serviceProvider;
@@ -26,56 +29,58 @@ public class AppSettingsEffects
     }
 
     [EffectMethod]
-    public async Task OnFetchSettings(FetchSettingsAction action, IDispatcher dispatcher)
-    {
-        var settings = await GetSettings();
-        dispatcher.Dispatch(new SetSettingsAction(settings));
-    }
+    public async Task OnFetchSettings(FetchSettingsAction action, IDispatcher dispatcher) =>
+        await SafeHandle(async () =>
+        {
+            var settings = await GetSettings();
+            dispatcher.Dispatch(new SetSettingsAction(settings));
+        });
 
     [EffectMethod]
     public async Task OnSetAzureBlobBackupContainerSASURI
-        (UpdateAzureBlobBackupContainerSASURIAction action, IDispatcher dispatcher)
-    {
-        await UpdateSettings(settings =>
-            settings with { AzureBlobBackupContainerSASURI = action.URI }, dispatcher);
+        (UpdateAzureBlobBackupContainerSASURIAction action, IDispatcher dispatcher) =>
+        await SafeHandle(async () =>
+        {
+            await UpdateSettings(settings =>
+                settings with { AzureBlobBackupContainerSASURI = action.URI }, dispatcher);
 
-        _snackbar.Add("Backup SAS URI Updated", Severity.Success);
-    }
-
-    [EffectMethod]
-    public async Task OnBackupAll(BackupAllAction action, IDispatcher dispatcher)
-    {
-        await _backupOrchestrator.Backup();
-        _snackbar.Add("Backup complete", Severity.Success);
-    }
+            _snackbar.Add("Backup SAS URI Updated", Severity.Success);
+        });
 
     [EffectMethod]
-    public async Task OnRestoreAll(RestoreAllAction action, IDispatcher dispatcher)
-    {
-        await _backupOrchestrator.Restore();
-        _snackbar.Add("Restore backup complete", Severity.Success);
-    }
+    public async Task OnBackupAll(BackupAllAction action, IDispatcher dispatcher) =>
+        await SafeHandle(async () =>
+        {
+            await _backupOrchestrator.Backup();
+            _snackbar.Add("Backup complete", Severity.Success);
+        });
 
     [EffectMethod]
-    public async Task OnDeleteAll(DeleteAllAction action, IDispatcher dispatcher)
-    {
-        await _clientStorage.DeleteAll();
-    }
+    public async Task OnRestoreAll(RestoreAllAction action, IDispatcher dispatcher) =>
+        await SafeHandle(async () =>
+        {
+            await _backupOrchestrator.Restore();
+            _snackbar.Add("Restore backup complete", Severity.Success);
+        });
+
+    [EffectMethod]
+    public async Task OnDeleteAll(DeleteAllAction action, IDispatcher dispatcher) =>
+        await SafeHandle(() => _clientStorage.DeleteAll().AsTask());
 
     [EffectMethod]
     public async Task OnTargetBodyPartsChange(UpdateTargetBodyAction action, IDispatcher dispatcher) =>
-        await UpdateSettings(settings =>
-            settings with { TargetBodyParts = action.TargetBodyParts }, dispatcher);
+        await SafeHandle(() => UpdateSettings(settings =>
+            settings with { TargetBodyParts = action.TargetBodyParts }, dispatcher));
 
     [EffectMethod]
     public async Task OnExercisesChange(UpdateEquipmentAction action, IDispatcher dispatcher) =>
-    await UpdateSettings(settings =>
-        settings with { Equipment = action.Equipment }, dispatcher);
+        await SafeHandle(() => UpdateSettings(settings =>
+            settings with { Equipment = action.Equipment }, dispatcher));
 
     [EffectMethod]
     public async Task OnSetTypesChange(UpdateSetTypesAction action, IDispatcher dispatcher) =>
-    await UpdateSettings(settings =>
-        settings with { SetType = action.SetTypes }, dispatcher);
+        await SafeHandle(() => UpdateSettings(settings =>
+            settings with { SetType = action.SetTypes }, dispatcher));
 
     private async Task UpdateSettings(
         Func<Models.AppSettings, Models.AppSettings> updateFunc,

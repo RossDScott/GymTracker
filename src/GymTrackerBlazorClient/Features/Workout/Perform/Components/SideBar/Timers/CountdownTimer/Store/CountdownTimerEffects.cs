@@ -1,16 +1,18 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Extensions;
+using GymTracker.BlazorClient.Shared;
 using System.Timers;
 
 namespace GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.CountdownTimer.Store;
 
-public class CountdownTimerEffects
+public class CountdownTimerEffects : EffectsBase
 {
     private System.Timers.Timer _timer = new(1);
     private readonly IState<CountdownTimerState> _state;
     private IDispatcher _dispatcher;
 
-    public CountdownTimerEffects(IState<CountdownTimerState> state, IDispatcher dispatcher)
+    public CountdownTimerEffects(IState<CountdownTimerState> state, IDispatcher dispatcher, ErrorService errorService)
+        : base(errorService)
     {
         _state = state;
         _dispatcher = dispatcher;
