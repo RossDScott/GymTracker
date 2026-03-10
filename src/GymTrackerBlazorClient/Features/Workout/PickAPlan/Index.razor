@@ -74,8 +74,11 @@
 
     private async Task bindData()
     {
-        var workoutPlans = await ClientStorage.WorkoutPlans.GetOrDefaultAsync();
-        var recentWorkouts = await ClientStorage.WorkoutStatistics.GetOrDefaultAsync();
+        var plansTask = ClientStorage.WorkoutPlans.GetOrDefaultAsync();
+        var statsTask = ClientStorage.WorkoutStatistics.GetOrDefaultAsync();
+        await Task.WhenAll(plansTask.AsTask(), statsTask.AsTask());
+        var workoutPlans = plansTask.Result;
+        var recentWorkouts = statsTask.Result;
         var latestWorkoutForPlan = recentWorkouts
         .GroupBy(x => x.WorkoutPlanId)
         .ToDictionary(

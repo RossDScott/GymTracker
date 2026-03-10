@@ -30,6 +30,11 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
             settings.AutoBackup = false;
         });
 
+        CurrentWorkout.Configure(settings =>
+        {
+            settings.CacheData = true;
+        });
+
         ExerciseStatistics.ConfigureList(settings =>
         {
             settings.GetId = (ExerciseStatistic x) => x.ExerciseId;
