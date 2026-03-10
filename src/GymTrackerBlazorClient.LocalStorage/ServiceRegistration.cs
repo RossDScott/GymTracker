@@ -1,4 +1,3 @@
-﻿using Blazored.LocalStorage;
 using GymTracker.Domain;
 using GymTracker.LocalStorage.Core;
 using GymTracker.LocalStorage.IndexedDb;
@@ -12,9 +11,6 @@ public static class ServiceRegistration
         where TImplementation : LocalStorageContext, TService, new()
         where TService : class
     {
-        // Keep Blazored.LocalStorage for data migration from localStorage to IndexedDB
-        services.AddBlazoredLocalStorage();
-
         services.AddScoped<IIndexedDbService, IndexedDbService>();
 
         services.AddScoped<TImplementation>(serviceProvider =>
@@ -32,6 +28,5 @@ public static class ServiceRegistration
 
         services.AddScoped<IBackupOrchestrator, BackupOrchestrator>();
         services.AddScoped<IAppSettingsProvider, AppSettingsProvider>();
-        services.AddScoped<StorageDiagnosticsService>();
     }
 }

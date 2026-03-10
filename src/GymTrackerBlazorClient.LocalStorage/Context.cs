@@ -1,8 +1,6 @@
-﻿using Blazored.LocalStorage;
 using GymTracker.Domain.Models;
 using GymTracker.Domain.Models.Statistics;
 using GymTracker.LocalStorage.Core;
-using GymTracker.LocalStorage.IndexedDb;
 using GymTracker.LocalStorage.Triggers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -55,11 +53,6 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
 
     internal override async Task InitializeData()
     {
-        // Migrate existing localStorage data to IndexedDB
-        var localStorage = _serviceProvider.GetRequiredService<ILocalStorageService>();
-        var migrationService = new DataMigrationService(localStorage, _indexedDb);
-        await migrationService.MigrateIfNeededAsync(this);
-
         if (!await HasInitialisedDefaultData.GetAsync())
         {
             var defaultDataBuilder = _serviceProvider.GetRequiredService<DefaultDataBuilderService>();

@@ -1,24 +1,22 @@
-﻿@page "/settings"
+@page "/settings"
 @using GymTracker.BlazorClient.Features.AppBar.Store;
 @using GymTracker.BlazorClient.Features.AppSettings.Store;
 @using System.Collections.Immutable;
 @using GymTracker.BlazorClient.Features.Common.ListItemFieldEditor
-@using GymTracker.LocalStorage.IndexedDb
 
 @inherits FluxorComponent
 
 @inject IState<AppSettingsState> State
 @inject IDispatcher Dispatcher
-@inject StorageDiagnosticsService DiagnosticsService
 
 <MudContainer Class="pa-3 ma-0">
     <MudCard Style="width:100%">
         <MudCardContent>
             <MudText>Backup</MudText>
-            <MudTextField 
+            <MudTextField
                 Value="State.Value?.AzureBlobBackupContainerSASURI"
                 ValueChanged="(string value) => HandleAzureBlobBackupContainerSASURIChanged(value)"
-                Label="Azure Blob Container SAS Uri" 
+                Label="Azure Blob Container SAS Uri"
                 Variant="Variant.Outlined">
             </MudTextField>
         </MudCardContent>
@@ -37,61 +35,6 @@
 
     <MudCard Class="mt-4" Style="width:100%">
         <MudCardContent>
-            <MudText Typo="Typo.subtitle1">Storage Diagnostics</MudText>
-            @if (_diagnostics is null)
-            {
-                <MudProgressLinear Indeterminate="true" Class="mt-2" />
-            }
-            else
-            {
-                <MudStack Row="true" AlignItems="AlignItems.Center" Class="mt-1 mb-2" Spacing="1">
-                    @if (_diagnostics.MigrationComplete)
-                    {
-                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
-                        <MudText Typo="Typo.body2">Migration complete</MudText>
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Small" />
-                        <MudText Typo="Typo.body2">Migration not yet run</MudText>
-                    }
-                </MudStack>
-                <MudSimpleTable Dense="true" Hover="false">
-                    <thead>
-                        <tr>
-                            <th>Store</th>
-                            <th>Local Storage</th>
-                            <th>IndexedDB</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var row in _diagnostics.Counts)
-                        {
-                            <tr>
-                                <td>@row.Name</td>
-                                <td>@row.LocalStorage</td>
-                                <td>@row.IndexedDb</td>
-                                <td>
-                                    @if (row.Matches)
-                                    {
-                                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
-                                    }
-                                    else
-                                    {
-                                        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" Size="Size.Small" />
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </MudSimpleTable>
-            }
-        </MudCardContent>
-    </MudCard>
-
-    <MudCard Class="mt-4" Style="width:100%">
-        <MudCardContent>
             <MudText>Exercise Lookups</MudText>
             <ListEditor
                 Label="Target Body Part"
@@ -100,14 +43,14 @@
             </ListEditor>
         </MudCardContent>
         <MudCardContent>
-            <ListEditor 
+            <ListEditor
                 Label="Equipment"
                 List="State.Value.Equipment"
                 OnChange="HandleEquipmentChange">
             </ListEditor>
         </MudCardContent>
         <MudCardContent>
-            <ListEditor 
+            <ListEditor
                 Label="Set Types"
                 List="State.Value.SetType"
                 OnChange="HandleSetTypesChange">
@@ -117,17 +60,14 @@
 </MudContainer>
 
 @code {
-    private StorageDiagnostics? _diagnostics;
-
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         Dispatcher.Dispatch(new FetchSettingsAction());
         Dispatcher.Dispatch(new SetBreadcrumbAction(new []
         {
             new BreadcrumbItem("App Settings", "/settings", false, Icons.Material.Filled.Settings)
         }));
-        _diagnostics = await DiagnosticsService.GetDiagnosticsAsync();
-        await base.OnInitializedAsync();
+        base.OnInitialized();
     }
 
     void HandleAzureBlobBackupContainerSASURIChanged(string value) =>
