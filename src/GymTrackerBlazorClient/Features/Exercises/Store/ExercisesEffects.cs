@@ -65,7 +65,6 @@ public class ExercisesEffects
     public async Task OnUpsertExercise(UpsertExerciseAction action, IDispatcher dispatcher)
     {
         var updateDTO = action.Exercise;
-        var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
         var exercise = await _clientStorage.Exercises.FindOrDefaultByIdAsync(updateDTO.Id)
             ?? new Exercise { Id = updateDTO.Id, Name = updateDTO.Name };
 
@@ -76,7 +75,8 @@ public class ExercisesEffects
         exercise.IsAcitve = updateDTO.IsActive;
         exercise.ShowChartOnHomepage = updateDTO.ShowChartOnHomepage;
 
-        var response = await _clientStorage.Exercises.UpsertAsync(exercise);
+        await _clientStorage.Exercises.UpsertAsync(exercise);
+        var exercises = await _clientStorage.Exercises.GetOrDefaultAsync();
         dispatcher.Dispatch(new SetExercisesAction(exercises));
         dispatcher.Dispatch(new SetExerciseAction(exercise));
     }

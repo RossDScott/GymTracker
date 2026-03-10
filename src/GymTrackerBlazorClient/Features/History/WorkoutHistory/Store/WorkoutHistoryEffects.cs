@@ -25,10 +25,11 @@ public class WorkoutHistoryEffects
     [EffectMethod]
     public async Task OnInitialise(InitialiseAction action, IDispatcher dispatcher)
     {
-        var plans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
-        var workouts = await _clientStorage.Workouts.GetOrDefaultAsync();
+        var plansTask = _clientStorage.WorkoutPlans.GetOrDefaultAsync();
+        var workoutsTask = _clientStorage.Workouts.GetOrDefaultAsync();
+        await Task.WhenAll(plansTask.AsTask(), workoutsTask.AsTask());
 
-        dispatcher.Dispatch(new SetInitialDataAction(plans, workouts));
+        dispatcher.Dispatch(new SetInitialDataAction(plansTask.Result, workoutsTask.Result));
     }
 
     [EffectMethod]
