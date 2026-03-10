@@ -3,6 +3,7 @@ using GymTracker.AzureBlobStorage;
 using GymTracker.BlazorClient;
 using GymTracker.BlazorClient.Features.SidePanel;
 using GymTracker.BlazorClient.Services;
+using GymTracker.BlazorClient.Shared;
 using GymTracker.Domain;
 using GymTracker.Domain.Models;
 using GymTracker.LocalStorage;
@@ -26,6 +27,7 @@ builder.Services.RegisterDomainServices();
 builder.Services.RegisterAzureBlobStorageServices();
 
 builder.Services.AddScoped<SidePanelService>();
+builder.Services.AddSingleton<ErrorService>();
 
 var serviceProvider = builder.Services.BuildServiceProvider();
 //await serviceProvider.ConfigureAzureBlobBackupSettings();
@@ -33,4 +35,15 @@ var serviceProvider = builder.Services.BuildServiceProvider();
 
 builder.Services.AddFluxor(o => o.ScanAssemblies(typeof(Program).Assembly));
 
-await builder.Build().RunAsync();
+var host = builder.Build();
+
+var errorService = host.Services.GetRequiredService<ErrorService>();
+AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+    errorService.CaptureException((Exception)args.ExceptionObject);
+TaskScheduler.UnobservedTaskException += (_, args) =>
+{
+    errorService.CaptureException(args.Exception);
+    args.SetObserved();
+};
+
+await host.RunAsync();
