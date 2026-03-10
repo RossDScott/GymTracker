@@ -1,32 +1,47 @@
-﻿@using GymTracker.BlazorClient.Features.AppBar.Components
+@using GymTracker.BlazorClient.Features.AppBar.Components
 @using GymTracker.BlazorClient.Features.SidePanel.Components
 @using GymTracker.BlazorClient.Shared.Store;
 @inherits LayoutComponentBase
+@implements IDisposable
 
 @inject IDispatcher Dispatcher
 @inject ISnackbar Snackbar
+@inject ErrorService ErrorService
 
 <MudThemeProvider @ref="@_mudThemeProvider" Theme="MyCustomTheme" @bind-IsDarkMode="@_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout Class="fullHeight fullWidth" @onclick="() => Dispatcher.Dispatch(new UnhandledClickAction())">
-    <AppBar></AppBar>
-    <MudMainContent Class="fullHeight fullWidth mt-n16 pt-16">
-        <MudContainer MaxWidth="MaxWidth.Large" Class="ma-0 pa-0 fullHeight fullWidth">
-            @Body
-        </MudContainer>
-    </MudMainContent>
+@if (_serviceException is not null)
+{
+    <ErrorDisplay Exception="_serviceException" OnRecover="RecoverFromServiceError" />
+}
+else
+{
+    <MudLayout Class="fullHeight fullWidth" @onclick="() => Dispatcher.Dispatch(new UnhandledClickAction())">
+        <AppBar></AppBar>
+        <MudMainContent Class="fullHeight fullWidth mt-n16 pt-16">
+            <MudContainer MaxWidth="MaxWidth.Large" Class="ma-0 pa-0 fullHeight fullWidth">
+                <ErrorBoundary @ref="_errorBoundary">
+                    <ChildContent>@Body</ChildContent>
+                    <ErrorContent Context="exception">
+                        <ErrorDisplay Exception="exception" OnRecover="RecoverFromBoundaryError" />
+                    </ErrorContent>
+                </ErrorBoundary>
+            </MudContainer>
+        </MudMainContent>
 
-
-    <SidePanel></SidePanel>
-</MudLayout>
-
+        <SidePanel></SidePanel>
+    </MudLayout>
+}
 
 @code {
     private bool _isDarkMode;
     private MudThemeProvider _mudThemeProvider = new();
+    private ErrorBoundary? _errorBoundary;
+    private Exception? _serviceException;
+
     MudTheme MyCustomTheme = new MudTheme()
     {
         Typography = new Typography
@@ -46,8 +61,30 @@
             Snackbar.Configuration.ClearAfterNavigation = true;
             Snackbar.Configuration.VisibleStateDuration = 3000;
 
+            ErrorService.OnErrorChanged += OnServiceErrorChanged;
 
             StateHasChanged();
         }
+    }
+
+    private void OnServiceErrorChanged()
+    {
+        _serviceException = ErrorService.CurrentException;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void RecoverFromBoundaryError()
+    {
+        _errorBoundary?.Recover();
+    }
+
+    private void RecoverFromServiceError()
+    {
+        ErrorService.ClearException();
+    }
+
+    public void Dispose()
+    {
+        ErrorService.OnErrorChanged -= OnServiceErrorChanged;
     }
 }

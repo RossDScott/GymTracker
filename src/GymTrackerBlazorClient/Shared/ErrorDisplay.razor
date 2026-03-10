@@ -1,0 +1,46 @@
+@inject IJSRuntime JS
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="pa-4 pt-8">
+    <MudAlert Severity="Severity.Error" Class="mb-4">
+        <MudText Typo="Typo.h6">@Exception?.GetType().FullName</MudText>
+        <MudText Typo="Typo.body1" Class="mt-2">@Exception?.Message</MudText>
+    </MudAlert>
+
+    <MudPaper Class="pa-4 mb-4" Elevation="2">
+        <MudText Typo="Typo.subtitle2" Class="mb-2"><strong>Stack Trace</strong></MudText>
+        <pre style="overflow-x: auto; white-space: pre-wrap; word-break: break-word; font-size: 0.75rem; max-height: 400px; overflow-y: auto;">@Exception?.StackTrace</pre>
+    </MudPaper>
+
+    @if (Exception?.InnerException is not null)
+    {
+        <MudExpansionPanels Class="mb-4">
+            <MudExpansionPanel Text="Inner Exception">
+                @{ var inner = Exception.InnerException; }
+                @while (inner is not null)
+                {
+                    <MudAlert Severity="Severity.Warning" Class="mb-2">
+                        <MudText Typo="Typo.subtitle2">@inner.GetType().FullName</MudText>
+                        <MudText Typo="Typo.body2">@inner.Message</MudText>
+                    </MudAlert>
+                    <pre style="overflow-x: auto; white-space: pre-wrap; word-break: break-word; font-size: 0.75rem; max-height: 200px; overflow-y: auto; margin-bottom: 8px;">@inner.StackTrace</pre>
+                    inner = inner.InnerException;
+                }
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    }
+
+    <MudStack Row="true" Spacing="2">
+        @if (OnRecover.HasDelegate)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnRecover">Recover</MudButton>
+        }
+        <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="Reload">Reload Page</MudButton>
+    </MudStack>
+</MudContainer>
+
+@code {
+    [Parameter] public Exception? Exception { get; set; }
+    [Parameter] public EventCallback OnRecover { get; set; }
+
+    private async Task Reload() => await JS.InvokeVoidAsync("location.reload");
+}
