@@ -27,10 +27,6 @@ builder.Services.RegisterAzureBlobStorageServices();
 
 builder.Services.AddScoped<SidePanelService>();
 
-var serviceProvider = builder.Services.BuildServiceProvider();
-//await serviceProvider.ConfigureAzureBlobBackupSettings();
-//var exerciseLogService = serviceProvider.GetRequiredService<ExerciseLogService>();
-
 builder.Services.AddFluxor(o => o.ScanAssemblies(typeof(Program).Assembly));
 
 await builder.Build().RunAsync();

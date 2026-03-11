@@ -5,7 +5,10 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-		<Version>1.6.6.0</Version>
+		<Version>1.6.7.0</Version>
+		<RunAOTCompilation>true</RunAOTCompilation>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>partial</TrimMode>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -19,7 +22,7 @@
 		<PackageReference Include="Blazor-ApexCharts" Version="3.4.0" />
 		<PackageReference Include="FluentValidation" Version="11.7.1" />
 		<PackageReference Include="Fluxor.Blazor.Web" Version="5.9.0" />
-		<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" />
+		<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" Condition="'$(Configuration)' == 'Debug'" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0" PrivateAssets="all" />
 		<PackageReference Include="MudBlazor" Version="9.1.0" />
