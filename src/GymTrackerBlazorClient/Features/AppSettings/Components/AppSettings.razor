@@ -1,4 +1,5 @@
 @page "/settings"
+@using GymTracker.AzureBlobStorage
 @using GymTracker.BlazorClient.Features.AppBar.Store;
 @using GymTracker.BlazorClient.Features.AppSettings.Store;
 @using System.Collections.Immutable;
@@ -8,6 +9,7 @@
 
 @inject IState<AppSettingsState> State
 @inject IDispatcher Dispatcher
+@inject ISasValidator SasValidator
 
 <MudContainer Class="pa-3 ma-0">
     <MudCard Style="width:100%">
@@ -19,6 +21,44 @@
                 Label="Azure Blob Container SAS Uri"
                 Variant="Variant.Outlined">
             </MudTextField>
+            @if (_validationResults is not null)
+            {
+                <MudPaper Class="mt-3 pa-3" Elevation="0" Outlined="true">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Validation Results</MudText>
+                    @foreach (var step in _validationResults)
+                    {
+                        <div class="d-flex align-center gap-2 mb-1">
+                            @if (step.Success)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" Size="Size.Small" />
+                            }
+                            <MudText Typo="Typo.body2">@step.StepName — @((int)step.Duration.TotalMilliseconds)ms</MudText>
+                        </div>
+                        @if (!step.Success && step.Exception is not null)
+                        {
+                            <MudPaper Class="pa-2 mt-1 mb-2" Elevation="0" Style="background-color: var(--mud-palette-error-lighten);">
+                                <MudText Typo="Typo.caption" Style="word-break: break-all; white-space: pre-wrap;">
+                                    @step.Exception.GetType().FullName: @step.Exception.Message
+                                </MudText>
+                                @if (!string.IsNullOrWhiteSpace(step.Exception.StackTrace))
+                                {
+                                    <MudText Typo="Typo.caption" Style="word-break: break-all; white-space: pre-wrap; font-family: monospace; font-size: 0.7rem;">
+                                        @step.Exception.StackTrace
+                                    </MudText>
+                                }
+                            </MudPaper>
+                        }
+                    }
+                    @if (_isValidating)
+                    {
+                        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mt-2" />
+                    }
+                </MudPaper>
+            }
         </MudCardContent>
         <MudCardActions>
             <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="HandleBackupAll">
@@ -29,6 +69,11 @@
             </MudButton>
             <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="HandleDeleteAll">
                 Delete All
+            </MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary"
+                       Disabled="@(_isValidating || string.IsNullOrWhiteSpace(State.Value?.AzureBlobBackupContainerSASURI))"
+                       OnClick="HandleValidateSasUri">
+                Validate
             </MudButton>
         </MudCardActions>
     </MudCard>
@@ -60,6 +105,9 @@
 </MudContainer>
 
 @code {
+    private bool _isValidating;
+    private IReadOnlyList<SasValidationStepResult>? _validationResults;
+
     protected override void OnInitialized()
     {
         Dispatcher.Dispatch(new FetchSettingsAction());
@@ -85,4 +133,15 @@
 
     void HandleSetTypesChange(ImmutableArray<string> setTypes) =>
         Dispatcher.Dispatch(new UpdateSetTypesAction(setTypes));
+
+    async Task HandleValidateSasUri()
+    {
+        _isValidating = true;
+        _validationResults = new List<SasValidationStepResult>();
+        StateHasChanged();
+
+        _validationResults = await SasValidator.ValidateAsync(State.Value!.AzureBlobBackupContainerSASURI!);
+
+        _isValidating = false;
+    }
 }
