@@ -8,14 +8,17 @@ public class SasValidator : ISasValidator
     public async Task<IReadOnlyList<SasValidationStepResult>> ValidateAsync(string sasUri)
     {
         var results = new List<SasValidationStepResult>();
-        var blobName = $"sas-validation-{Guid.NewGuid():N}";
-        var containerClient = new BlobContainerClient(new Uri(sasUri));
-        var blobClient = containerClient.GetBlobClient(blobName);
         bool created = false;
+        BlobContainerClient? containerClient = null;
+        BlobClient? blobClient = null;
         var sw = new Stopwatch();
 
         try
         {
+            var blobName = $"sas-validation-{Guid.NewGuid():N}";
+            containerClient = new BlobContainerClient(new Uri(sasUri));
+            blobClient = containerClient.GetBlobClient(blobName);
+            
             // Step 1: Create
             sw.Restart();
             try
@@ -55,9 +58,10 @@ public class SasValidator : ISasValidator
             }
             catch (Exception ex) { results.Add(new("Delete", false, sw.Elapsed, ex)); }
         }
+        catch (Exception ex) { results.Add(new("Overall", false, sw.Elapsed, ex)); }
         finally
         {
-            if (created)
+            if (created && blobClient is not null)
                 try { await blobClient.DeleteIfExistsAsync(); } catch { }
         }
 
