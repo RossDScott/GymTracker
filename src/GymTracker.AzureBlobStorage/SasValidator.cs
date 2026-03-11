@@ -1,29 +1,36 @@
-using Azure.Storage.Blobs;
 using System.Diagnostics;
 
 namespace GymTracker.AzureBlobStorage;
 
 public class SasValidator : ISasValidator
 {
+    private readonly HttpClient _http;
+
+    public SasValidator(HttpClient http) => _http = http;
+
+    private static string BlobUrl(string containerSasUri, string blobName)
+    {
+        var uri = new Uri(containerSasUri);
+        return $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}/{Uri.EscapeDataString(blobName)}{uri.Query}";
+    }
+
     public async Task<IReadOnlyList<SasValidationStepResult>> ValidateAsync(string sasUri)
     {
         var results = new List<SasValidationStepResult>();
         bool created = false;
-        BlobContainerClient? containerClient = null;
-        BlobClient? blobClient = null;
+        var blobUrl = BlobUrl(sasUri, $"sas-validation-{Guid.NewGuid():N}");
         var sw = new Stopwatch();
 
         try
         {
-            var blobName = $"sas-validation-{Guid.NewGuid():N}";
-            containerClient = BlobClientFactory.CreateContainerClient(sasUri);
-            blobClient = containerClient.GetBlobClient(blobName);
-            
             // Step 1: Create
             sw.Restart();
             try
             {
-                await blobClient.UploadAsync(BinaryData.FromString("gymtracker-validation"), overwrite: false);
+                var req = new HttpRequestMessage(HttpMethod.Put, blobUrl);
+                req.Headers.Add("x-ms-blob-type", "BlockBlob");
+                req.Content = new StringContent("gymtracker-validation", System.Text.Encoding.UTF8, "text/plain");
+                (await _http.SendAsync(req)).EnsureSuccessStatusCode();
                 results.Add(new("Create", true, sw.Elapsed));
                 created = true;
             }
@@ -33,7 +40,10 @@ public class SasValidator : ISasValidator
             sw.Restart();
             try
             {
-                await blobClient.UploadAsync(BinaryData.FromString("gymtracker-validation-updated"), overwrite: true);
+                var req = new HttpRequestMessage(HttpMethod.Put, blobUrl);
+                req.Headers.Add("x-ms-blob-type", "BlockBlob");
+                req.Content = new StringContent("gymtracker-validation-updated", System.Text.Encoding.UTF8, "text/plain");
+                (await _http.SendAsync(req)).EnsureSuccessStatusCode();
                 results.Add(new("Update", true, sw.Elapsed));
             }
             catch (Exception ex) { results.Add(new("Update", false, sw.Elapsed, ex)); return results; }
@@ -42,8 +52,9 @@ public class SasValidator : ISasValidator
             sw.Restart();
             try
             {
-                var download = await blobClient.DownloadContentAsync();
-                _ = download.Value.Content.ToString();
+                var resp = await _http.GetAsync(blobUrl);
+                resp.EnsureSuccessStatusCode();
+                _ = await resp.Content.ReadAsStringAsync();
                 results.Add(new("Read", true, sw.Elapsed));
             }
             catch (Exception ex) { results.Add(new("Read", false, sw.Elapsed, ex)); return results; }
@@ -52,7 +63,7 @@ public class SasValidator : ISasValidator
             sw.Restart();
             try
             {
-                await blobClient.DeleteAsync();
+                (await _http.DeleteAsync(blobUrl)).EnsureSuccessStatusCode();
                 created = false;
                 results.Add(new("Delete", true, sw.Elapsed));
             }
@@ -61,8 +72,8 @@ public class SasValidator : ISasValidator
         catch (Exception ex) { results.Add(new("Overall", false, sw.Elapsed, ex)); }
         finally
         {
-            if (created && blobClient is not null)
-                try { await blobClient.DeleteIfExistsAsync(); } catch { }
+            if (created)
+                try { await _http.DeleteAsync(blobUrl); } catch { }
         }
 
         return results;

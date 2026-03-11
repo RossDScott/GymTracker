@@ -1,55 +1,56 @@
-﻿using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using GymTracker.Domain;
 
 namespace GymTracker.AzureBlobStorage;
 public class BlobBackupClient : IDataBackupClient
 {
     private readonly IAppSettingsProvider _appSettings;
+    private readonly HttpClient _http;
 
-    public BlobBackupClient(IAppSettingsProvider appSettings)
+    public BlobBackupClient(IAppSettingsProvider appSettings, HttpClient http)
     {
         _appSettings = appSettings;
+        _http = http;
     }
 
-    private async ValueTask<BlobContainerClient?> BuildContainerClient()
+    private static string BlobUrl(string containerSasUri, string blobName)
+    {
+        var uri = new Uri(containerSasUri);
+        return $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}/{Uri.EscapeDataString(blobName)}{uri.Query}";
+    }
+
+    private async ValueTask<string?> GetContainerSasUri()
     {
         var sasUri = (await _appSettings.GetAsync()).AzureBlobBackupContainerSASURI;
-
-        return string.IsNullOrWhiteSpace(sasUri)
-            ? null
-            : BlobClientFactory.CreateContainerClient(sasUri);
+        return string.IsNullOrWhiteSpace(sasUri) ? null : sasUri;
     }
 
     public async Task BackupAsync(string key, string dataAsString)
     {
-        var containerClient = await BuildContainerClient();
-        if (string.IsNullOrWhiteSpace(dataAsString) || containerClient is null)
-            return;
-
+        if (string.IsNullOrWhiteSpace(dataAsString)) return;
         ArgumentNullException.ThrowIfNull(key);
+        var sasUri = await GetContainerSasUri();
+        if (sasUri is null) return;
 
-        var blob = containerClient.GetBlobClient(key);
-        await blob.UploadAsync(BinaryData.FromString(dataAsString), overwrite: true);
+        var request = new HttpRequestMessage(HttpMethod.Put, BlobUrl(sasUri, key));
+        request.Headers.Add("x-ms-blob-type", "BlockBlob");
+        request.Content = new StringContent(dataAsString, System.Text.Encoding.UTF8, "text/plain");
+        (await _http.SendAsync(request)).EnsureSuccessStatusCode();
     }
 
     public async Task<string> DownloadBackupItem(string key)
     {
-        var containerClient = await BuildContainerClient();
-        ArgumentNullException.ThrowIfNull(containerClient);
-
-        var blob = containerClient.GetBlobClient(key);
-        BlobDownloadResult downloadResult = await blob.DownloadContentAsync();
-        string blobData = downloadResult.Content.ToString();
-        return blobData;
+        var sasUri = await GetContainerSasUri();
+        ArgumentNullException.ThrowIfNull(sasUri);
+        var response = await _http.GetAsync(BlobUrl(sasUri, key));
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync();
     }
 
     public async Task<bool> BackupExistsAsync(string key)
     {
-        var containerClient = await BuildContainerClient();
-        ArgumentNullException.ThrowIfNull(containerClient);
-
-        var blob = containerClient.GetBlobClient(key);
-        return await blob.ExistsAsync();
+        var sasUri = await GetContainerSasUri();
+        ArgumentNullException.ThrowIfNull(sasUri);
+        var response = await _http.SendAsync(new HttpRequestMessage(HttpMethod.Head, BlobUrl(sasUri, key)));
+        return response.IsSuccessStatusCode;
     }
 }
