@@ -7,5 +7,6 @@ public static class ServiceRegistration
     public static void RegisterAzureBlobStorageServices(this IServiceCollection services)
     {
         services.AddScoped<IDataBackupClient, BlobBackupClient>();
+        services.AddScoped<ISasValidator, SasValidator>();
     }
 }
