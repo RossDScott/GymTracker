@@ -16,8 +16,13 @@ public class StatisticsBuilderService : ITrigger
 
     public void Subscribe()
     {
-        // Item-level upsert: incremental update for single workout saves
-        _localStorageContex.Workouts.SubscribeToItemUpsert(WorkoutUpserted);
+        // Item-level upsert: fire-and-forget so the workout save returns immediately
+        // and statistics are computed in the background without blocking navigation.
+        _localStorageContex.Workouts.SubscribeToItemUpsert(workout =>
+        {
+            _ = WorkoutUpserted(workout);
+            return Task.CompletedTask;
+        });
 
         // Collection-level changes: full rebuild for bulk operations (migration, restore)
         _localStorageContex.Workouts.SubscribeToChanges(WorkoutsChanged);
