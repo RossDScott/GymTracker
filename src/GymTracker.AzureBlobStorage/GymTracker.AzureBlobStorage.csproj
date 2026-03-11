@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.17.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GymTracker.Domain\GymTracker.Domain.csproj" />
   </ItemGroup>
 
