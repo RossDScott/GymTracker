@@ -16,7 +16,7 @@ public class SasValidator : ISasValidator
         try
         {
             var blobName = $"sas-validation-{Guid.NewGuid():N}";
-            containerClient = new BlobContainerClient(new Uri(sasUri));
+            containerClient = BlobClientFactory.CreateContainerClient(sasUri);
             blobClient = containerClient.GetBlobClient(blobName);
             
             // Step 1: Create
