@@ -1,0 +1,120 @@
+@page "/mobile"
+@using GymTracker.Domain.Models.Statistics
+@using GymTracker.BlazorClient.Features.Home.Components.WorkoutHistory
+
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<PageTitle>Workout History</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="pa-2">
+
+    <MudExpansionPanels Class="mb-3">
+        <MudExpansionPanel @bind-Expanded="_settingsOpen" Text="Settings">
+            <MudTextField
+                @bind-Value="_sasUri"
+                Label="Azure Blob Container SAS URI"
+                Variant="Variant.Outlined"
+                InputType="@(_showSasUri ? InputType.Text : InputType.Password)"
+                Adornment="Adornment.End"
+                AdornmentIcon="@(_showSasUri ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                OnAdornmentClick="() => _showSasUri = !_showSasUri"
+                Class="mb-2" />
+            <MudButton
+                Variant="Variant.Filled"
+                Color="Color.Primary"
+                FullWidth="true"
+                Disabled="@(string.IsNullOrWhiteSpace(_sasUri))"
+                OnClick="SaveAndLoad">
+                Save &amp; Load
+            </MudButton>
+        </MudExpansionPanel>
+    </MudExpansionPanels>
+
+    @if (_isLoading)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-3" />
+    }
+
+    @if (_error is not null)
+    {
+        <MudAlert Severity="Severity.Error" Class="mb-3">@_error</MudAlert>
+    }
+
+    @if (_workouts is not null)
+    {
+        @foreach (var workout in _workouts)
+        {
+            <MudPaper Class="pa-3 mb-2" Elevation="1">
+                <div class="d-flex justify-space-between">
+                    <MudText Typo="Typo.subtitle1">@workout.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
+                    <MudText Typo="Typo.subtitle1">@workout.WorkoutPlanName</MudText>
+                </div>
+                @WorkoutView(workout)
+            </MudPaper>
+        }
+    }
+
+</MudContainer>
+
+@code {
+    private string? _sasUri;
+    private WorkoutStatistic[]? _workouts;
+    private bool _isLoading;
+    private string? _error;
+    private bool _settingsOpen = true;
+    private bool _showSasUri;
+
+    private const string StorageKey = "MobileSasUri";
+    private const string BlobKey = "WorkoutStatistics";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _sasUri = await JS.InvokeAsync<string?>("localStorage.getItem", StorageKey);
+        if (!string.IsNullOrWhiteSpace(_sasUri))
+        {
+            _settingsOpen = false;
+            await FetchWorkouts();
+        }
+    }
+
+    private async Task SaveAndLoad()
+    {
+        await JS.InvokeVoidAsync("localStorage.setItem", StorageKey, _sasUri);
+        _settingsOpen = false;
+        await FetchWorkouts();
+    }
+
+    private async Task FetchWorkouts()
+    {
+        if (string.IsNullOrWhiteSpace(_sasUri)) return;
+
+        _isLoading = true;
+        _error = null;
+        _workouts = null;
+
+        try
+        {
+            var uri = new Uri(_sasUri);
+            var url = $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}/{Uri.EscapeDataString(BlobKey)}{uri.Query}";
+            _workouts = await Http.GetFromJsonAsync<WorkoutStatistic[]>(url);
+            _workouts = _workouts?
+                .OrderByDescending(x => x.CompletedOn)
+                .Take(20)
+                .ToArray();
+        }
+        catch (Exception ex)
+        {
+            _error = $"Failed to load workouts: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private RenderFragment WorkoutView(WorkoutStatistic workout) =>
+        workout.IsRepsOnly && workout.Exercises.Count() == 1
+            ? @<SingleExerciseReps WorkoutStatistic="workout" />
+            : @<StandardExercises WorkoutStatistic="workout" />;
+}
