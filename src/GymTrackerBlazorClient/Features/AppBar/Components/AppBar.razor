@@ -1,24 +1,39 @@
-﻿@using GymTracker.BlazorClient.Features.AppBar.Store;
+@using GymTracker.BlazorClient.Features.AppBar.Store;
 @using System.Reflection
 @inject NavigationManager NavigationManager
+@inject IDispatcher Dispatcher
+
+@implements IDisposable
 
 @inherits FluxorComponent
 
 @inject IState<AppBarState> State
 
-<MudAppBar 
-    Color="Color.Surface" 
+<MudAppBar
+    Color="Color.Surface"
     Fixed="false">
     <MudBreadcrumbs Items="State.Value.Breadcrumbs.ToList()"></MudBreadcrumbs>
     <MudSpacer />
+    @if (NavigationManager.Uri.EndsWith("/mobile", StringComparison.OrdinalIgnoreCase))
+    {
+        <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                       Color="Color.Inherit"
+                       OnClick="() => Dispatcher.Dispatch(new ToggleMobileSettingsAction())" />
+    }
     @GetVersion()
-@*     <MudMenu 
-        Icon="@Icons.Material.Filled.MoreVert">
-        <MudMenuItem OnClick="HandleNavigateToSettings">Settings</MudMenuItem>
-    </MudMenu> *@
 </MudAppBar>
 
 @code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    void OnLocationChanged(object? sender, LocationChangedEventArgs e) => StateHasChanged();
+
+    public void Dispose() => NavigationManager.LocationChanged -= OnLocationChanged;
+
     void HandleNavigateHome() => NavigationManager.NavigateTo("/");
     void HandleNavigateToSettings() => NavigationManager.NavigateTo("/settings");
 
