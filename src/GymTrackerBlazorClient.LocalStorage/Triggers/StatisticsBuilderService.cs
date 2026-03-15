@@ -2,6 +2,7 @@ using GymTracker.Domain.Models;
 using GymTracker.Domain.Models.Extensions;
 using GymTracker.Domain.Models.Statistics;
 using GymTracker.LocalStorage.Core;
+using System.Collections.Immutable;
 
 namespace GymTracker.LocalStorage.Triggers;
 
@@ -16,40 +17,35 @@ public class StatisticsBuilderService : ITrigger
 
     public void Subscribe()
     {
-        // Item-level upsert: fire-and-forget so the workout save returns immediately
-        // and statistics are computed in the background without blocking navigation.
         _localStorageContex.Workouts.SubscribeToItemUpsert(workout =>
         {
             _ = WorkoutUpserted(workout);
             return Task.CompletedTask;
         });
 
-        // Collection-level changes: full rebuild for bulk operations (migration, restore)
-        _localStorageContex.Workouts.SubscribeToChanges(WorkoutsChanged);
-
-        _localStorageContex.Exercises.SubscribeToChanges(async _ =>
+        _localStorageContex.Exercises.SubscribeToItemUpsert(exercise =>
         {
-            var workouts = await _localStorageContex.Workouts.GetOrDefaultAsync();
-            await WorkoutsChanged(workouts);
+            _ = RebuildAllStatistics();
+            return Task.CompletedTask;
+        });
+
+        _localStorageContex.WorkoutPlans.SubscribeToItemUpsert(plan =>
+        {
+            _ = ComputeAndSaveNextWorkout();
+            return Task.CompletedTask;
         });
     }
 
-    /// <summary>
-    /// Incremental update when a single workout is upserted.
-    /// Only updates statistics for the affected workout, plan, and exercises.
-    /// </summary>
-    public async Task WorkoutUpserted(Workout workout)
+    private async Task WorkoutUpserted(Workout workout)
     {
         if (workout.WorkoutEnd is null)
-            return; // Not a completed workout, nothing to compute
+            return;
 
         var exercises = await _localStorageContex.Exercises.GetOrDefaultAsync();
 
-        // 1. Upsert the single WorkoutStatistic
         var workoutStat = workout.ToWorkoutStatistics();
         await _localStorageContex.WorkoutStatistics.UpsertAsync(workoutStat);
 
-        // 2. Update ExerciseStatistics for each exercise in this workout
         foreach (var workoutExercise in workout.Exercises)
         {
             var exercise = exercises.SingleOrDefault(x => x.Id == workoutExercise.Exercise.Id);
@@ -76,7 +72,6 @@ public class StatisticsBuilderService : ITrigger
 
             var logs = existingStat?.Logs?.ToList() ?? new List<ExerciseLog>();
 
-            // Replace existing log for this workout date, or add new
             var existingLogIndex = logs.FindIndex(l => l.WorkoutDateTime == workout.WorkoutEnd.Value);
             if (existingLogIndex >= 0)
                 logs[existingLogIndex] = newLog;
@@ -95,7 +90,6 @@ public class StatisticsBuilderService : ITrigger
             await _localStorageContex.ExerciseStatistics.UpsertAsync(updatedStat);
         }
 
-        // 3. Update WorkoutPlanStatistic for this workout's plan
         var existingPlanStat = await _localStorageContex.WorkoutPlanStatistics
             .FindOrDefaultByIdAsync(workout.Plan.Id);
 
@@ -114,14 +108,14 @@ public class StatisticsBuilderService : ITrigger
         };
 
         await _localStorageContex.WorkoutPlanStatistics.UpsertAsync(planStat);
+
+        await ComputeAndSaveNextWorkout();
     }
 
-    /// <summary>
-    /// Full rebuild of all statistics. Used for bulk operations (migration, restore, exercise changes).
-    /// </summary>
-    public async Task WorkoutsChanged(ICollection<Workout> workouts)
+    private async Task RebuildAllStatistics()
     {
         var exercises = await _localStorageContex.Exercises.GetOrDefaultAsync();
+        var workouts = await _localStorageContex.Workouts.GetOrDefaultAsync();
         var completedWorkouts = workouts
                                 .Where(x => x.WorkoutEnd != null)
                                 .OrderByDescending(x => x.WorkoutEnd)
@@ -189,5 +183,41 @@ public class StatisticsBuilderService : ITrigger
                                     .Select(x => x.ToWorkoutStatistics())
                                     .ToList();
         await _localStorageContex.WorkoutStatistics.SetAsync(workoutStatistics);
+
+        await ComputeAndSaveNextWorkout();
+    }
+
+    private async Task ComputeAndSaveNextWorkout()
+    {
+        var plans = await _localStorageContex.WorkoutPlans.GetOrDefaultAsync();
+        var regularPlans = plans.Where(p => p.IsRegularRoutine && p.IsAcitve).ToList();
+
+        if (!regularPlans.Any())
+            return;
+
+        var planStats = await _localStorageContex.WorkoutPlanStatistics.GetOrDefaultAsync();
+        var statsByPlanId = planStats.ToDictionary(s => s.WorkoutPlanId);
+
+        var nextPlan = regularPlans
+            .OrderBy(p => statsByPlanId.TryGetValue(p.Id, out var stat)
+                ? stat.PreviousWorkout.CompletedOn
+                : DateTimeOffset.MinValue)
+            .First();
+
+        var lastCompleted = statsByPlanId.TryGetValue(nextPlan.Id, out var planStat)
+            ? planStat.PreviousWorkout.CompletedOn
+            : (DateTimeOffset?)null;
+
+        var summary = new NextWorkoutSummary
+        {
+            WorkoutPlanId = nextPlan.Id,
+            WorkoutPlanName = nextPlan.Name,
+            LastCompletedOn = lastCompleted,
+            Exercises = nextPlan.PlannedExercises
+                .OrderBy(e => e.Order)
+                .ToImmutableArray()
+        };
+
+        await _localStorageContex.NextWorkoutSummary.SetAsync(summary);
     }
 }

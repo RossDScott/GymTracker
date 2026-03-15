@@ -1,5 +1,5 @@
 const DB_NAME = 'GymTrackerDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbInstance = null;
 
@@ -22,7 +22,8 @@ function getDb() {
                 { name: 'WorkoutPlanStatistics', keyPath: 'workoutPlanId' },
                 { name: 'WorkoutStatistics', keyPath: 'workoutId', indexes: [{ name: 'workoutPlanId', keyPath: 'workoutPlanId' }] },
                 { name: 'HasInitialisedDefaultData', keyPath: 'key' },
-                { name: 'Meta', keyPath: 'key' }
+                { name: 'Meta', keyPath: 'key' },
+                { name: 'NextWorkoutSummary', keyPath: 'key' }
             ];
 
             for (const store of stores) {

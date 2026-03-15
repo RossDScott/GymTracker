@@ -16,6 +16,7 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
     public IKeyListItem<ExerciseStatistic> ExerciseStatistics { get; init; } = default!;
     public IKeyListItem<WorkoutPlanStatistic> WorkoutPlanStatistics { get; init; } = default!;
     public IKeyListItem<WorkoutStatistic> WorkoutStatistics { get; init; } = default!;
+    public IKeyItem<NextWorkoutSummary> NextWorkoutSummary { get; init; } = default!;
 
     public ClientStorageContext()
     {
@@ -48,6 +49,11 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
         WorkoutStatistics.ConfigureList(settings =>
         {
             settings.GetId = (WorkoutStatistic x) => x.WorkoutId;
+        });
+
+        NextWorkoutSummary.Configure(settings =>
+        {
+            settings.AutoBackup = true;
         });
 
         AddTrigger(new StatisticsBuilderService(this));

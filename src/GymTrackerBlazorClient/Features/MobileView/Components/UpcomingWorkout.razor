@@ -1,0 +1,37 @@
+@using GymTracker.Domain.Models
+@using GymTracker.Domain.Models.Statistics
+@using GymTracker.Domain.Models.Extensions
+
+<MudPaper Class="pa-3 mb-2" Elevation="1">
+    <div class="d-flex justify-space-between">
+        <MudText Typo="Typo.subtitle2">@Summary.WorkoutPlanName</MudText>
+        <MudText Typo="Typo.subtitle2">
+            @(Summary.LastCompletedOn.HasValue
+                ? Summary.LastCompletedOn.Value.ToString("dd/MM/yy HH:mm")
+                : "Never")
+        </MudText>
+    </div>
+
+    @foreach (var exercise in Summary.Exercises)
+    {
+        <div class="d-flex justify-space-between">
+            <MudText Typo="Typo.subtitle2">@exercise.Exercise.Name</MudText>
+            <MudText Typo="Typo.subtitle2">@TargetSetText(exercise)</MudText>
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public NextWorkoutSummary Summary { get; set; } = default!;
+
+    private string TargetSetText(PlannedExercise exercise)
+    {
+        var firstWorkingSet = exercise.PlannedSets
+            .Where(s => s.SetType == "Set")
+            .OrderBy(s => s.Order)
+            .FirstOrDefault();
+
+        return firstWorkingSet?.TargetMetrics.GetMeasureText(exercise.Exercise.MetricType) ?? string.Empty;
+    }
+}

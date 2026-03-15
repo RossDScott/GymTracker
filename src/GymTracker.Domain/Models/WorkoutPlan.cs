@@ -7,6 +7,7 @@ public record WorkoutPlan
     public ICollection<PlannedExercise> PlannedExercises { get; set; } = new List<PlannedExercise>();
 
     public bool IsAcitve { get; set; } = true;
+    public bool IsRegularRoutine { get; set; } = false;
 }
 
 public record PlannedExercise : IOrderable

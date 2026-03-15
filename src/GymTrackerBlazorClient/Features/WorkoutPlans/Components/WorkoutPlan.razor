@@ -38,6 +38,10 @@
                        Label="Is Active"
                        LabelPlacement="Placement.Start"
                        ValueChanged="(bool isActive) => HandleIsActiveChanged(isActive)" />
+            <MudSwitch T="bool" Value="_isRegularRoutine"
+                       Label="Regular Routine"
+                       LabelPlacement="Placement.Start"
+                       ValueChanged="(bool value) => HandleIsRegularRoutineChanged(value)" />
         </MudStack>
     </MudForm>
 </MudPaper>
@@ -58,6 +62,7 @@
     MudForm _form = default!;
     string _workoutPlanName = string.Empty;
     bool _isActive = true;
+    bool _isRegularRoutine = false;
 
     ImmutableArray<ListItem> _plannedExercises = ImmutableArray<ListItem>.Empty;
 
@@ -67,6 +72,7 @@
         _plannedExercises = WorkoutPlanDetail.PlannedExercises;
 
         _isActive = WorkoutPlanDetail.IsActive;
+        _isRegularRoutine = WorkoutPlanDetail.IsRegularRoutine;
 
         if (_form is not null) await _form.ResetValidationAsync();
 
@@ -83,8 +89,8 @@
         var updateDTO = WorkoutPlanDetail with
             {
                 Name = _workoutPlanName,
-
-                IsActive = _isActive
+                IsActive = _isActive,
+                IsRegularRoutine = _isRegularRoutine
             };
 
         await OnWorkoutPlanUpdated.InvokeAsync(updateDTO);
@@ -112,6 +118,12 @@
     async Task HandleIsActiveChanged(bool isActive)
     {
         _isActive = isActive;
+        await HandleUpdateWorkoutPlan();
+    }
+
+    async Task HandleIsRegularRoutineChanged(bool value)
+    {
+        _isRegularRoutine = value;
         await HandleUpdateWorkoutPlan();
     }
 }
