@@ -46,14 +46,21 @@
         <MudAlert Severity="Severity.Error" Class="mb-3">@_error</MudAlert>
     }
 
+    @if (_nextWorkout is not null)
+    {
+        <MudText Typo="Typo.subtitle1" Class="mb-1">Upcoming</MudText>
+        <UpcomingWorkout Summary="_nextWorkout" />
+    }
+
     @if (_workouts is not null)
     {
+        <MudText Typo="Typo.subtitle1" Class="mb-1">Previous</MudText>
         @foreach (var workout in _workouts)
         {
             <MudPaper Class="pa-3 mb-2" Elevation="1">
                 <div class="d-flex justify-space-between">
-                    <MudText Typo="Typo.subtitle1">@workout.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
-                    <MudText Typo="Typo.subtitle1">@workout.WorkoutPlanName</MudText>
+                    <MudText Typo="Typo.subtitle2">@workout.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
+                    <MudText Typo="Typo.subtitle2">@workout.WorkoutPlanName</MudText>
                 </div>
                 @WorkoutView(workout)
             </MudPaper>
@@ -65,6 +72,7 @@
 @code {
     private string? _sasUri;
     private WorkoutStatistic[]? _workouts;
+    private NextWorkoutSummary? _nextWorkout;
     private bool _isLoading;
     private string? _error;
     private bool _settingsOpen = true;
@@ -72,6 +80,7 @@
 
     private const string StorageKey = "MobileSasUri";
     private const string BlobKey = "WorkoutStatistics";
+    private const string NextWorkoutBlobKey = "NextWorkoutSummary";
 
     protected override void OnInitialized()
     {
@@ -106,6 +115,7 @@
         _isLoading = true;
         _error = null;
         _workouts = null;
+        _nextWorkout = null;
 
         try
         {
@@ -116,6 +126,16 @@
                 .OrderByDescending(x => x.CompletedOn)
                 .Take(20)
                 .ToArray();
+
+            try
+            {
+                var nextUrl = $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}/{Uri.EscapeDataString(NextWorkoutBlobKey)}{uri.Query}";
+                _nextWorkout = await Http.GetFromJsonAsync<NextWorkoutSummary>(nextUrl);
+            }
+            catch
+            {
+                _nextWorkout = null; // optional — silently skip if blob doesn't exist yet
+            }
         }
         catch (Exception ex)
         {

@@ -24,6 +24,7 @@ public record WorkoutPlanDetail
     public ImmutableArray<ListItem> PlannedExercises { get; init; } = ImmutableArray<ListItem>.Empty;
 
     public bool IsActive { get; init; } = true;
+    public bool IsRegularRoutine { get; init; } = false;
 }
 
 public record PlannedExerciseDetail

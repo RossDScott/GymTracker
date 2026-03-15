@@ -15,7 +15,8 @@ public static class ModelExtensions
                                     .OrderBy(x => x.Order)
                                     .Select(x => x.ToListItem())
                                     .ToImmutableArray(),
-            IsActive = plan.IsAcitve
+            IsActive = plan.IsAcitve,
+            IsRegularRoutine = plan.IsRegularRoutine
         };
 
     public static PlannedExerciseDetail ToDetailItem(this PlannedExercise exercise)

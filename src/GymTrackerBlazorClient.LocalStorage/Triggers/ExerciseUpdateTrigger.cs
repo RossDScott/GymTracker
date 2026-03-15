@@ -1,4 +1,4 @@
-﻿using GymTracker.Domain.Models;
+using GymTracker.Domain.Models;
 using GymTracker.LocalStorage.Core;
 
 namespace GymTracker.LocalStorage.Triggers;
@@ -13,27 +13,32 @@ internal class ExerciseUpdateTrigger : ITrigger
 
     public void Subscribe()
     {
-        _localStorageContex.Exercises.SubscribeToChanges(ExercisesChanged);
+        _localStorageContex.Exercises.SubscribeToItemUpsert(exercise =>
+        {
+            _ = ExerciseUpserted(exercise);
+            return Task.CompletedTask;
+        });
     }
 
-    public async Task ExercisesChanged(ICollection<Exercise> exercises)
+    private async Task ExerciseUpserted(Exercise exercise)
     {
         var plans = await _localStorageContex.WorkoutPlans.GetOrDefaultAsync();
 
-        foreach (var exercise in exercises)
+        foreach (var plan in plans)
         {
-            foreach (var plan in plans)
+            var matchingExercises = plan.PlannedExercises
+                                        .Where(x => x.Exercise.Id == exercise.Id)
+                                        .ToList();
+
+            if (!matchingExercises.Any())
+                continue;
+
+            foreach (var matchingExercise in matchingExercises)
             {
-                var mactchingExercises = plan.PlannedExercises
-                                                .Where(x => x.Exercise.Id == exercise.Id);
-
-                foreach (var matchingExercise in mactchingExercises)
-                {
-                    matchingExercise.Exercise = exercise;
-                }
+                matchingExercise.Exercise = exercise;
             }
-        }
 
-        await _localStorageContex.WorkoutPlans.SetAsync(plans);
+            await _localStorageContex.WorkoutPlans.UpsertAsync(plan);
+        }
     }
 }
