@@ -7,6 +7,8 @@
 @using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 
 @inject IDispatcher Dispatcher
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <div class="d-flex flex-row fullWidth fullHeight">
     <div class="pa-3 d-flex flex-column fullHeight" style="width: 65%; height: 30%;">
@@ -23,11 +25,16 @@
 </div>
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        var isMobile = await JS.InvokeAsync<bool>("eval", "window.innerWidth <= 768");
+        if (isMobile)
+        {
+            NavigationManager.NavigateTo("/mobile");
+            return;
+        }
+
         Dispatcher.Dispatch(new ResetBreadcrumbsToHomeAction());
         Dispatcher.Dispatch(new InitaliseHomeAction());
-
-        base.OnInitialized();
     }
 }
