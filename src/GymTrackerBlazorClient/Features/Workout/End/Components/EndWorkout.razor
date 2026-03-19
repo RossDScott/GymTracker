@@ -1,8 +1,11 @@
-﻿@page "/workout/end"
+@page "/workout/end"
 @using GymTracker.BlazorClient.Extensions
 @using GymTracker.BlazorClient.Features.Common
+@using GymTracker.BlazorClient.Features.Common.FullHeightList
 @using GymTracker.BlazorClient.Features.Workout.End.Store
+@using GymTracker.Domain.Models
 @using GymTracker.Domain.Models.Extensions
+@using System.Collections.Immutable
 
 @inherits FluxorComponent
 
@@ -11,135 +14,387 @@
 @inject IState<SavingState> SavingState
 @inject IDialogService DialogService
 
-<div class="ma-3">
-    <MudGrid>
-        <MudItem xs="3">
-            <MudDatePicker Label="Start Date" @bind-Date="State.Value.WorkoutStartDate" />
-        </MudItem>
-        <MudItem xs="3">
-            <MudTimePicker Label="Start Time" @bind-Time="State.Value.WorkoutStartTime" />
-        </MudItem>
-    </MudGrid>
-    <MudGrid>
-        <MudItem xs="3">
-            <MudDatePicker Label="End Date" @bind-Date="State.Value.WorkoutEndDate" />
-        </MudItem>
-        <MudItem xs="3">
-            <MudTimePicker Label="End Time" @bind-Time="State.Value.WorkoutEndTime" />
-        </MudItem>
-    </MudGrid>
+<div class="d-flex flex-column fullHeight">
 
-    <div>
-        <MudText Typo="Typo.subtitle1">Duration: @State.Value.Duration.ToString(@"hh\:mm")</MudText>
-    </div>
-    <div>
-        <MudText Typo="Typo.subtitle1">Total Volume: @State.Value.TotalVolumeMessage</MudText>
-        @if(State.Value.PreviousStatistics != null)
+    @* Header *@
+    <div class="ma-3">
+        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-2">
+            <MudText Typo="Typo.h5">Workout Complete</MudText>
+            <MudStack Row="true" Spacing="4">
+                <MudText Typo="Typo.body2"><strong>@State.Value.Duration.ToString(@"hh\:mm")</strong></MudText>
+                <MudText Typo="Typo.body2"><strong>@State.Value.TotalVolumeMessage</strong></MudText>
+            </MudStack>
+        </MudStack>
+
+        @if (State.Value.PreviousStatistics != null)
         {
-            <MudText Typo="Typo.subtitle1">Previous Total Volume: @State.Value.PreviousStatistics.PreviousWorkout.TotalWeightVolumeWithMeasure</MudText>
+            <MudText Typo="Typo.caption" Class="mb-2" Style="color: var(--mud-palette-text-secondary);">
+                Previous volume: @State.Value.PreviousStatistics.PreviousWorkout.TotalWeightVolumeWithMeasure
+            </MudText>
         }
+
+        <MudExpansionPanels Class="mb-2" Elevation="0">
+            <MudExpansionPanel Text="Edit start/end times" Style="background: var(--mud-palette-surface);">
+                <MudGrid Spacing="4">
+                    <MudItem xs="6" sm="3">
+                        <MudDatePicker Label="Start Date" @bind-Date="State.Value.WorkoutStartDate" />
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudTimePicker Label="Start Time" @bind-Time="State.Value.WorkoutStartTime" />
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudDatePicker Label="End Date" @bind-Date="State.Value.WorkoutEndDate" />
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <MudTimePicker Label="End Time" @bind-Time="State.Value.WorkoutEndTime" />
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
     </div>
 
-    <div class="mt-3">
-        <MudGrid>
-            <MudItem xs="5"></MudItem>
-            <MudItem xs="6"><MudText Typo="Typo.h6">Next Workout Plan</MudText></MudItem></MudGrid>
-        <MudGrid>
-            <MudItem Class="name" xs="3"><MudText Typo="Typo.h6">Exercise</MudText></MudItem>
-            <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6" Align="Align.Left">Completed</MudText></MudItem>
-            <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Target</MudText></MudItem>
-            <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Max</MudText></MudItem>
-            <MudItem Class="ma-2" xs="2"><MudText Typo="Typo.h6">Progression</MudText></MudItem>
-        </MudGrid>
-        @foreach (var exercise in State.Value.ExerciseList)
-        {
-            <MudGrid>
-                <MudItem Class="name" xs="3">@exercise.ExerciseName</MudItem>
-                <MudItem Class="ma-2" xs="2">
-                    @foreach (var set in exercise.CompletedSets)
-                    {
-                        <MudText Typo="Typo.body2" Align="Align.Left">
-                            @set.GetMeasureText(exercise.MetricType)
-                        </MudText>
+    @* List + Detail *@
+    <div class="d-flex flex-grow-1 fullWidth" style="overflow: hidden;">
+
+        @* Left panel — exercise list + actions *@
+        <div id="exerciseListPanel" class="d-flex flex-column fullHeight">
+            <div class="flex-grow-1" style="overflow-y: auto;">
+                <FullHeightList List="ExerciseListItems"
+                                SelectedId="selectedExerciseId"
+                                OnItemClick="HandleExerciseSelected"
+                                AutoCollapseOnSelection="true" />
+            </div>
+            <div class="pa-3">
+                <MudStack Spacing="2">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true"
+                               OnClick="OnConfirmEndClick"
+                               Disabled="SavingState.Value.IsSaving">
+                        Confirm End
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined" FullWidth="true"
+                               OnClick="() => Dispatcher.Dispatch(new CancelEndWorkoutAction())"
+                               Disabled="SavingState.Value.IsSaving">
+                        Back
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" FullWidth="true"
+                               OnClick="OpenConfirmAbandon"
+                               Disabled="SavingState.Value.IsSaving">
+                        Abandon
+                    </MudButton>
+                </MudStack>
+            </div>
+        </div>
+
+        <MudDivider Vertical="true" />
+
+        @* Right panel — exercise detail *@
+        <div class="flex-grow-1 fullHeight" style="overflow-y: auto;">
+            @if (SelectedExercise != null)
+            {
+                var exercise = SelectedExercise;
+                var metrics = GetCurrentMetrics(exercise);
+
+                <div class="detail-content pa-3">
+
+                    @* Exercise name + type *@
+                    <MudText Typo="Typo.h5" Align="Align.Center" Style="text-transform: uppercase; letter-spacing: 1px;">
+                        @exercise.ExerciseName
+                    </MudText>
+                    @* Completed sets *@
+                    <MudStack Row="true" Spacing="2" Class="mb-4" Style="flex-wrap: wrap;">
+                        @for (var i = 0; i < exercise.CompletedSets.Length; i++)
+                        {
+                            var setIndex = i;
+                            var set = exercise.CompletedSets[setIndex];
+                            <MudPaper Class="pa-2 flex-grow-1" Elevation="0"
+                                      Style="min-width: 80px; text-align: center; background: var(--mud-palette-background); border-radius: 10px;">
+                                <MudText Typo="Typo.overline">Set @(setIndex + 1)</MudText>
+                                <MudText Typo="Typo.body2">@set.GetMeasureText(exercise.MetricType)</MudText>
+                            </MudPaper>
+                        }
+                    </MudStack>
+
+                    @* Previous target reference *@
+                    @{
+                        var prevSet = exercise.ProgressSets.FirstOrDefault(x => x.ProgressType == ProgressType.Previous);
                     }
-                </MudItem>
-                @GetItem(exercise, ProgressType.Previous)
-                @GetItem(exercise, ProgressType.MaxSet)
-                @GetItem(exercise, ProgressType.AutoProgress)
-            </MudGrid>
-        }
+                    @if (prevSet != null)
+                    {
+                        <MudPaper Class="pa-2 mb-4" Elevation="0"
+                                  Style="background: var(--mud-palette-background); border-radius: 8px;">
+                            <MudText Typo="Typo.body2">
+                                Previous target: <strong>@prevSet.Metrics.GetMeasureText(exercise.MetricType)</strong>
+                            </MudText>
+                        </MudPaper>
+                    }
+
+                    @* Stepper section *@
+                    <MudPaper Class="pa-4 mb-3" Elevation="0"
+                              Style="background: var(--mud-palette-background); border-radius: 12px;">
+                        <MudText Typo="Typo.overline" Align="Align.Center" Class="mb-3"
+                                 Style="color: var(--mud-palette-primary);">
+                            Set Next Target
+                        </MudText>
+
+                        @if (exercise.MetricType == MetricType.Weight)
+                        {
+                            <div class="stepper-grid">
+                                <MudText Class="stepper-label">Reps</MudText>
+                                <div class="stepper-control">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
+                                                   OnClick="() => StepReps(-1)" Class="stepper-btn" />
+                                    <MudNumericField T="int?" Value="metrics.Reps" ValueChanged="OnRepsChanged"
+                                                     HideSpinButtons="true" Variant="Variant.Text"
+                                                     Underline="false" Class="stepper-input" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
+                                                   OnClick="() => StepReps(1)" Class="stepper-btn" />
+                                </div>
+                                <span class="stepper-unit"></span>
+
+                                <MudText Class="stepper-label">Weight</MudText>
+                                <div class="stepper-control">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
+                                                   OnClick="() => StepWeight(-2.5m)" Class="stepper-btn" />
+                                    <MudNumericField T="decimal?" Value="metrics.Weight" ValueChanged="OnWeightChanged"
+                                                     HideSpinButtons="true" Variant="Variant.Text" Step="2.5m"
+                                                     Underline="false" Class="stepper-input" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
+                                                   OnClick="() => StepWeight(2.5m)" Class="stepper-btn" />
+                                </div>
+                                <MudText Class="stepper-unit">Kg</MudText>
+                            </div>
+                        }
+                        else if (exercise.MetricType == MetricType.Reps)
+                        {
+                            <div class="stepper-grid">
+                                <MudText Class="stepper-label">Reps</MudText>
+                                <div class="stepper-control">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
+                                                   OnClick="() => StepReps(-1)" Class="stepper-btn" />
+                                    <MudNumericField T="int?" Value="metrics.Reps" ValueChanged="OnRepsChanged"
+                                                     HideSpinButtons="true" Variant="Variant.Text"
+                                                     Underline="false" Class="stepper-input" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
+                                                   OnClick="() => StepReps(1)" Class="stepper-btn" />
+                                </div>
+                                <span class="stepper-unit"></span>
+                            </div>
+                        }
+                        else if (exercise.MetricType == MetricType.Time)
+                        {
+                            <div class="stepper-grid">
+                                <MudText Class="stepper-label">Time</MudText>
+                                <div class="stepper-control">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
+                                                   OnClick="() => StepTime(-5m)" Class="stepper-btn" />
+                                    <MudNumericField T="decimal?" Value="metrics.Time" ValueChanged="OnTimeChanged"
+                                                     HideSpinButtons="true" Variant="Variant.Text" Step="5m"
+                                                     Underline="false" Class="stepper-input" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
+                                                   OnClick="() => StepTime(5m)" Class="stepper-btn" />
+                                </div>
+                                <MudText Class="stepper-unit">sec</MudText>
+                            </div>
+                        }
+                        else if (exercise.MetricType == MetricType.TimeAndDistance)
+                        {
+                            <div class="stepper-grid">
+                                <MudText Class="stepper-label">Time</MudText>
+                                <div class="stepper-control">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
+                                                   OnClick="() => StepTime(-5m)" Class="stepper-btn" />
+                                    <MudNumericField T="decimal?" Value="metrics.Time" ValueChanged="OnTimeChanged"
+                                                     HideSpinButtons="true" Variant="Variant.Text" Step="5m"
+                                                     Underline="false" Class="stepper-input" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
+                                                   OnClick="() => StepTime(5m)" Class="stepper-btn" />
+                                </div>
+                                <MudText Class="stepper-unit">sec</MudText>
+
+                                <MudText Class="stepper-label">Distance</MudText>
+                                <div class="stepper-control">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Medium"
+                                                   OnClick="() => StepDistance(-0.1m)" Class="stepper-btn" />
+                                    <MudNumericField T="decimal?" Value="metrics.Distance" ValueChanged="OnDistanceChanged"
+                                                     HideSpinButtons="true" Variant="Variant.Text" Step="0.1m"
+                                                     Underline="false" Class="stepper-input" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Medium"
+                                                   OnClick="() => StepDistance(0.1m)" Class="stepper-btn" />
+                                </div>
+                                <MudText Class="stepper-unit">km</MudText>
+                            </div>
+                        }
+                    </MudPaper>
+
+                    @* Quick set buttons *@
+                    <MudText Typo="Typo.overline" Align="Align.Center" Class="mb-2">Quick set</MudText>
+                    <MudStack Row="true" Spacing="2" Justify="Justify.Center" Style="flex-wrap: wrap;">
+                        @{
+                            var previousProgress = exercise.ProgressSets.FirstOrDefault(x => x.ProgressType == ProgressType.Previous);
+                            var bestProgress = exercise.ProgressSets.FirstOrDefault(x => x.ProgressType == ProgressType.MaxSet);
+                            var autoProgress = exercise.ProgressSets.FirstOrDefault(x => x.ProgressType == ProgressType.AutoProgress);
+                        }
+
+                        <MudButton Variant="Variant.Outlined" Color="Color.Default"
+                                   Class="@(previousProgress?.Selected == true ? "quickset-selected" : "")"
+                                   Size="Size.Small" Disabled="previousProgress == null"
+                                   OnClick="() => OnQuickSet(exercise, ProgressType.Previous)">
+                            @if (previousProgress != null)
+                            {
+                                @($"Previous \u00B7 {previousProgress.Metrics.GetMeasureText(exercise.MetricType)}")
+                            }
+                            else
+                            {
+                                @("Previous (N/A)")
+                            }
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Outlined" Color="Color.Default"
+                                   Class="@(bestProgress?.Selected == true ? "quickset-selected" : "")"
+                                   Size="Size.Small" Disabled="bestProgress == null"
+                                   OnClick="() => OnQuickSet(exercise, ProgressType.MaxSet)">
+                            @if (bestProgress != null)
+                            {
+                                @($"Best \u00B7 {bestProgress.Metrics.GetMeasureText(exercise.MetricType)}")
+                            }
+                            else
+                            {
+                                @("Best (N/A)")
+                            }
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Outlined" Color="Color.Default"
+                                   Class="@(autoProgress?.Selected == true ? "quickset-selected" : "")"
+                                   Size="Size.Small" Disabled="autoProgress == null"
+                                   OnClick="() => OnQuickSet(exercise, ProgressType.AutoProgress)">
+                            @if (autoProgress != null)
+                            {
+                                @($"Auto \u00B7 {autoProgress.Metrics.GetMeasureText(exercise.MetricType)}")
+                            }
+                            else
+                            {
+                                @("Auto (N/A)")
+                            }
+                        </MudButton>
+                    </MudStack>
+                </div>
+            }
+        </div>
     </div>
 
-    <div class="mt-3">
-        <MudButton 
-            Variant="Variant.Filled"
-            OnClick="() => Dispatcher.Dispatch(new CancelEndWorkoutAction())"
-            Disabled="SavingState.Value.IsSaving">
-            Back to workout
-        </MudButton>
-        <MudButton 
-            Variant="Variant.Filled"
-            OnClick="OpenConfirmAbandon"
-            Disabled="SavingState.Value.IsSaving"
-            Class="ml-2">
-            Abandon workout
-        </MudButton>
-        <MudButton 
-            Variant="Variant.Filled" 
-            Color="Color.Primary"
-            OnClick="OnConfirmEndClick"
-            Disabled="SavingState.Value.IsSaving"
-            Class="ml-2">
-            Confirm End
-        </MudButton>
-    </div>
 </div>
 
-<style>
-    .mud-grid-item{
-        text-align: center;
-    }
-    .name{
-        text-align: left;
-    }
-    .selected {
-        background-color: #212228;
-        border: 1px solid white;
-    }
-</style>
-
 @code {
-    RenderFragment GetItem(ExerciseDetail exerciseDetail, ProgressType progressType)
-        => @<MudItem 
-                Class="@GetSelectedClass(exerciseDetail, progressType)" xs="2"
-                @onclick="() => OnItemClick(exerciseDetail, progressType)">
-                @GetMetric(exerciseDetail, progressType)
-           </MudItem>
-    ;
+    private Guid? selectedExerciseId;
 
-    string GetMetric(ExerciseDetail exerciseDetail, ProgressType progressType)
+    private ImmutableArray<ListItem> ExerciseListItems =>
+        State.Value.ExerciseList
+            .Select(e => new ListItem(e.WorkoutExerciseId, e.ExerciseName, true))
+            .ToImmutableArray();
+
+    private ExerciseDetail? SelectedExercise =>
+        selectedExerciseId.HasValue
+            ? State.Value.ExerciseList.FirstOrDefault(x => x.WorkoutExerciseId == selectedExerciseId)
+            : null;
+
+    protected override void OnAfterRender(bool firstRender)
     {
-        var progressSet = exerciseDetail.ProgressSets.SingleOrDefault(x => x.ProgressType == progressType);
-
-        if (progressSet == null)
-            return "N/A";
-
-        return progressSet.Metrics.GetMeasureText(exerciseDetail.MetricType);
+        if (selectedExerciseId == null && State.Value.ExerciseList.Length > 0)
+        {
+            selectedExerciseId = State.Value.ExerciseList[0].WorkoutExerciseId;
+            StateHasChanged();
+        }
     }
 
-    string GetSelectedClass(ExerciseDetail exerciseDetail, ProgressType progressType)
+    private void HandleExerciseSelected(ListItem item)
     {
-        var progressSet = exerciseDetail.ProgressSets.SingleOrDefault(x => x.ProgressType == progressType);
-
-        return progressSet?.Selected ?? false ? "selected ma-2" : "ma-2";
+        selectedExerciseId = item.Id;
     }
 
-    void OnItemClick(ExerciseDetail exerciseDetail, ProgressType progressType)
+    private ExerciseSetMetrics GetCurrentMetrics(ExerciseDetail exercise)
     {
-        Dispatcher.Dispatch(new SetSelectedProgressAction(exerciseDetail.WorkoutExerciseId, progressType));
+        var selected = exercise.ProgressSets.FirstOrDefault(x => x.Selected);
+        return selected?.Metrics ?? new ExerciseSetMetrics();
     }
 
-    void OnConfirmEndClick()
+    private void OnRepsChanged(int? value)
+    {
+        if (SelectedExercise == null) return;
+        var current = GetCurrentMetrics(SelectedExercise);
+        Dispatcher.Dispatch(new SetCustomProgressAction(
+            SelectedExercise.WorkoutExerciseId,
+            current with { Reps = value }));
+    }
+
+    private void OnWeightChanged(decimal? value)
+    {
+        if (SelectedExercise == null) return;
+        var current = GetCurrentMetrics(SelectedExercise);
+        Dispatcher.Dispatch(new SetCustomProgressAction(
+            SelectedExercise.WorkoutExerciseId,
+            current with { Weight = value }));
+    }
+
+    private void OnTimeChanged(decimal? value)
+    {
+        if (SelectedExercise == null) return;
+        var current = GetCurrentMetrics(SelectedExercise);
+        Dispatcher.Dispatch(new SetCustomProgressAction(
+            SelectedExercise.WorkoutExerciseId,
+            current with { Time = value }));
+    }
+
+    private void OnDistanceChanged(decimal? value)
+    {
+        if (SelectedExercise == null) return;
+        var current = GetCurrentMetrics(SelectedExercise);
+        Dispatcher.Dispatch(new SetCustomProgressAction(
+            SelectedExercise.WorkoutExerciseId,
+            current with { Distance = value }));
+    }
+
+    private void StepReps(int delta)
+    {
+        if (SelectedExercise == null) return;
+        var current = GetCurrentMetrics(SelectedExercise);
+        var newVal = (current.Reps ?? 0) + delta;
+        if (newVal < 0) newVal = 0;
+        OnRepsChanged(newVal);
+    }
+
+    private void StepWeight(decimal delta)
+    {
+        if (SelectedExercise == null) return;
+        var current = GetCurrentMetrics(SelectedExercise);
+        var newVal = (current.Weight ?? 0) + delta;
+        if (newVal < 0) newVal = 0;
+        OnWeightChanged(newVal);
+    }
+
+    private void StepTime(decimal delta)
+    {
+        if (SelectedExercise == null) return;
+        var current = GetCurrentMetrics(SelectedExercise);
+        var newVal = (current.Time ?? 0) + delta;
+        if (newVal < 0) newVal = 0;
+        OnTimeChanged(newVal);
+    }
+
+    private void StepDistance(decimal delta)
+    {
+        if (SelectedExercise == null) return;
+        var current = GetCurrentMetrics(SelectedExercise);
+        var newVal = (current.Distance ?? 0) + delta;
+        if (newVal < 0) newVal = 0;
+        OnDistanceChanged(newVal);
+    }
+
+    private void OnQuickSet(ExerciseDetail exercise, ProgressType type)
+    {
+        Dispatcher.Dispatch(new SetSelectedProgressAction(exercise.WorkoutExerciseId, type));
+    }
+
+    private void OnConfirmEndClick()
     {
         Dispatcher.Dispatch(new SetIsSavingAction(true));
         Dispatcher.DispatchWithDelay(new ConfirmEndWorkoutAction());
@@ -152,7 +407,7 @@
         var dialog = await DialogService.ShowAsync<ConfirmAbandonWorkout>("Simple Dialog", options);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (!result?.Canceled ?? false)
             Dispatcher.Dispatch(new AbandonWorkoutAction());
     }
 }
