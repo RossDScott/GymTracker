@@ -34,7 +34,7 @@ public static class ExercisesReducers
     [ReducerMethod]
     public static ExercisesState OnSetExercises(ExercisesState state, SetExercisesAction action) =>
         FilterExercises(state with
-        { OriginalList = action.Exercises.ToImmutableArray() });
+        { OriginalList = action.Exercises.OrderBy(x => x.Name).ToImmutableArray() });
 
     [ReducerMethod]
     public static ExercisesState OnSetExercise(ExercisesState state, SetExerciseAction action) =>
