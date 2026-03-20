@@ -8,3 +8,4 @@ public record CancelEndWorkoutAction();
 public record AbandonWorkoutAction();
 public record SetEndWorkoutAction(Models.Workout Workout, Models.Statistics.WorkoutPlanStatistic? PreviousStatistics);
 public record SetSelectedProgressAction(Guid workoutExerciseId, ProgressType progressType);
+public record SetCustomProgressAction(Guid WorkoutExerciseId, Models.ExerciseSetMetrics Metrics);

@@ -1,1 +1,64 @@
-﻿
+#exerciseListPanel {
+    width: 22%;
+}
+
+.detail-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Stepper controls */
+.stepper-grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+.stepper-label {
+    text-align: right;
+    font-size: 14px;
+    color: var(--mud-palette-text-secondary);
+}
+
+.stepper-control {
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    border: 1px solid var(--mud-palette-lines-default);
+    overflow: hidden;
+    background: var(--mud-palette-surface);
+}
+
+::deep .stepper-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 0;
+}
+
+::deep .stepper-input {
+    width: 90px;
+}
+
+::deep .stepper-input .mud-input-slot {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 8px 4px;
+}
+
+::deep .stepper-input .mud-input {
+    margin: 0;
+}
+
+::deep .quickset-selected {
+    border-width: 2px !important;
+    font-weight: 700;
+    background-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+.stepper-unit {
+    font-size: 14px;
+    color: var(--mud-palette-text-secondary);
+}

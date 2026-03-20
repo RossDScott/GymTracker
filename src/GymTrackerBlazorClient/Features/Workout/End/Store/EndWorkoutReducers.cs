@@ -61,6 +61,33 @@ public static class EndWorkoutReducers
         };
     }
 
+    [ReducerMethod]
+    public static EndWorkoutState OnSetCustomProgress(EndWorkoutState state, SetCustomProgressAction action)
+    {
+        var exercise = state.ExerciseList.First(x => x.WorkoutExerciseId == action.WorkoutExerciseId);
+        var progressSets = exercise.ProgressSets.ToList();
+
+        progressSets.ForEach(x => x.Selected = false);
+
+        var existing = progressSets.SingleOrDefault(x => x.ProgressType == ProgressType.Custom);
+        if (existing != null)
+            progressSets.Remove(existing);
+
+        progressSets.Add(new ProgressSet
+        {
+            ProgressType = ProgressType.Custom,
+            Metrics = action.Metrics,
+            Selected = true
+        });
+
+        return state with
+        {
+            ExerciseList = state.ExerciseList.Replace(
+                exercise,
+                exercise with { ProgressSets = progressSets.ToImmutableArray() })
+        };
+    }
+
     private static ImmutableArray<ProgressSet> BuildProgressSets(WorkoutExercise workoutExercise)
     {
         var metricType = workoutExercise.Exercise.MetricType;
