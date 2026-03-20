@@ -36,6 +36,21 @@ public class ClientStorageContext : LocalStorageContext, IClientStorage
             settings.CacheData = true;
         });
 
+        Exercises.ConfigureList(settings =>
+        {
+            settings.GetId = (Exercise x) => x.Id;
+        });
+
+        WorkoutPlans.ConfigureList(settings =>
+        {
+            settings.GetId = (WorkoutPlan x) => x.Id;
+        });
+
+        Workouts.ConfigureList(settings =>
+        {
+            settings.GetId = (Workout x) => x.Id;
+        });
+
         ExerciseStatistics.ConfigureList(settings =>
         {
             settings.GetId = (ExerciseStatistic x) => x.ExerciseId;
