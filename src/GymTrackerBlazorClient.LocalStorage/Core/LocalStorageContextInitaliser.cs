@@ -9,13 +9,7 @@ public static class LocalStorageContextExtensions
         IServiceProvider serviceProvider)
         where T : LocalStorageContext, new()
     {
-        context.GetType()
-               .GetField("_indexedDb", BindingFlags.Instance | BindingFlags.NonPublic)!
-               .SetValue(context, indexedDbService);
-
-        context.GetType()
-               .GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
-               .SetValue(context, serviceProvider);
+        context.Init(indexedDbService, serviceProvider);
 
         var keys = new List<IKeyItem>();
         keys.AddRange(InitialiseKeys(context, typeof(IKeyItem<>), typeof(IndexedDbKeyItem<>), indexedDbService));

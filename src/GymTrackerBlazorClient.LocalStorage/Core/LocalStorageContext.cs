@@ -3,8 +3,14 @@ using GymTracker.LocalStorage.IndexedDb;
 namespace GymTracker.LocalStorage.Core;
 public abstract class LocalStorageContext
 {
-    protected readonly IServiceProvider _serviceProvider = default!;
-    protected readonly IIndexedDbService _indexedDb = default!;
+    protected IServiceProvider _serviceProvider = default!;
+    protected IIndexedDbService _indexedDb = default!;
+
+    internal void Init(IIndexedDbService indexedDb, IServiceProvider serviceProvider)
+    {
+        _indexedDb = indexedDb;
+        _serviceProvider = serviceProvider;
+    }
 
     public IEnumerable<IKeyItem> Keys { get; internal set; } = Enumerable.Empty<IKeyItem>();
 
