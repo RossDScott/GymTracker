@@ -69,11 +69,8 @@ public class IndexedDbKeyListItem<T> : IKeyListItem<T> where T : class
         return await _db.GetAsync<T>(Config.Key, id.ToString());
     }
 
-    public async Task<UpsertResponse> UpsertAsync(T item)
+    public async Task UpsertAsync(T item)
     {
-        var id = ListConfig.GetId(item);
-        var existing = await _db.GetAsync<T>(Config.Key, id.ToString());
-
         await _db.PutAsync(Config.Key, item);
 
         InvalidateCache();
@@ -84,8 +81,6 @@ public class IndexedDbKeyListItem<T> : IKeyListItem<T> where T : class
 
         // Fire JSON change callbacks (for backup orchestrator)
         await NotifyJsonChangeCallbacks();
-
-        return existing is null ? UpsertResponse.New : UpsertResponse.Existing;
     }
 
     public async ValueTask SetAsync(ICollection<T> items)
