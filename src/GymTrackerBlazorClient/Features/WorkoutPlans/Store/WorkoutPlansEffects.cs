@@ -124,7 +124,7 @@ public class WorkoutPlansEffects
         workoutPlan.IsAcitve = updateDTO.IsActive;
         workoutPlan.IsRegularRoutine = updateDTO.IsRegularRoutine;
 
-        var response = await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
         dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
 
         await LoadWorkoutPlans(dispatcher);

@@ -5,12 +5,6 @@ public interface IKeyListItem<T> : IKeyItem<ICollection<T>>
     void ConfigureList(Action<KeyListItemConfig<ICollection<T>, T>> configureSettings);
     Task<T> FindByIdAsync(Guid id);
     Task<T?> FindOrDefaultByIdAsync(Guid id);
-    Task<UpsertResponse> UpsertAsync(T item);
+    Task UpsertAsync(T item);
     void SubscribeToItemUpsert(Func<T, Task> callback);
-}
-
-public enum UpsertResponse
-{
-    Existing,
-    New
 }
