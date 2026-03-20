@@ -165,15 +165,5 @@ public class IndexedDbKeyListItem<T> : IKeyListItem<T> where T : class
     private void ConfigureDefaults()
     {
         Configure(x => x.DefaultConstructor = () => new List<T>());
-
-        var type = typeof(T);
-        var idProperty = type.GetProperty("Id", typeof(Guid));
-        if (idProperty != null)
-        {
-            ConfigureList(settings =>
-            {
-                settings.GetId = (item) => (Guid)idProperty.GetValue(item)!;
-            });
-        }
     }
 }
