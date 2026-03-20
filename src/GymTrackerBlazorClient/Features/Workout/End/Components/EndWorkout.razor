@@ -114,25 +114,11 @@
                         }
                     </MudStack>
 
-                    @* Previous target reference *@
-                    @{
-                        var prevSet = exercise.ProgressSets.FirstOrDefault(x => x.ProgressType == ProgressType.Previous);
-                    }
-                    @if (prevSet != null)
-                    {
-                        <MudPaper Class="pa-2 mb-4" Elevation="0"
-                                  Style="background: var(--mud-palette-background); border-radius: 8px;">
-                            <MudText Typo="Typo.body2">
-                                Previous target: <strong>@prevSet.Metrics.GetMeasureText(exercise.MetricType)</strong>
-                            </MudText>
-                        </MudPaper>
-                    }
-
                     @* Stepper section *@
                     <MudPaper Class="pa-4 mb-3" Elevation="0"
                               Style="background: var(--mud-palette-background); border-radius: 12px;">
                         <MudText Typo="Typo.overline" Align="Align.Center" Class="mb-3"
-                                 Style="color: var(--mud-palette-primary);">
+                                 >
                             Set Next Target
                         </MudText>
 
