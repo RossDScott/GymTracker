@@ -10,3 +10,7 @@ The version format is `Major.Minor.Patch.Revision` (e.g. `1.5.8.0`). Bump the th
 
 - **Primary (tablet):** Samsung Galaxy Tab A7 SM-T500 — 10.4" display, 2000 x 1200 pixels (WUXGA+), ~224 PPI
 - **Mobile:** Samsung Galaxy S25 — 6.2" display, 2340 x 1080 pixels (FHD+), ~416 PPI
+
+## Branching
+When on main branch always create a new branch
+After the changes have been applied ask if you want to push and create a PR

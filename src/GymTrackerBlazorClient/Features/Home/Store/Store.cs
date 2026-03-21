@@ -1,9 +1,11 @@
-﻿using ApexCharts;
+﻿using System.Text.Json;
+using ApexCharts;
 using Fluxor;
 using GymTracker.BlazorClient.Features.Workout.End.Store;
 using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 using GymTracker.Domain.Models.Statistics;
 using GymTracker.LocalStorage.Core;
+using GymTracker.LocalStorage.IndexedDb;
 using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.Home.Store;
@@ -45,10 +47,17 @@ public record SetExerciseStatisticsDataAction(IEnumerable<ExerciseStatistic> Sta
 public class HomeEffects
 {
     private readonly IClientStorage _clientStorage;
+    private readonly IIndexedDbService _db;
 
-    public HomeEffects(IClientStorage clientStorage, IDispatcher dispatcher)
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    public HomeEffects(IClientStorage clientStorage, IIndexedDbService db, IDispatcher dispatcher)
     {
         _clientStorage = clientStorage;
+        _db = db;
 
         clientStorage.WorkoutStatistics.SubscribeToChanges((stats) =>
         {
@@ -66,18 +75,29 @@ public class HomeEffects
     [EffectMethod]
     public async Task OnInitaliseHome(InitaliseHomeAction action, IDispatcher dispatcher)
     {
-        var currentWorkoutTask = _clientStorage.CurrentWorkout.GetAsync();
-        var workoutsTask = _clientStorage.WorkoutStatistics.GetAsync();
-        var exercisesTask = _clientStorage.ExerciseStatistics.GetAsync();
-        await Task.WhenAll(currentWorkoutTask.AsTask(), workoutsTask.AsTask(), exercisesTask.AsTask());
+        var results = await _db.GetBatchAsync([
+            new { storeName = "CurrentWorkout", key = (object)"singleton" },
+            new { storeName = "WorkoutStatistics" },
+            new { storeName = "ExerciseStatistics" }
+        ]);
 
-        dispatcher.Dispatch(new SetHasExistingWorkoutAction(currentWorkoutTask.Result is not null));
+        var currentWorkout = results[0].ValueKind != JsonValueKind.Null
+            ? results[0].Deserialize<SingletonWrapper<GymTracker.Domain.Models.Workout>>(_jsonOptions)?.Value
+            : null;
+        var workoutStats = results[1].ValueKind != JsonValueKind.Null
+            ? results[1].Deserialize<List<WorkoutStatistic>>(_jsonOptions)
+            : null;
+        var exerciseStats = results[2].ValueKind != JsonValueKind.Null
+            ? results[2].Deserialize<List<ExerciseStatistic>>(_jsonOptions)
+            : null;
 
-        if (workoutsTask.Result != null)
-            dispatcher.Dispatch(new SetWorkoutStatisticsDataAction(workoutsTask.Result));
+        dispatcher.Dispatch(new SetHasExistingWorkoutAction(currentWorkout is not null));
 
-        if (exercisesTask.Result != null)
-            dispatcher.Dispatch(new SetExerciseStatisticsDataAction(exercisesTask.Result));
+        if (workoutStats != null)
+            dispatcher.Dispatch(new SetWorkoutStatisticsDataAction(workoutStats));
+
+        if (exerciseStats != null)
+            dispatcher.Dispatch(new SetExerciseStatisticsDataAction(exerciseStats));
     }
 
     [EffectMethod]

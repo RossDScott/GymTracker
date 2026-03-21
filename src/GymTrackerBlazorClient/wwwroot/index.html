@@ -13,6 +13,15 @@
 
     <link href="css/app.css" rel="stylesheet" />
     <link href="GymTracker.BlazorClient.styles.css" rel="stylesheet" />
+    <script>
+        window.__isMobile = window.innerWidth <= 768;
+        window.__isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    </script>
+    <script type="module">
+        // Pre-import IndexedDB module and open DB connection during WASM boot
+        import('./_content/GymTracker.LocalStorage/indexedDb.js')
+            .then(m => m.get('Meta', '__warmup__').catch(() => {}));
+    </script>
 </head>
 
 <body class="fullHeight">

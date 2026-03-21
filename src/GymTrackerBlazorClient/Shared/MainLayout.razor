@@ -5,6 +5,7 @@
 
 @inject IDispatcher Dispatcher
 @inject ISnackbar Snackbar
+@inject IJSRuntime JS
 
 <MudThemeProvider @ref="@_mudThemeProvider" Theme="MyCustomTheme" @bind-IsDarkMode="@_isDarkMode" />
 <MudPopoverProvider />
@@ -36,18 +37,12 @@
         }
     };
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
+        _isDarkMode = await JS.InvokeAsync<bool>("eval", "window.__isDarkMode");
 
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
-            Snackbar.Configuration.ClearAfterNavigation = true;
-            Snackbar.Configuration.VisibleStateDuration = 3000;
-
-
-            StateHasChanged();
-        }
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+        Snackbar.Configuration.ClearAfterNavigation = true;
+        Snackbar.Configuration.VisibleStateDuration = 3000;
     }
 }

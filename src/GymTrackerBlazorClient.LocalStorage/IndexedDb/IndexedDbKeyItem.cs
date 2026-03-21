@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace GymTracker.LocalStorage.IndexedDb;
 
-internal record SingletonWrapper<T>
+public record SingletonWrapper<T>
 {
     public string Key { get; init; } = "singleton";
     public T? Value { get; init; }
