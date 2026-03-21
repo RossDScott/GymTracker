@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.JSInterop;
 
 namespace GymTracker.LocalStorage.IndexedDb;
@@ -65,6 +66,12 @@ public class IndexedDbService : IIndexedDbService, IAsyncDisposable
     {
         var module = await GetModuleAsync();
         return await module.InvokeAsync<List<T>>("getByIndex", storeName, indexName, key);
+    }
+
+    public async ValueTask<JsonElement[]> GetBatchAsync(object[] operations)
+    {
+        var module = await GetModuleAsync();
+        return await module.InvokeAsync<JsonElement[]>("getBatch", new object[] { operations });
     }
 
     public async ValueTask DisposeAsync()

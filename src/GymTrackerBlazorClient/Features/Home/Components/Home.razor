@@ -27,7 +27,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        var isMobile = await JS.InvokeAsync<bool>("eval", "window.innerWidth <= 768");
+        var isMobile = await JS.InvokeAsync<bool>("eval", "window.__isMobile");
         if (isMobile)
         {
             NavigationManager.NavigateTo("/mobile");

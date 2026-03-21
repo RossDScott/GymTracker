@@ -10,4 +10,5 @@ public interface IIndexedDbService
     ValueTask ClearAsync(string storeName);
     ValueTask<int> CountAsync(string storeName);
     ValueTask<List<T>> GetByIndexAsync<T>(string storeName, string indexName, object key);
+    ValueTask<System.Text.Json.JsonElement[]> GetBatchAsync(object[] operations);
 }

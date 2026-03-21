@@ -114,3 +114,21 @@ export async function getByIndex(storeName, indexName, key) {
     const result = await promisifyRequest(index.getAll(key));
     return result || [];
 }
+
+export async function getBatch(operations) {
+    const db = await getDb();
+    const storeNames = [...new Set(operations.map(op => op.storeName))];
+    const tx = db.transaction(storeNames, 'readonly');
+
+    const promises = operations.map(op => {
+        const store = tx.objectStore(op.storeName);
+        if (op.key !== undefined && op.key !== null) {
+            return promisifyRequest(store.get(op.key));
+        } else {
+            return promisifyRequest(store.getAll());
+        }
+    });
+
+    const results = await Promise.all(promises);
+    return results.map(r => r || null);
+}
