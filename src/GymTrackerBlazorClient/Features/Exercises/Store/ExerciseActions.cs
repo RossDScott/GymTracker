@@ -1,4 +1,5 @@
 ﻿using GymTracker.Domain.Models;
+using GymTracker.Domain.Models.Statistics;
 
 namespace GymTracker.BlazorClient.Features.Exercises.Store;
 
@@ -13,3 +14,5 @@ public record SetExerciseAction(Exercise Exercise);
 public record UpsertExerciseAction(DetailItem Exercise);
 public record CreateNewExerciseAction();
 public record UpdateFilterAction(ExercisesFilter Filter);
+public record FetchExerciseStatisticAction(Guid ExerciseId);
+public record SetExerciseStatisticAction(ExerciseStatistic? ExerciseStatistic);

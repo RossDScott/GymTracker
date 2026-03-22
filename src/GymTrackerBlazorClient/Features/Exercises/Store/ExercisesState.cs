@@ -1,5 +1,6 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Features.Common;
+using GymTracker.Domain.Models.Statistics;
 using System.Collections.Immutable;
 using Models = GymTracker.Domain.Models;
 
@@ -14,6 +15,7 @@ public record ExercisesState
     public ImmutableArray<Models.Exercise> OriginalList { get; init; } = ImmutableArray<Models.Exercise>.Empty;
     public ImmutableArray<ListItem> Exercises { get; init; } = ImmutableArray<ListItem>.Empty;
     public DetailItem? SelectedExercise { get; init; } = null;
+    public ExerciseStatistic? SelectedExerciseStatistic { get; init; } = null;
     public ExercisesFilter Filter { get; init; } = new();
 }
 
