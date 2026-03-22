@@ -23,6 +23,7 @@ public record WorkoutStatistic
     public bool IsRepsOnly { get; set; } = false;
 
     public required ImmutableArray<WorkoutExerciseStatistics> Exercises { get; init; }
+    public bool HasVolumePR { get; set; } = false;
 }
 
 public record WorkoutExerciseStatistics
@@ -32,4 +33,5 @@ public record WorkoutExerciseStatistics
     public MetricType MetricType { get; set; }
     public required bool AllCompleted { get; set; }
     public required bool AnyCompleted { get; set; }
+    public bool HasPR { get; set; } = false;
 }

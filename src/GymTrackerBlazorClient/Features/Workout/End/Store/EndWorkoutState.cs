@@ -19,6 +19,10 @@ public record EndWorkoutState
     public required string TotalVolumeMessage { get; init; }
     public required ImmutableArray<ExerciseDetail> ExerciseList { get; init; }
     public WorkoutPlanStatistic? PreviousStatistics { get; init; } = null;
+    public bool HasVolumePR { get; init; } = false;
+
+    public int TotalMilestoneCount => ExerciseList.Sum(e => e.Milestones.Length + (e.VolumeMilestone != null ? 1 : 0)) + (HasVolumePR ? 1 : 0);
+    public bool HasMilestones => TotalMilestoneCount > 0;
 }
 
 public record ExerciseDetail
@@ -29,6 +33,8 @@ public record ExerciseDetail
     public required MetricType MetricType { get; init; }
     public required ImmutableArray<ProgressSet> ProgressSets { get; init; }
     public required ImmutableArray<ExerciseSetMetrics> CompletedSets { get; set; }
+    public ImmutableArray<SetMilestone> Milestones { get; init; } = ImmutableArray<SetMilestone>.Empty;
+    public SetMilestone? VolumeMilestone { get; init; } = null;
 }
 
 public record ProgressSet

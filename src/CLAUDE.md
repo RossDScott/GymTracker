@@ -14,3 +14,4 @@ The version format is `Major.Minor.Patch.Revision` (e.g. `1.5.8.0`). Bump the th
 ## Branching
 When on main branch always create a new branch
 After the changes have been applied ask if you want to push and create a PR
+After pushing a PR, output the new version number

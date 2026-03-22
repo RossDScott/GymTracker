@@ -2,9 +2,12 @@
 using GymTracker.BlazorClient.Features.AppBar.Store;
 using GymTracker.BlazorClient.Features.Common;
 using GymTracker.Domain.Models;
+using GymTracker.Domain.Models.Extensions;
+using GymTracker.Domain.Models.Statistics;
 using GymTracker.LocalStorage.Core;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.Workout.End.Store;
 
@@ -31,7 +34,36 @@ public class EndWorkoutEffects
         ArgumentNullException.ThrowIfNull(workout, nameof(workout));
         var workoutStatistics = await _clientStorage.WorkoutPlanStatistics.FindOrDefaultByIdAsync(workout.Plan.Id);
 
-        dispatcher.Dispatch(new SetEndWorkoutAction(workout, workoutStatistics));
+        var milestonesList = new List<ExerciseMilestones>();
+        foreach (var workoutExercise in workout.Exercises)
+        {
+            var completedSets = workoutExercise.Sets
+                .Where(s => s.SetType == DefaultData.SetType.Set && s.Completed)
+                .Select(s => s.Metrics)
+                .ToList();
+
+            if (!completedSets.Any()) continue;
+
+            var exerciseStat = await _clientStorage.ExerciseStatistics
+                .FindOrDefaultByIdAsync(workoutExercise.Exercise.Id);
+
+            var totalVolume = workoutExercise.Sets
+                .Where(s => s.Completed)
+                .Select(s => s.Metrics)
+                .GetTotalVolume(workoutExercise.Exercise.MetricType);
+
+            var exerciseMilestones = MilestoneDetector.DetectExerciseMilestones(
+                workoutExercise.Exercise.Id,
+                workoutExercise.Exercise.Name,
+                workoutExercise.Exercise.MetricType,
+                completedSets,
+                totalVolume,
+                exerciseStat);
+
+            milestonesList.Add(exerciseMilestones);
+        }
+
+        dispatcher.Dispatch(new SetEndWorkoutAction(workout, workoutStatistics, milestonesList.ToImmutableArray()));
         dispatcher.Dispatch(new SetBreadcrumbAction(new[]
         {
             new BreadcrumbItem("Workout", "/workout/end", false, Icons.Material.Filled.SportsMartialArts),
