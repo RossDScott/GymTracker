@@ -1,5 +1,11 @@
-﻿<h3>Charts</h3>
+@using GymTracker.BlazorClient.Features.Exercises.Components
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.SideBar.Store
+@inherits FluxorComponent
 
-@code {
+@inject IState<HistoryState> State
 
-}
+<div class="pa-2" style="overflow-y: auto; height: 530px;">
+    <ExercisePerformance
+        Statistic="State.Value.ExerciseStatistic"
+        MetricType="State.Value.MetricType" />
+</div>

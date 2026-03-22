@@ -44,6 +44,15 @@ public class ExercisesEffects
             new BreadcrumbItem("Exercises", "/exercises", false, Icons.Material.Filled.List),
             new BreadcrumbItem(exercise.Name, $"/exercises", false, Icons.Material.Filled.Edit),
         }));
+
+        dispatcher.Dispatch(new FetchExerciseStatisticAction(action.Id));
+    }
+
+    [EffectMethod]
+    public async Task OnFetchExerciseStatistic(FetchExerciseStatisticAction action, IDispatcher dispatcher)
+    {
+        var stat = await _clientStorage.ExerciseStatistics.FindOrDefaultByIdAsync(action.ExerciseId);
+        dispatcher.Dispatch(new SetExerciseStatisticAction(stat));
     }
 
     [EffectMethod]

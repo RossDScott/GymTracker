@@ -37,9 +37,9 @@
     <MudItem xs="4" Class="">
         @if(State.Value.SelectedExercise is not null)
         {
-            <MudPaper Class="pa-16" Elevation="3">
-                This is where the records and charts will be
-            </MudPaper>            
+            <ExercisePerformance
+                Statistic="State.Value.SelectedExerciseStatistic"
+                MetricType="State.Value.SelectedExercise.MetricType" />
         }
     </MudItem>
 </MudGrid>

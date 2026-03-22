@@ -1,6 +1,7 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Features.Common;
 using GymTracker.Domain.Models;
+using GymTracker.Domain.Models.Statistics;
 using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.Exercises.Store;
@@ -47,8 +48,13 @@ public static class ExercisesReducers
     public static ExercisesState OnCreateNewExercise(ExercisesState state, CreateNewExerciseAction action) =>
         state with
         {
-            SelectedExercise = new DetailItem { Id = Guid.NewGuid(), MetricType = MetricType.Weight }
+            SelectedExercise = new DetailItem { Id = Guid.NewGuid(), MetricType = MetricType.Weight },
+            SelectedExerciseStatistic = null
         };
+
+    [ReducerMethod]
+    public static ExercisesState OnSetExerciseStatistic(ExercisesState state, SetExerciseStatisticAction action) =>
+        state with { SelectedExerciseStatistic = action.ExerciseStatistic };
 
     [ReducerMethod]
     public static ExercisesState OnUpdateFilter(ExercisesState state, UpdateFilterAction action) =>

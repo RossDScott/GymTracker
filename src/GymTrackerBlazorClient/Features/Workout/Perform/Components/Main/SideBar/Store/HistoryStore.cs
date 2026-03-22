@@ -15,6 +15,7 @@ public record HistoryState
     public MetricType MetricType { get; set; }
     public ExerciseSetMetrics? MaxSet { get; init; } = null;
     public ExerciseSetMetrics? MaxVolume { get; init; } = null;
+    public ExerciseStatistic? ExerciseStatistic { get; init; } = null;
 
     public ImmutableArray<Workout> History { get; init; } = ImmutableArray<Workout>.Empty;
 }
@@ -39,7 +40,7 @@ public static class HistoryStateReducer
     public static HistoryState OnSetHistory(HistoryState state, SetHistoryAction action)
     {
         if (action.ExerciseStatistic == null)
-            return state with { MetricType = action.MetricType };
+            return state with { MetricType = action.MetricType, ExerciseStatistic = null };
 
         var dataForMonths = action.ExerciseStatistic.Logs
             .Where(x => x.WorkoutDateTime > DateTimeOffset.Now.AddMonths(-state.NumberOfMonths))
@@ -49,6 +50,7 @@ public static class HistoryStateReducer
             return state with
             {
                 MetricType = action.MetricType,
+                ExerciseStatistic = action.ExerciseStatistic,
                 MaxVolume = null,
                 MaxSet = null,
                 History = ImmutableArray<Workout>.Empty
@@ -59,6 +61,7 @@ public static class HistoryStateReducer
         return state with
         {
             MetricType = action.MetricType,
+            ExerciseStatistic = action.ExerciseStatistic,
             MaxSet = sets.GetMaxSet(action.MetricType),
             MaxVolume = sets.GetMaxVolumeSet(action.MetricType),
             History = dataForMonths
