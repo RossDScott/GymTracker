@@ -1,4 +1,9 @@
-﻿<div class="d-flex fullWidth fullHeight">
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.SideBar.Store
+@inherits FluxorComponent
+
+@inject IState<HistoryState> HistoryState
+
+<div class="d-flex fullWidth fullHeight">
     <MudDivider Class="fullHeight" Vertical="true" FlexItem="true" />
     <MudPaper Class="fullHeight fullWidth" Elevation="0" Square="true">
         <MudTabs Class="fullHeight" TabPanelsClass="fullHeight" Outlined="false" MinimumTabWidth="55px" Border="true" Centered="true" @bind-ActivePanelIndex="activeTabIndex">
@@ -17,4 +22,22 @@
 
 @code {
     int activeTabIndex = 0;
+    private Guid? _lastExerciseId;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        HistoryState.StateChanged += OnHistoryStateChanged;
+    }
+
+    private void OnHistoryStateChanged(object? sender, EventArgs e)
+    {
+        var currentId = HistoryState.Value.ExerciseStatistic?.ExerciseId;
+        if (currentId != _lastExerciseId)
+        {
+            _lastExerciseId = currentId;
+            activeTabIndex = 0;
+            InvokeAsync(StateHasChanged);
+        }
+    }
 }

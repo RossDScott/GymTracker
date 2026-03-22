@@ -5,7 +5,7 @@
 @inject IState<HistoryState> State
 
 <div class="pa-2" style="overflow-y: auto; height: 530px;">
-    <ExercisePerformance
+    <ExercisePerformance @key="State.Value.ExerciseStatistic?.ExerciseId"
         Statistic="State.Value.ExerciseStatistic"
         MetricType="State.Value.MetricType" />
 </div>
