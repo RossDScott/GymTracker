@@ -4,7 +4,13 @@
 
 <div>
     <div class="d-flex justify-space-between">
-        <MudText Typo="Typo.subtitle2">Max Set</MudText>
+        <MudText Typo="Typo.subtitle2">
+            @if (SingleExercise.HasPR)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Small" Color="Color.Warning" Class="mr-1" Style="vertical-align: text-bottom;" />
+            }
+            Max Set
+        </MudText>
         <MudText Typo="Typo.subtitle2">@SingleExercise.MaxSet?.GetMeasureText(SingleExercise.MetricType)</MudText>
     </div>
     <div class="d-flex justify-space-between">

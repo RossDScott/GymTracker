@@ -1,6 +1,7 @@
 ﻿using Fluxor;
 using GymTracker.Domain.Models;
 using GymTracker.Domain.Models.Extensions;
+using GymTracker.Domain.Models.Statistics;
 using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.Workout.End.Store;
@@ -22,20 +23,44 @@ public static class EndWorkoutReducers
                 .Select(x => x.Metrics)
                 .GetWeightTotalVolumeWithMeasure(),
             ExerciseList = action.Workout.Exercises
-                .Select(exercise => new ExerciseDetail
+                .Select(exercise =>
                 {
-                    WorkoutExerciseId = exercise.Id,
-                    PlannedWorkoutExerciseId = exercise.PlannedExercise?.Id,
-                    ExerciseName = exercise.Exercise.Name,
-                    MetricType = exercise.Exercise.MetricType,
-                    ProgressSets = BuildProgressSets(exercise),
-                    CompletedSets = exercise.Sets
-                                            .Where(x => x.SetType == DefaultData.SetType.Set)
-                                            .OrderBy(x => x.CompletedOn)
-                                            .Select(x => x.Metrics).ToImmutableArray()
+                    var exerciseMilestones = action.ExerciseMilestones
+                        .FirstOrDefault(m => m.ExerciseId == exercise.Exercise.Id);
+
+                    return new ExerciseDetail
+                    {
+                        WorkoutExerciseId = exercise.Id,
+                        PlannedWorkoutExerciseId = exercise.PlannedExercise?.Id,
+                        ExerciseName = exercise.Exercise.Name,
+                        MetricType = exercise.Exercise.MetricType,
+                        ProgressSets = BuildProgressSets(exercise),
+                        CompletedSets = exercise.Sets
+                                                .Where(x => x.SetType == DefaultData.SetType.Set)
+                                                .OrderBy(x => x.CompletedOn)
+                                                .Select(x => x.Metrics).ToImmutableArray(),
+                        Milestones = exerciseMilestones?.SetMilestones.ToImmutableArray()
+                                     ?? ImmutableArray<SetMilestone>.Empty,
+                        VolumeMilestone = exerciseMilestones?.VolumeMilestone
+                    };
                 }).ToImmutableArray(),
-            PreviousStatistics = action.PreviousStatistics
+            PreviousStatistics = action.PreviousStatistics,
+            HasVolumePR = ComputeHasVolumePR(action)
         };
+    }
+
+    private static bool ComputeHasVolumePR(SetEndWorkoutAction action)
+    {
+        if (action.PreviousStatistics is null)
+            return false;
+
+        var currentVolume = action.Workout.Exercises
+            .Where(x => x.Exercise.MetricType == MetricType.Weight)
+            .SelectMany(x => x.Sets)
+            .Where(x => x.Completed)
+            .Sum(x => (x.Metrics.Weight ?? 0) * (x.Metrics.Reps ?? 0));
+
+        return currentVolume > 0 && currentVolume > action.PreviousStatistics.BestWeightTotalVolumeIn6Months;
     }
 
     [ReducerMethod]

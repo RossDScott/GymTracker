@@ -5,6 +5,7 @@
 @using GymTracker.BlazorClient.Features.Workout.End.Store
 @using GymTracker.Domain.Models
 @using GymTracker.Domain.Models.Extensions
+@using GymTracker.Domain.Models.Statistics
 @using System.Collections.Immutable
 
 @inherits FluxorComponent
@@ -22,7 +23,13 @@
             <MudText Typo="Typo.h5">Workout Complete</MudText>
             <MudStack Row="true" Spacing="4">
                 <MudText Typo="Typo.body2"><strong>@State.Value.Duration.ToString(@"hh\:mm")</strong></MudText>
-                <MudText Typo="Typo.body2"><strong>@State.Value.TotalVolumeMessage</strong></MudText>
+                <MudText Typo="Typo.body2">
+                    <strong>@State.Value.TotalVolumeMessage</strong>
+                    @if (State.Value.HasVolumePR)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Small" Color="Color.Warning" Class="ml-1" Style="vertical-align: text-bottom;" />
+                    }
+                </MudText>
             </MudStack>
         </MudStack>
 
@@ -31,6 +38,15 @@
             <MudText Typo="Typo.caption" Class="mb-2" Style="color: var(--mud-palette-text-secondary);">
                 Previous volume: @State.Value.PreviousStatistics.PreviousWorkout.TotalWeightVolumeWithMeasure
             </MudText>
+        }
+
+        @if (State.Value.HasMilestones)
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Filled"
+                      Dense="true" Class="mb-2"
+                      Icon="@Icons.Material.Filled.EmojiEvents">
+                @State.Value.TotalMilestoneCount Personal Record@(State.Value.TotalMilestoneCount > 1 ? "s" : "") this workout!
+            </MudAlert>
         }
 
         <MudExpansionPanels Class="mb-2" Elevation="0">
@@ -113,6 +129,24 @@
                             </MudPaper>
                         }
                     </MudStack>
+
+                    @* Milestones *@
+                    @foreach (var milestone in exercise.Milestones)
+                    {
+                        <MudAlert Severity="Severity.Success" Variant="Variant.Filled"
+                                  Dense="true" Class="mb-2"
+                                  Icon="@Icons.Material.Filled.EmojiEvents">
+                            @milestone.Description
+                        </MudAlert>
+                    }
+                    @if (exercise.VolumeMilestone != null)
+                    {
+                        <MudAlert Severity="Severity.Success" Variant="Variant.Filled"
+                                  Dense="true" Class="mb-2"
+                                  Icon="@Icons.Material.Filled.EmojiEvents">
+                            @exercise.VolumeMilestone.Description
+                        </MudAlert>
+                    }
 
                     @* Stepper section *@
                     <MudPaper Class="pa-4 mb-3" Elevation="0"
@@ -275,7 +309,12 @@
 
     private ImmutableArray<ListItem> ExerciseListItems =>
         State.Value.ExerciseList
-            .Select(e => new ListItem(e.WorkoutExerciseId, e.ExerciseName, true))
+            .Select(e =>
+            {
+                var hasMilestones = e.Milestones.Length > 0 || e.VolumeMilestone != null;
+                var name = hasMilestones ? $"\U0001f3c6 {e.ExerciseName}" : e.ExerciseName;
+                return new ListItem(e.WorkoutExerciseId, name, true);
+            })
             .ToImmutableArray();
 
     private ExerciseDetail? SelectedExercise =>

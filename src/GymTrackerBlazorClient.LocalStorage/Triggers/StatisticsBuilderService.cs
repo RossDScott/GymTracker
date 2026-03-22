@@ -44,7 +44,6 @@ public class StatisticsBuilderService : ITrigger
         var exercises = await _localStorageContex.Exercises.GetOrDefaultAsync();
 
         var workoutStat = workout.ToWorkoutStatistics();
-        await _localStorageContex.WorkoutStatistics.UpsertAsync(workoutStat);
 
         foreach (var workoutExercise in workout.Exercises)
         {
@@ -54,13 +53,15 @@ public class StatisticsBuilderService : ITrigger
             var existingStat = await _localStorageContex.ExerciseStatistics
                 .FindOrDefaultByIdAsync(workoutExercise.Exercise.Id);
 
+            var completedSets = workoutExercise.Sets
+                .Where(x => x.SetType == DefaultData.SetType.Set && x.Completed)
+                .Select(x => x.Metrics)
+                .ToList();
+
             var newLog = new ExerciseLog
             {
                 WorkoutDateTime = workout.WorkoutEnd.Value,
-                Sets = workoutExercise.Sets
-                    .Where(x => x.SetType == DefaultData.SetType.Set && x.Completed)
-                    .Select(x => x.Metrics)
-                    .ToList(),
+                Sets = completedSets,
                 TotalVolume = workoutExercise.Sets
                     .Where(x => x.Completed)
                     .Select(x => x.Metrics)
@@ -69,6 +70,22 @@ public class StatisticsBuilderService : ITrigger
 
             if (!newLog.Sets.Any())
                 continue;
+
+            var milestones = MilestoneDetector.DetectExerciseMilestones(
+                exercise.Id,
+                exercise.Name,
+                exercise.MetricType,
+                completedSets,
+                newLog.TotalVolume,
+                existingStat);
+
+            if (milestones.SetMilestones.Count > 0 || milestones.VolumeMilestone != null)
+            {
+                var exerciseStat = workoutStat.Exercises
+                    .FirstOrDefault(e => e.ExerciseName == exercise.Name);
+                if (exerciseStat != null)
+                    exerciseStat.HasPR = true;
+            }
 
             var logs = existingStat?.Logs?.ToList() ?? new List<ExerciseLog>();
 
@@ -89,6 +106,21 @@ public class StatisticsBuilderService : ITrigger
 
             await _localStorageContex.ExerciseStatistics.UpsertAsync(updatedStat);
         }
+
+        if (workoutStat.TotalWeightVolume > 0)
+        {
+            var allWorkoutStats = await _localStorageContex.WorkoutStatistics.GetOrDefaultAsync();
+            var maxHistoricalVolume = allWorkoutStats
+                .Where(s => s.WorkoutPlanId == workout.Plan.Id)
+                .Select(s => s.TotalWeightVolume)
+                .DefaultIfEmpty(0)
+                .Max();
+
+            if (workoutStat.TotalWeightVolume > maxHistoricalVolume)
+                workoutStat.HasVolumePR = true;
+        }
+
+        await _localStorageContex.WorkoutStatistics.UpsertAsync(workoutStat);
 
         var existingPlanStat = await _localStorageContex.WorkoutPlanStatistics
             .FindOrDefaultByIdAsync(workout.Plan.Id);
@@ -179,9 +211,78 @@ public class StatisticsBuilderService : ITrigger
             .ToList();
         await _localStorageContex.WorkoutPlanStatistics.SetAsync(workoutPlanStatistics);
 
+        var exerciseStatsById = completedExercises.ToDictionary(e => e.ExerciseId);
         var workoutStatistics = completedWorkouts
                                     .Select(x => x.ToWorkoutStatistics())
                                     .ToList();
+
+        foreach (var workoutStat in workoutStatistics)
+        {
+            var workout = completedWorkouts.Single(w => w.Id == workoutStat.WorkoutId);
+            foreach (var workoutExercise in workout.Exercises)
+            {
+                if (!exerciseStatsById.TryGetValue(workoutExercise.Exercise.Id, out var exerciseStat))
+                    continue;
+
+                var completedSets = workoutExercise.Sets
+                    .Where(s => s.SetType == DefaultData.SetType.Set && s.Completed)
+                    .Select(s => s.Metrics)
+                    .ToList();
+
+                if (!completedSets.Any()) continue;
+
+                var exercise = exercises.Single(e => e.Id == workoutExercise.Exercise.Id);
+                var historicalStat = new ExerciseStatistic
+                {
+                    ExerciseId = exerciseStat.ExerciseId,
+                    ExerciseName = exerciseStat.ExerciseName,
+                    Logs = exerciseStat.Logs
+                        .Where(l => l.WorkoutDateTime < workoutStat.CompletedOn)
+                        .ToList(),
+                    ExerciseMetric = exerciseStat.ExerciseMetric
+                };
+
+                var totalVolume = workoutExercise.Sets
+                    .Where(s => s.Completed)
+                    .Select(s => s.Metrics)
+                    .GetTotalVolume(exercise.MetricType);
+
+                var milestones = MilestoneDetector.DetectExerciseMilestones(
+                    exercise.Id,
+                    exercise.Name,
+                    exercise.MetricType,
+                    completedSets,
+                    totalVolume,
+                    historicalStat);
+
+                if (milestones.SetMilestones.Count > 0 || milestones.VolumeMilestone != null)
+                {
+                    var exerciseStatEntry = workoutStat.Exercises
+                        .FirstOrDefault(e => e.ExerciseName == exercise.Name);
+                    if (exerciseStatEntry != null)
+                        exerciseStatEntry.HasPR = true;
+                }
+            }
+        }
+
+        foreach (var planGroup in workoutStatistics.GroupBy(w => w.WorkoutPlanId))
+        {
+            var planWorkouts = planGroup.OrderBy(w => w.CompletedOn).ToList();
+            var maxVolumeSoFar = 0m;
+            foreach (var ws in planWorkouts)
+            {
+                if (ws.TotalWeightVolume > 0 && ws.TotalWeightVolume > maxVolumeSoFar)
+                {
+                    ws.HasVolumePR = true;
+                    maxVolumeSoFar = ws.TotalWeightVolume;
+                }
+                else
+                {
+                    maxVolumeSoFar = Math.Max(maxVolumeSoFar, ws.TotalWeightVolume);
+                }
+            }
+        }
+
         await _localStorageContex.WorkoutStatistics.SetAsync(workoutStatistics);
 
         await ComputeAndSaveNextWorkout();

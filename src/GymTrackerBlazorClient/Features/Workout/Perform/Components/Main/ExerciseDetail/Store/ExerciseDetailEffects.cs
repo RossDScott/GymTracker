@@ -3,8 +3,10 @@ using GymTracker.BlazorClient.Extensions;
 using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.CountdownTimer.Store;
 using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 using GymTracker.Domain.Models;
+using GymTracker.Domain.Models.Extensions;
 using GymTracker.LocalStorage.Core;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store;
 
@@ -12,11 +14,13 @@ public class ExerciseDetailEffects
 {
     private readonly IClientStorage _clientStorage;
     private readonly NavigationManager _navigationManager;
+    private readonly ISnackbar _snackbar;
 
-    public ExerciseDetailEffects(IClientStorage clientStorage, NavigationManager navigationManager)
+    public ExerciseDetailEffects(IClientStorage clientStorage, NavigationManager navigationManager, ISnackbar snackbar)
     {
         _clientStorage = clientStorage;
         _navigationManager = navigationManager;
+        _snackbar = snackbar;
     }
 
     [EffectMethod]
@@ -114,6 +118,39 @@ public class ExerciseDetailEffects
 
         await _clientStorage.CurrentWorkout.SetAsync(workout);
         dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+
+        if (set.Completed && set.SetType == DefaultData.SetType.Set)
+        {
+            var exerciseStat = await _clientStorage.ExerciseStatistics
+                .FindOrDefaultByIdAsync(exercise.Exercise.Id);
+
+            var historicalSets = exerciseStat?.Logs
+                .SelectMany(l => l.Sets) ?? Enumerable.Empty<ExerciseSetMetrics>();
+
+            var previousWorkoutSets = exercise.Sets
+                .Where(s => s.SetType == DefaultData.SetType.Set
+                         && s.Completed
+                         && s.Id != set.Id)
+                .Select(s => s.Metrics);
+
+            var milestones = MilestoneDetector.DetectSetMilestones(
+                set.Metrics,
+                exercise.Exercise.MetricType,
+                historicalSets,
+                previousWorkoutSets);
+
+            foreach (var milestone in milestones)
+            {
+                _snackbar.Add(
+                    $"{exercise.Exercise.Name}: {milestone.Description}",
+                    Severity.Success,
+                    config =>
+                    {
+                        config.VisibleStateDuration = 5000;
+                        config.Icon = Icons.Material.Filled.EmojiEvents;
+                    });
+            }
+        }
     }
 
     [EffectMethod]
