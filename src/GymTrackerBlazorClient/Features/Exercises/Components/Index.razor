@@ -37,7 +37,7 @@
     <MudItem xs="4" Class="">
         @if(State.Value.SelectedExercise is not null)
         {
-            <ExercisePerformance
+            <ExercisePerformance @key="State.Value.SelectedExercise.Id"
                 Statistic="State.Value.SelectedExerciseStatistic"
                 MetricType="State.Value.SelectedExercise.MetricType" />
         }
