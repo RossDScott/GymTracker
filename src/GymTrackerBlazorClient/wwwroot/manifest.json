@@ -1,9 +1,9 @@
 {
-  "name": "GymTrackerBlazorClient",
-  "short_name": "GymTrackerBlazorClient",
+  "name": "Garage Gym",
+  "short_name": "Garage Gym",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#000000",
   "theme_color": "#03173d",
   "prefer_related_applications": false,
   "icons": [
@@ -11,6 +11,12 @@
       "src": "icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "icon-512-maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ]
 }
