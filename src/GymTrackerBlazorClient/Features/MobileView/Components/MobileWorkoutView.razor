@@ -121,7 +121,12 @@
         {
             var uri = new Uri(_sasUri);
             var url = $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}/{Uri.EscapeDataString(BlobKey)}{uri.Query}";
-            _workouts = await Http.GetFromJsonAsync<WorkoutStatistic[]>(url);
+
+            var workoutsRequest = new HttpRequestMessage(HttpMethod.Get, url);
+            workoutsRequest.SetBrowserRequestCache(BrowserRequestCache.NoCache);
+            var workoutsResponse = await Http.SendAsync(workoutsRequest);
+            workoutsResponse.EnsureSuccessStatusCode();
+            _workouts = await workoutsResponse.Content.ReadFromJsonAsync<WorkoutStatistic[]>();
             _workouts = _workouts?
                 .OrderByDescending(x => x.CompletedOn)
                 .Take(20)
@@ -130,7 +135,11 @@
             try
             {
                 var nextUrl = $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}/{Uri.EscapeDataString(NextWorkoutBlobKey)}{uri.Query}";
-                _nextWorkout = await Http.GetFromJsonAsync<NextWorkoutSummary>(nextUrl);
+                var nextRequest = new HttpRequestMessage(HttpMethod.Get, nextUrl);
+                nextRequest.SetBrowserRequestCache(BrowserRequestCache.NoCache);
+                var nextResponse = await Http.SendAsync(nextRequest);
+                nextResponse.EnsureSuccessStatusCode();
+                _nextWorkout = await nextResponse.Content.ReadFromJsonAsync<NextWorkoutSummary>();
             }
             catch
             {
