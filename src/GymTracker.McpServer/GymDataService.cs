@@ -54,4 +54,30 @@ public class GymDataService
         var json = await _backupClient.DownloadBackupItem("WorkoutPlanStatistics");
         return JsonSerializer.Deserialize<List<WorkoutPlanStatistic>>(json, JsonOptions) ?? [];
     }
+
+    private static readonly JsonSerializerOptions WriteJsonOptions = new();
+
+    private async Task BackupBeforeWriteAsync(string key)
+    {
+        var existing = await _backupClient.DownloadBackupItem(key);
+        if (!string.IsNullOrEmpty(existing))
+        {
+            var timestamp = DateTimeOffset.UtcNow.ToString("yyyyMMddTHHmmssZ");
+            await _backupClient.BackupAsync($"{key}_bak_{timestamp}", existing);
+        }
+    }
+
+    public async Task SaveWorkoutPlansAsync(List<WorkoutPlan> plans)
+    {
+        await BackupBeforeWriteAsync("WorkoutPlans");
+        var json = JsonSerializer.Serialize(plans, WriteJsonOptions);
+        await _backupClient.BackupAsync("WorkoutPlans", json);
+    }
+
+    public async Task SaveWorkoutsAsync(List<Workout> workouts)
+    {
+        await BackupBeforeWriteAsync("Workouts");
+        var json = JsonSerializer.Serialize(workouts, WriteJsonOptions);
+        await _backupClient.BackupAsync("Workouts", json);
+    }
 }
