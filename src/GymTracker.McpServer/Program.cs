@@ -3,9 +3,12 @@ using GymTracker.Domain;
 using GymTracker.McpServer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using ModelContextProtocol;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+builder.Logging.ClearProviders();
 
 builder.Services.AddSingleton<IAppSettingsProvider, EnvironmentAppSettingsProvider>();
 builder.Services.AddSingleton<HttpClient>();
