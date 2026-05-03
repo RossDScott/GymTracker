@@ -69,10 +69,22 @@ public class HomeEffects
             return Task.CompletedTask;
         });
 
+        clientStorage.WorkoutStatistics.SubscribeToItemUpsert(async (_) =>
+        {
+            var allStats = await clientStorage.WorkoutStatistics.GetOrDefaultAsync();
+            dispatcher.Dispatch(new SetWorkoutStatisticsDataAction(allStats));
+        });
+
         clientStorage.ExerciseStatistics.SubscribeToChanges((stats) =>
         {
             dispatcher.Dispatch(new SetExerciseStatisticsDataAction(stats));
             return Task.CompletedTask;
+        });
+
+        clientStorage.ExerciseStatistics.SubscribeToItemUpsert(async (_) =>
+        {
+            var allStats = await clientStorage.ExerciseStatistics.GetOrDefaultAsync();
+            dispatcher.Dispatch(new SetExerciseStatisticsDataAction(allStats));
         });
     }
 

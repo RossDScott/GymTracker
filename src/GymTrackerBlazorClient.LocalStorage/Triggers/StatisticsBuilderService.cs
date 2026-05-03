@@ -17,10 +17,9 @@ public class StatisticsBuilderService : ITrigger
 
     public void Subscribe()
     {
-        _localStorageContex.Workouts.SubscribeToItemUpsert(workout =>
+        _localStorageContex.Workouts.SubscribeToItemUpsert(async workout =>
         {
-            _ = WorkoutUpserted(workout);
-            return Task.CompletedTask;
+            await WorkoutUpserted(workout);
         });
 
         _localStorageContex.Exercises.SubscribeToItemUpsert(exercise =>
