@@ -53,4 +53,19 @@ public class BlobBackupClient : IDataBackupClient
         var response = await _http.SendAsync(new HttpRequestMessage(HttpMethod.Head, BlobUrl(sasUri, key)));
         return response.IsSuccessStatusCode;
     }
+
+    public async Task DeleteAsync(string key)
+    {
+        var sasUri = await GetContainerSasUri();
+        if (sasUri is null) return;
+
+        var response = await _http.SendAsync(new HttpRequestMessage(HttpMethod.Delete, BlobUrl(sasUri, key)));
+        if (!response.IsSuccessStatusCode && response.StatusCode != System.Net.HttpStatusCode.NotFound)
+            response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<bool> IsConfiguredAsync()
+    {
+        return await GetContainerSasUri() is not null;
+    }
 }

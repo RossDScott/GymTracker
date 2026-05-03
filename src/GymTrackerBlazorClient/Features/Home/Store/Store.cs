@@ -3,6 +3,7 @@ using ApexCharts;
 using Fluxor;
 using GymTracker.BlazorClient.Features.Workout.End.Store;
 using GymTracker.BlazorClient.Features.Workout.Perform.Store;
+using GymTracker.Domain;
 using GymTracker.Domain.Models.Statistics;
 using GymTracker.LocalStorage.Core;
 using GymTracker.LocalStorage.IndexedDb;
@@ -39,7 +40,8 @@ public record ChartState
     };
 }
 
-public record InitaliseHomeAction();
+public record InitaliseHomeAction(bool SyncFromBlob = true);
+public record SyncFromBlobAction();
 public record SetHasExistingWorkoutAction(bool HasExistingWorkout);
 public record SetWorkoutStatisticsDataAction(IEnumerable<WorkoutStatistic> Statistics);
 public record SetExerciseStatisticsDataAction(IEnumerable<ExerciseStatistic> Statistics);
@@ -48,16 +50,18 @@ public class HomeEffects
 {
     private readonly IClientStorage _clientStorage;
     private readonly IIndexedDbService _db;
+    private readonly IBackupOrchestrator _backupOrchestrator;
 
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public HomeEffects(IClientStorage clientStorage, IIndexedDbService db, IDispatcher dispatcher)
+    public HomeEffects(IClientStorage clientStorage, IIndexedDbService db, IDispatcher dispatcher, IBackupOrchestrator backupOrchestrator)
     {
         _clientStorage = clientStorage;
         _db = db;
+        _backupOrchestrator = backupOrchestrator;
 
         clientStorage.WorkoutStatistics.SubscribeToChanges((stats) =>
         {
@@ -65,10 +69,22 @@ public class HomeEffects
             return Task.CompletedTask;
         });
 
+        clientStorage.WorkoutStatistics.SubscribeToItemUpsert(async (_) =>
+        {
+            var allStats = await clientStorage.WorkoutStatistics.GetOrDefaultAsync();
+            dispatcher.Dispatch(new SetWorkoutStatisticsDataAction(allStats));
+        });
+
         clientStorage.ExerciseStatistics.SubscribeToChanges((stats) =>
         {
             dispatcher.Dispatch(new SetExerciseStatisticsDataAction(stats));
             return Task.CompletedTask;
+        });
+
+        clientStorage.ExerciseStatistics.SubscribeToItemUpsert(async (_) =>
+        {
+            var allStats = await clientStorage.ExerciseStatistics.GetOrDefaultAsync();
+            dispatcher.Dispatch(new SetExerciseStatisticsDataAction(allStats));
         });
     }
 
@@ -98,6 +114,16 @@ public class HomeEffects
 
         if (exerciseStats != null)
             dispatcher.Dispatch(new SetExerciseStatisticsDataAction(exerciseStats));
+
+        if (action.SyncFromBlob)
+            dispatcher.Dispatch(new SyncFromBlobAction());
+    }
+
+    [EffectMethod]
+    public async Task OnSyncFromBlob(SyncFromBlobAction action, IDispatcher dispatcher)
+    {
+        await _backupOrchestrator.SyncFromBlobAsync();
+        dispatcher.Dispatch(new InitaliseHomeAction(SyncFromBlob: false));
     }
 
     [EffectMethod]

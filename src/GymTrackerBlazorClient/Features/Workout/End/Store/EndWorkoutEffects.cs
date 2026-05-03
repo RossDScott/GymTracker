@@ -1,6 +1,7 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Features.AppBar.Store;
 using GymTracker.BlazorClient.Features.Common;
+using GymTracker.Domain;
 using GymTracker.Domain.Models;
 using GymTracker.Domain.Models.Extensions;
 using GymTracker.Domain.Models.Statistics;
@@ -16,15 +17,18 @@ public class EndWorkoutEffects
     private readonly IClientStorage _clientStorage;
     private readonly NavigationManager _navigationManager;
     private readonly IState<EndWorkoutState> _state;
+    private readonly IBackupOrchestrator _backupOrchestrator;
 
     public EndWorkoutEffects(
         IClientStorage clientStorage,
         NavigationManager navigationManager,
-        IState<EndWorkoutState> state)
+        IState<EndWorkoutState> state,
+        IBackupOrchestrator backupOrchestrator)
     {
         _clientStorage = clientStorage;
         _navigationManager = navigationManager;
         _state = state;
+        _backupOrchestrator = backupOrchestrator;
     }
 
     [EffectMethod]
@@ -84,6 +88,7 @@ public class EndWorkoutEffects
     public async Task OnAbandonWorkout(AbandonWorkoutAction action, IDispatcher dispatcher)
     {
         await _clientStorage.CurrentWorkout.DeleteAsync();
+        await _backupOrchestrator.DeleteBlobAsync(_clientStorage.CurrentWorkout.KeyName);
         _navigationManager.NavigateTo("/");
     }
 
@@ -128,6 +133,7 @@ public class EndWorkoutEffects
         await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
         await _clientStorage.Workouts.UpsertAsync(workout);
         await _clientStorage.CurrentWorkout.DeleteAsync();
+        await _backupOrchestrator.DeleteBlobAsync(_clientStorage.CurrentWorkout.KeyName);
 
         dispatcher.Dispatch(new SetIsSavingAction(false));
 
