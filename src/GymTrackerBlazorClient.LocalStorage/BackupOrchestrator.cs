@@ -37,6 +37,9 @@ public class BackupOrchestrator : IBackupOrchestrator
 
     public async Task Restore()
     {
+        if (!await _dataBackupClient.IsConfiguredAsync())
+            return;
+
         _isRestoring = true;
         try
         {
@@ -59,6 +62,30 @@ public class BackupOrchestrator : IBackupOrchestrator
         finally
         {
             _isRestoring = false;
+        }
+    }
+
+    public async Task DeleteBlobAsync(string key)
+    {
+        try
+        {
+            await _dataBackupClient.DeleteAsync(key);
+        }
+        catch
+        {
+            // Best-effort: ignore failures (e.g., SAS lacks DELETE permission)
+        }
+    }
+
+    public async Task SyncFromBlobAsync()
+    {
+        try
+        {
+            await Restore();
+        }
+        catch
+        {
+            // Best-effort: don't break the app if blob is unreachable
         }
     }
 
