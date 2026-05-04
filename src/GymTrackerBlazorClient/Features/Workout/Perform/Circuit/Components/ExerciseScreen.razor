@@ -14,7 +14,7 @@
     @if (Exercise.MetricType is MetricType.Time or MetricType.TimeAndDistance)
     {
         @* Timed exercise *@
-        <MudText Typo="Typo.subtitle1" Color="Color.Secondary">
+        <MudText Typo="Typo.subtitle1" Color="Color.Default">
             Target: @FormatTime(Exercise.TargetTime ?? 0)
         </MudText>
 
@@ -42,7 +42,7 @@
     else
     {
         @* Reps-based exercise *@
-        <MudText Typo="Typo.subtitle1" Color="Color.Secondary">
+        <MudText Typo="Typo.subtitle1" Color="Color.Default">
             Target: @TargetDescription
         </MudText>
 
