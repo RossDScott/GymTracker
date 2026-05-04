@@ -1,14 +1,6 @@
-﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers.Stopwatch.Store
-@inherits FluxorComponent
-
-@inject IState<StopwatchState> StopwatchState
-
-<div class="d-flex flex-column pa-2 gap-1" style="border-bottom: 1px solid var(--mud-palette-divider)">
+﻿<div class="d-flex flex-column pa-2 gap-1" style="border-bottom: 1px solid var(--mud-palette-divider)">
     <div class="d-flex flex-row justify-space-between align-center">
         <MudText Typo="Typo.subtitle1" Class="font-weight-bold">@PlanName</MudText>
-        <MudText Typo="Typo.body2" Color="Color.Secondary">
-            @StopwatchState.Value.Duration.ToString(@"hh\:mm\:ss")
-        </MudText>
     </div>
     <div class="d-flex flex-row gap-4">
         <div class="flex-1">
@@ -30,5 +22,4 @@
     [Parameter, EditorRequired] public int TotalRounds { get; set; }
     [Parameter, EditorRequired] public int CurrentExerciseIndex { get; set; }
     [Parameter, EditorRequired] public int TotalExercises { get; set; }
-
 }
