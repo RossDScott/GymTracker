@@ -137,7 +137,7 @@ public static class EndWorkoutReducers
             {
                 ExerciseSetMetrics? progressSet = null;
 
-                if (metricType == MetricType.Weight)
+                if (metricType == MetricType.Weight && workoutExercise.PlannedExercise.TargetRepsUpper > 0)
                 {
                     if (minSet.Reps >= workoutExercise.PlannedExercise.TargetRepsUpper)
                     {

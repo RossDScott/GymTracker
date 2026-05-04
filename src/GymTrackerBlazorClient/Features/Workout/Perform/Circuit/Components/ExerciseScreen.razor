@@ -1,0 +1,174 @@
+@using GymTracker.BlazorClient.Features.Workout.Perform.Circuit.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.CountdownTimer.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers
+@using GymTracker.Domain.Models
+@inherits FluxorComponent
+
+@inject IDispatcher Dispatcher
+@inject IState<CountdownTimerState> CountdownState
+
+<div class="d-flex flex-column align-center justify-center gap-4 fullHeight pa-4">
+
+    <MudText Typo="Typo.h4" Class="font-weight-bold text-center">@Exercise.ExerciseName</MudText>
+
+    @if (Exercise.MetricType is MetricType.Time or MetricType.TimeAndDistance)
+    {
+        @* Timed exercise *@
+        <MudText Typo="Typo.subtitle1" Color="Color.Secondary">
+            Target: @FormatTime(Exercise.TargetTime ?? 0)
+        </MudText>
+
+        <div class="d-flex flex-column align-center gap-2">
+            <MudText Typo="Typo.h2" Class="font-weight-bold">
+                @CountdownState.Value.Duration.ToString(@"mm\:ss")
+            </MudText>
+            @if (CountdownState.Value.TimesUp)
+            {
+                <MudText Typo="Typo.h6" Color="Color.Success">Time's up!</MudText>
+                <audio autoplay controls style="display: none">
+                    <source src="/microwave-beeps-101846.mp3" />
+                </audio>
+            }
+            <div class="d-flex flex-row gap-2">
+                <ControlButtons CanPause="true"
+                                IsPaused="@CountdownState.Value.IsPaused"
+                                IsRunning="@(CountdownState.Value.StartTime is not null)"
+                                OnStart="HandleTimerStart"
+                                OnPause="HandleTimerPause"
+                                OnReset="HandleTimerReset" />
+            </div>
+        </div>
+    }
+    else
+    {
+        @* Reps-based exercise *@
+        <MudText Typo="Typo.subtitle1" Color="Color.Secondary">
+            Target: @TargetDescription
+        </MudText>
+
+        <div class="d-flex flex-row gap-3 align-end">
+            <div style="width: 120px">
+                <MudNumericField @bind-Value="_enteredReps"
+                                 Variant="Variant.Outlined"
+                                 Label="Actual reps"
+                                 Min="0" Max="9999"
+                                 HideSpinButtons="false" />
+            </div>
+            @if (Exercise.MetricType == MetricType.Weight)
+            {
+                <div style="width: 120px">
+                    <MudNumericField @bind-Value="_enteredWeight"
+                                     Variant="Variant.Outlined"
+                                     Label="Weight (kg)"
+                                     Min="0" Max="9999"
+                                     HideSpinButtons="false" />
+                </div>
+            }
+        </div>
+    }
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               Size="Size.Large"
+               FullWidth="true"
+               Style="max-width: 360px"
+               OnClick="HandleDone">
+        Done — @NextLabel
+    </MudButton>
+
+    @if (UpcomingExercises.Any())
+    {
+        <div class="pa-2 rounded" style="background: var(--mud-palette-background-grey); max-width: 400px; width: 100%">
+            <MudText Typo="Typo.caption" Color="Color.Secondary">Coming up this round:</MudText>
+            <MudText Typo="Typo.body2">@UpcomingText</MudText>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public CircuitExerciseItem Exercise { get; set; } = default!;
+    [Parameter, EditorRequired] public int CurrentRound { get; set; }
+    [Parameter, EditorRequired] public int TotalRounds { get; set; }
+    [Parameter, EditorRequired] public int CurrentExerciseIndex { get; set; }
+    [Parameter, EditorRequired] public int TotalExercises { get; set; }
+    [Parameter, EditorRequired] public IEnumerable<CircuitExerciseItem> UpcomingExercises { get; set; } = [];
+
+    int? _enteredReps;
+    decimal? _enteredWeight;
+    private Guid _lastExerciseId;
+
+    protected override void OnParametersSet()
+    {
+        if (Exercise.WorkoutExerciseId != _lastExerciseId)
+        {
+            _lastExerciseId = Exercise.WorkoutExerciseId;
+            _enteredReps = Exercise.TargetReps;
+            _enteredWeight = Exercise.TargetWeight;
+
+            if (Exercise.MetricType is MetricType.Time or MetricType.TimeAndDistance && Exercise.TargetTime.HasValue)
+            {
+                Dispatcher.Dispatch(new CountdownTimerResetAction());
+                Dispatcher.Dispatch(new CountdownTimerSetStartDurationAction(
+                    TimeSpan.FromSeconds((double)Exercise.TargetTime.Value)));
+            }
+        }
+        base.OnParametersSet();
+    }
+
+    string TargetDescription
+    {
+        get
+        {
+            if (Exercise.MetricType == MetricType.Weight)
+                return $"{Exercise.TargetReps} reps @ {Exercise.TargetWeight}kg";
+            return $"{Exercise.TargetReps} reps";
+        }
+    }
+
+    string NextLabel => CurrentExerciseIndex < TotalExercises - 1
+        ? "Next Exercise"
+        : CurrentRound < TotalRounds ? "Rest" : "Finish";
+
+    string UpcomingText => string.Join(", ", UpcomingExercises.Select(e =>
+        e.MetricType is MetricType.Time or MetricType.TimeAndDistance
+            ? $"{e.ExerciseName} ({FormatTime(e.TargetTime ?? 0)})"
+            : e.MetricType == MetricType.Weight
+                ? $"{e.ExerciseName} ({e.TargetReps} @ {e.TargetWeight}kg)"
+                : $"{e.ExerciseName} ({e.TargetReps} reps)"));
+
+    static string FormatTime(decimal totalSeconds)
+    {
+        var ts = TimeSpan.FromSeconds((double)totalSeconds);
+        return ts.Minutes > 0 ? ts.ToString(@"m\:ss") : $"{(int)totalSeconds}s";
+    }
+
+    void HandleTimerStart() => Dispatcher.Dispatch(new CountdownTimerStartAction(DateTime.Now));
+    void HandleTimerPause() => Dispatcher.Dispatch(new CountdownTimerPauseAction());
+    void HandleTimerReset() => Dispatcher.Dispatch(new CountdownTimerResetAction());
+
+    void HandleDone()
+    {
+        int? actualReps = null;
+        decimal? actualWeight = null;
+        decimal? actualTime = null;
+
+        if (Exercise.MetricType is MetricType.Time or MetricType.TimeAndDistance)
+        {
+            var cs = CountdownState.Value;
+            if (cs.TimesUp)
+                actualTime = Exercise.TargetTime;
+            else if (cs.StartTime is not null || cs.IsPaused)
+                actualTime = (decimal)Math.Max(0, (cs.StartDuration - cs.Duration).TotalSeconds);
+            else
+                actualTime = Exercise.TargetTime;
+        }
+        else
+        {
+            actualReps = _enteredReps;
+            if (Exercise.MetricType == MetricType.Weight)
+                actualWeight = _enteredWeight;
+        }
+
+        Dispatcher.Dispatch(new CircuitAdvanceAction(actualReps, actualWeight, actualTime));
+    }
+}

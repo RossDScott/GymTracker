@@ -8,6 +8,8 @@ public record WorkoutPlan
 
     public bool IsAcitve { get; set; } = true;
     public bool IsRegularRoutine { get; set; } = false;
+    public WorkoutType WorkoutType { get; set; } = WorkoutType.Standard;
+    public CircuitConfig? CircuitConfig { get; set; } = null;
 }
 
 public record PlannedExercise : IOrderable

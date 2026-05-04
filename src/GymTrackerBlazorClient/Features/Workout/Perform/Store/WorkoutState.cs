@@ -1,5 +1,6 @@
 ﻿using Fluxor;
 using GymTracker.BlazorClient.Features.Common;
+using GymTracker.Domain.Models;
 using System.Collections.Immutable;
 
 namespace GymTracker.BlazorClient.Features.Workout.Perform.Store;
@@ -19,4 +20,5 @@ public record WorkoutDetail
     public DateTimeOffset? WorkoutEnd { get; init; }
 
     public ImmutableArray<ListItem> ExerciseList { get; init; } = ImmutableArray<ListItem>.Empty;
+    public WorkoutType WorkoutType { get; init; } = WorkoutType.Standard;
 }

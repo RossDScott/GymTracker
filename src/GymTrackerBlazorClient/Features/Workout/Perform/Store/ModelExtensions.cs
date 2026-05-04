@@ -15,6 +15,7 @@ public static class ModelExtensions
             ExerciseList = workout.Exercises
             .OrderBy(x => x.Order)
             .Select(x => new ListItem(x.Id, x.Exercise.Name, false))
-            .ToImmutableArray()
+            .ToImmutableArray(),
+            WorkoutType = workout.Plan.WorkoutType
         };
 }

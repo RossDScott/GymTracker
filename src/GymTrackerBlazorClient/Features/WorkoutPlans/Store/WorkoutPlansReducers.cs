@@ -37,4 +37,11 @@ public static class WorkoutPlansReducers
         {
             SelectedExercise = action.Exercise.ToDetailItem()
         };
+
+    [ReducerMethod]
+    public static WorkoutPlansState OnSetCircuitExercise(WorkoutPlansState state, SetCircuitExerciseAction action)
+        => state with
+        {
+            SelectedCircuitExercise = action.Exercise.ToCircuitDetailItem()
+        };
 }

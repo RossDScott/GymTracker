@@ -16,8 +16,25 @@ public static class ModelExtensions
                                     .Select(x => x.ToListItem())
                                     .ToImmutableArray(),
             IsActive = plan.IsAcitve,
-            IsRegularRoutine = plan.IsRegularRoutine
+            IsRegularRoutine = plan.IsRegularRoutine,
+            WorkoutType = plan.WorkoutType,
+            Rounds = plan.CircuitConfig?.Rounds ?? 3,
+            RestBetweenRounds = plan.CircuitConfig?.RestBetweenRounds ?? TimeSpan.FromMinutes(2)
         };
+
+    public static PlannedCircuitExerciseDetail ToCircuitDetailItem(this PlannedExercise exercise)
+    {
+        var targetSet = exercise.PlannedSets.OrderBy(x => x.Order).FirstOrDefault();
+        return new PlannedCircuitExerciseDetail
+        {
+            Id = exercise.Id,
+            ExerciseName = exercise.Exercise.Name,
+            MetricType = exercise.Exercise.MetricType,
+            TargetReps = targetSet?.TargetMetrics.Reps,
+            TargetWeight = targetSet?.TargetMetrics.Weight,
+            TargetTime = targetSet?.TargetMetrics.Time
+        };
+    }
 
     public static PlannedExerciseDetail ToDetailItem(this PlannedExercise exercise)
         => new PlannedExerciseDetail

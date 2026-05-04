@@ -7,9 +7,36 @@ public record Workout
     public Workout(WorkoutPlan plan)
     {
         Plan = plan;
-        Exercises = plan.PlannedExercises
-            .Select(plannedExercise => new WorkoutExercise(plannedExercise))
-            .ToList();
+
+        if (plan.WorkoutType == WorkoutType.Circuit && plan.CircuitConfig != null)
+        {
+            var config = plan.CircuitConfig;
+            Exercises = plan.PlannedExercises
+                .OrderBy(pe => pe.Order)
+                .Select(pe =>
+                {
+                    var templateSet = pe.PlannedSets.OrderBy(s => s.Order).FirstOrDefault();
+                    return new WorkoutExercise(pe.Exercise)
+                    {
+                        Order = pe.Order,
+                        PlannedExercise = pe,
+                        Sets = Enumerable.Range(1, config.Rounds)
+                            .Select(round => new WorkoutExerciseSet(templateSet)
+                            {
+                                Order = round,
+                                OrderForSetType = round
+                            })
+                            .ToList<WorkoutExerciseSet>()
+                    };
+                })
+                .ToList();
+        }
+        else
+        {
+            Exercises = plan.PlannedExercises
+                .Select(plannedExercise => new WorkoutExercise(plannedExercise))
+                .ToList();
+        }
     }
 
     public Guid Id { get; init; } = Guid.NewGuid();
