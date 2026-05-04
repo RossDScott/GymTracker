@@ -1,4 +1,4 @@
-﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Circuit.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Circuit.Store
 @using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers.CountdownTimer.Store
 @using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers
 @using GymTracker.Domain.Models
@@ -67,31 +67,10 @@
         </div>
     }
 
-    <MudButton Variant="Variant.Filled"
-               Color="Color.Primary"
-               Size="Size.Large"
-               FullWidth="true"
-               Style="max-width: 360px"
-               OnClick="HandleDone">
-        Done &mdash; @NextLabel
-    </MudButton>
-
-    @if (UpcomingExercises.Any())
-    {
-        <div class="pa-2 rounded" style="background: var(--mud-palette-background-grey); max-width: 400px; width: 100%">
-            <MudText Typo="Typo.caption" Color="Color.Secondary">Coming up this round:</MudText>
-            <MudText Typo="Typo.body2">@UpcomingText</MudText>
-        </div>
-    }
 </div>
 
 @code {
     [Parameter, EditorRequired] public CircuitExerciseItem Exercise { get; set; } = default!;
-    [Parameter, EditorRequired] public int CurrentRound { get; set; }
-    [Parameter, EditorRequired] public int TotalRounds { get; set; }
-    [Parameter, EditorRequired] public int CurrentExerciseIndex { get; set; }
-    [Parameter, EditorRequired] public int TotalExercises { get; set; }
-    [Parameter, EditorRequired] public IEnumerable<CircuitExerciseItem> UpcomingExercises { get; set; } = [];
 
     int? _enteredReps;
     decimal? _enteredWeight;
@@ -125,17 +104,6 @@
         }
     }
 
-    string NextLabel => CurrentExerciseIndex < TotalExercises - 1
-        ? "Next Exercise"
-        : CurrentRound < TotalRounds ? "Rest" : "Finish";
-
-    string UpcomingText => string.Join(", ", UpcomingExercises.Select(e =>
-        e.MetricType is MetricType.Time or MetricType.TimeAndDistance
-            ? $"{e.ExerciseName} ({FormatTime(e.TargetTime ?? 0)})"
-            : e.MetricType == MetricType.Weight
-                ? $"{e.ExerciseName} ({e.TargetReps} @ {e.TargetWeight}kg)"
-                : $"{e.ExerciseName} ({e.TargetReps} reps)"));
-
     static string FormatTime(decimal totalSeconds)
     {
         var ts = TimeSpan.FromSeconds((double)totalSeconds);
@@ -146,7 +114,7 @@
     void HandleTimerPause() => Dispatcher.Dispatch(new CountdownTimerPauseAction());
     void HandleTimerReset() => Dispatcher.Dispatch(new CountdownTimerResetAction());
 
-    void HandleDone()
+    public void TriggerDone()
     {
         int? actualReps = null;
         decimal? actualWeight = null;

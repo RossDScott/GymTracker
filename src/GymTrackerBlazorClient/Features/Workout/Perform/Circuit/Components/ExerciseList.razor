@@ -1,0 +1,60 @@
+@using GymTracker.BlazorClient.Features.Workout.Perform.Circuit.Store
+@using GymTracker.Domain.Models
+@using System.Collections.Immutable
+
+<div class="d-flex flex-column pa-2 gap-1 overflow-y-auto" style="width: 220px; min-width: 220px">
+    @for (int i = 0; i < Exercises.Length; i++)
+    {
+        var exercise = Exercises[i];
+        var idx = i;
+        var isCompleted = idx < CurrentExerciseIndex || Phase == CircuitPhase.Resting;
+        var isCurrent = idx == CurrentExerciseIndex && Phase == CircuitPhase.Exercising;
+
+        <div class="d-flex flex-row align-center gap-2 pa-1 rounded">
+            @if (isCompleted)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
+            }
+            else if (isCurrent)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.ArrowCircleRight" Color="Color.Primary" Size="Size.Small" />
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Material.Outlined.Circle" Size="Size.Small" Style="opacity: 0.35" />
+            }
+            <div class="d-flex flex-column overflow-hidden">
+                <MudText Typo="Typo.body2"
+                         Class="@(isCurrent ? "font-weight-bold" : "")"
+                         Color="@(isCurrent ? Color.Default : isCompleted ? Color.Default : Color.Secondary)"
+                         Style="@(isCurrent ? "" : isCompleted ? "" : "opacity: 0.6")">
+                    @exercise.ExerciseName
+                </MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    @MetricSummary(exercise)
+                </MudText>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public ImmutableArray<CircuitExerciseItem> Exercises { get; set; }
+    [Parameter, EditorRequired] public int CurrentExerciseIndex { get; set; }
+    [Parameter, EditorRequired] public CircuitPhase Phase { get; set; }
+
+    static string MetricSummary(CircuitExerciseItem e)
+    {
+        if (e.MetricType is MetricType.Time or MetricType.TimeAndDistance)
+            return FormatTime(e.TargetTime ?? 0);
+        if (e.MetricType == MetricType.Weight)
+            return $"{e.TargetReps} reps @ {e.TargetWeight}kg";
+        return $"{e.TargetReps} reps";
+    }
+
+    static string FormatTime(decimal totalSeconds)
+    {
+        var ts = TimeSpan.FromSeconds((double)totalSeconds);
+        return ts.Minutes > 0 ? ts.ToString(@"m\:ss") : $"{(int)totalSeconds}s";
+    }
+}
