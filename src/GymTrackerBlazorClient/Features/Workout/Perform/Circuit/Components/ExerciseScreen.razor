@@ -1,6 +1,6 @@
-@using GymTracker.BlazorClient.Features.Workout.Perform.Circuit.Store
-@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.CountdownTimer.Store
-@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Circuit.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers.CountdownTimer.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers
 @using GymTracker.Domain.Models
 @inherits FluxorComponent
 
@@ -73,7 +73,7 @@
                FullWidth="true"
                Style="max-width: 360px"
                OnClick="HandleDone">
-        Done — @NextLabel
+        Done &mdash; @NextLabel
     </MudButton>
 
     @if (UpcomingExercises.Any())
