@@ -30,7 +30,9 @@
                          Style="@(isCurrent ? "" : isCompleted ? "" : "opacity: 0.6")">
                     @exercise.ExerciseName
                 </MudText>
-                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                <MudText Typo="Typo.caption"
+                         Color="@(isCurrent ? Color.Default : isCompleted ? Color.Default : Color.Secondary)"
+                         Style="@(isCurrent ? "" : isCompleted ? "" : "opacity: 0.6")">
                     @MetricSummary(exercise)
                 </MudText>
             </div>
