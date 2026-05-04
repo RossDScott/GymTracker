@@ -1,31 +1,25 @@
-﻿@page "/workout/perform"
+@page "/workout/perform"
 @page "/workout/view/{id:guid}"
 
 @using GymTracker.BlazorClient.Features.AppBar.Store;
-@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main
-@using GymTracker.BlazorClient.Features.Workout.Perform.Components.Main.ExerciseDetail.Store
-@using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar
+@using GymTracker.BlazorClient.Features.Workout.Perform.Circuit
+@using GymTracker.BlazorClient.Features.Workout.Perform.Standard
 @using GymTracker.BlazorClient.Features.Workout.Perform.Store;
+@using GymTracker.Domain.Models;
 
 @inherits FluxorComponent
 
 @inject IDispatcher Dispatcher
 @inject IState<WorkoutState> State
 
-<div id="mainContent" class="fullHeight fullWidth d-flex" @onclick="() => Dispatcher.Dispatch(new SetSelectedSetAction(null))">
-    <div id="sessionSidebar" class="fullHeight">
-        <SideBar></SideBar>
-    </div>
-   
-    <MudDivider Vertical="true" FlexItem="true" Class="mx-3" />
-
-    <div id="mainSession" Class="flex-grow-1 fullHeight">
-        @if (State.Value.SelectedExerciseId.HasValue)
-        {
-            <Main></Main>
-        }
-    </div>
-</div>
+@if (State.Value.Workout?.WorkoutType == WorkoutType.Circuit)
+{
+    <CircuitIndex />
+}
+else
+{
+    <StandardIndex />
+}
 
 @code {
     [Parameter]
@@ -43,7 +37,6 @@
 
     protected override void OnParametersSet()
     {
-
         base.OnParametersSet();
     }
 }

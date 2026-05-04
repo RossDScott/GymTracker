@@ -1,4 +1,4 @@
-﻿@using GymTracker.BlazorClient.Features.Common.FullHeightList
+@using GymTracker.BlazorClient.Features.Common.FullHeightList
 @using GymTracker.BlazorClient.Features.Common;
 @using GymTracker.BlazorClient.Features.SidePanel;
 @using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
@@ -8,6 +8,7 @@
 
 @inject IDispatcher Dispatcher
 @inject SidePanelService SidePanelService
+@inject IDialogService DialogService
 
 <MudPaper Class="pa-2">
     <MudForm @ref="_form">
@@ -23,17 +24,24 @@
                           RequiredError="Workout Plan Name required!">
             </MudTextField>
 
-            <MudItem xs="4" Class="mb-0 fullHeight fullWidth" Style="position: relative">
-                <MudText Typo="Typo.overline">Planned Exercises</MudText>
-                <FullHeightList CanReorder="true"
-                                List="_plannedExercises"
-                                SelectedId="SelectedExerciseId"
-                                OnAddItem="HandleAddExercise"
-                                OnItemClick="HandleExerciseSelected"
-                                OnChangeOrder="((ListItem item, OrderDirection direction)x) 
-                                    => HandleChangeOrder(x.item, x.direction)">
-                </FullHeightList>
-            </MudItem>
+            <MudRadioGroup T="WorkoutType" Value="_workoutType" ValueChanged="HandleWorkoutTypeChanged">
+                <MudRadio T="WorkoutType" Value="WorkoutType.Standard" Color="Color.Primary">Standard</MudRadio>
+                <MudRadio T="WorkoutType" Value="WorkoutType.Circuit" Color="Color.Primary">Circuit</MudRadio>
+            </MudRadioGroup>
+
+            @if (_workoutType == WorkoutType.Circuit)
+            {
+                <CircuitPlanBody WorkoutPlanDetail="WorkoutPlanDetail"
+                                 SelectedExerciseId="SelectedExerciseId"
+                                 OnExerciseSelected="OnExerciseSelected" />
+            }
+            else
+            {
+                <StandardPlanBody WorkoutPlanDetail="WorkoutPlanDetail"
+                                  SelectedExerciseId="SelectedExerciseId"
+                                  OnExerciseSelected="OnExerciseSelected" />
+            }
+
             <MudSwitch T="bool" Value="_isActive"
                        Label="Is Active"
                        LabelPlacement="Placement.Start"
@@ -63,16 +71,14 @@
     string _workoutPlanName = string.Empty;
     bool _isActive = true;
     bool _isRegularRoutine = false;
-
-    ImmutableArray<ListItem> _plannedExercises = ImmutableArray<ListItem>.Empty;
+    WorkoutType _workoutType = WorkoutType.Standard;
 
     protected override async Task OnParametersSetAsync()
     {
         _workoutPlanName = WorkoutPlanDetail.Name;
-        _plannedExercises = WorkoutPlanDetail.PlannedExercises;
-
         _isActive = WorkoutPlanDetail.IsActive;
         _isRegularRoutine = WorkoutPlanDetail.IsRegularRoutine;
+        _workoutType = WorkoutPlanDetail.WorkoutType;
 
         if (_form is not null) await _form.ResetValidationAsync();
 
@@ -96,23 +102,25 @@
         await OnWorkoutPlanUpdated.InvokeAsync(updateDTO);
     }
 
-    void HandleExerciseSelected(ListItem item) => OnExerciseSelected.InvokeAsync(item);
-
-    async Task HandleAddExercise()
+    async Task HandleWorkoutTypeChanged(WorkoutType newType)
     {
-        var response = SidePanelService.ShowSidePanel<ExercisePicker, ListItem>();
-        var result = await response.Result();
+        if (newType == _workoutType) return;
 
-        if (!result.Canceled)
+        if (WorkoutPlanDetail.PlannedExercises.Length > 0)
         {
-            var exerciseId = result.Data!.Id;
-            Dispatcher.Dispatch(new AddExerciseToWorkoutPlanAction(WorkoutPlanDetail.Id, exerciseId));
+            var parameters = new DialogParameters<ConfirmDialog>
+            {
+                { x => x.Title, "Change workout type?" },
+                { x => x.Message, "Switching type will remove all current exercises. Continue?" },
+                { x => x.ConfirmText, "Yes, switch" }
+            };
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("", parameters);
+            var result = await dialog.Result;
+            if (result?.Canceled ?? true) return;
         }
-    }
 
-    void HandleChangeOrder(ListItem item, OrderDirection direction)
-    {
-        Dispatcher.Dispatch(new ChangeOrderAction(WorkoutPlanDetail.Id, item.Id, direction));
+        _workoutType = newType;
+        Dispatcher.Dispatch(new SetWorkoutPlanTypeAction(WorkoutPlanDetail.Id, newType));
     }
 
     async Task HandleIsActiveChanged(bool isActive)

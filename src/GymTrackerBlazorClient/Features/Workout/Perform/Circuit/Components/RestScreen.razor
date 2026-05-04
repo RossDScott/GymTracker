@@ -1,0 +1,51 @@
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Circuit.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers.CountdownTimer.Store
+@using GymTracker.Domain.Models
+
+@inject IDispatcher Dispatcher
+
+<div class="d-flex flex-column align-center justify-center gap-4 fullHeight pa-4">
+
+    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Large" />
+    <MudText Typo="Typo.h5" Class="text-center">
+        Round @CompletedRound of @TotalRounds complete!
+    </MudText>
+
+    <MudText Typo="Typo.subtitle1" Color="Color.Secondary">REST</MudText>
+
+    @if (CountdownState.TimesUp)
+    {
+        <MudText Typo="Typo.h2" Class="font-weight-bold" Color="Color.Success">Ready!</MudText>
+    }
+    else
+    {
+        <MudText Typo="Typo.h2" Class="font-weight-bold">
+            @CountdownState.Duration.ToString(@"mm\:ss")
+        </MudText>
+    }
+
+    <div class="d-flex flex-row gap-3">
+        <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="OnSkipRest">
+            Skip Rest
+        </MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="OnAddTime">
+            + 30s
+        </MudButton>
+    </div>
+
+    @if (NextExerciseName is not null)
+    {
+        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="text-center">
+            Next: Round @(CompletedRound + 1) &mdash; starts with <strong>@NextExerciseName</strong>
+        </MudText>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public int CompletedRound { get; set; }
+    [Parameter, EditorRequired] public int TotalRounds { get; set; }
+    [Parameter, EditorRequired] public string? NextExerciseName { get; set; }
+    [Parameter, EditorRequired] public CountdownTimerState CountdownState { get; set; } = default!;
+    [Parameter, EditorRequired] public EventCallback OnSkipRest { get; set; }
+    [Parameter, EditorRequired] public EventCallback OnAddTime { get; set; }
+}

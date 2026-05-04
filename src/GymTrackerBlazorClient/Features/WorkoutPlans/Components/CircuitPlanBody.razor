@@ -1,0 +1,112 @@
+@using GymTracker.BlazorClient.Features.Common.FullHeightList
+@using GymTracker.BlazorClient.Features.Common;
+@using GymTracker.BlazorClient.Features.SidePanel;
+@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+@using GymTracker.BlazorClient.Features.Common.ExercisePicker.Components;
+@using GymTracker.BlazorClient.Features.Common.UpDownNumericEditor;
+@using System.Collections.Immutable;
+@using GymTracker.Domain.Models;
+
+@inject IDispatcher Dispatcher
+@inject SidePanelService SidePanelService
+
+<MudStack Spacing="2">
+    <MudField Variant="Variant.Outlined" Label="Circuit Setup" InnerPadding="false" Class="pa-2">
+        <div class="d-flex flex-row align-center gap-4 pa-2">
+            <div class="d-flex flex-column align-center">
+                <MudText Typo="Typo.caption">Rounds</MudText>
+                <UpDownIntegerEditor Value="_rounds" ValueChanged="HandleRoundsChanged" />
+            </div>
+            <div class="d-flex flex-column">
+                <MudText Typo="Typo.caption">Rest Between Rounds</MudText>
+                <div class="d-flex flex-row">
+                    <MudSelect Underline="false" Dense="true" T="int" Label="Min" Variant="Variant.Text"
+                               Value="_restMinutes" ValueChanged="HandleRestMinutesChanged">
+                        @for (int i = 0; i < 10; i++)
+                        {
+                            <MudSelectItem Value="@i" />
+                        }
+                    </MudSelect>
+                    <MudSelect Underline="false" Dense="true" T="int" Label="Sec" Variant="Variant.Text"
+                               Value="_restSeconds" ValueChanged="HandleRestSecondsChanged">
+                        @for (int i = 0; i < 60; i++)
+                        {
+                            <MudSelectItem Value="@i" />
+                        }
+                    </MudSelect>
+                </div>
+            </div>
+        </div>
+    </MudField>
+
+    <MudItem xs="4" Class="mb-0 fullHeight fullWidth" Style="position: relative">
+        <MudText Typo="Typo.overline">Exercises in Circuit</MudText>
+        <FullHeightList CanReorder="true"
+                        List="WorkoutPlanDetail.PlannedExercises"
+                        SelectedId="SelectedExerciseId"
+                        OnAddItem="HandleAddExercise"
+                        OnItemClick="OnExerciseSelected"
+                        OnChangeOrder="((ListItem item, OrderDirection direction)x)
+                            => HandleChangeOrder(x.item, x.direction)">
+        </FullHeightList>
+    </MudItem>
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired]
+    public WorkoutPlanDetail WorkoutPlanDetail { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<ListItem> OnExerciseSelected { get; set; }
+
+    [Parameter, EditorRequired]
+    public Guid? SelectedExerciseId { get; set; } = null;
+
+    int _rounds = 3;
+    int _restMinutes = 2;
+    int _restSeconds = 0;
+
+    protected override void OnParametersSet()
+    {
+        _rounds = WorkoutPlanDetail.Rounds;
+        _restMinutes = WorkoutPlanDetail.RestBetweenRounds.Minutes;
+        _restSeconds = WorkoutPlanDetail.RestBetweenRounds.Seconds;
+        base.OnParametersSet();
+    }
+
+    async Task HandleAddExercise()
+    {
+        var response = SidePanelService.ShowSidePanel<ExercisePicker, ListItem>();
+        var result = await response.Result();
+
+        if (!result.Canceled)
+            Dispatcher.Dispatch(new AddExerciseToCircuitAction(WorkoutPlanDetail.Id, result.Data!.Id));
+    }
+
+    void HandleChangeOrder(ListItem item, OrderDirection direction) =>
+        Dispatcher.Dispatch(new ChangeOrderAction(WorkoutPlanDetail.Id, item.Id, direction));
+
+    void HandleRoundsChanged(int? value)
+    {
+        _rounds = value ?? 1;
+        DispatchCircuitConfig();
+    }
+
+    void HandleRestMinutesChanged(int minutes)
+    {
+        _restMinutes = minutes;
+        DispatchCircuitConfig();
+    }
+
+    void HandleRestSecondsChanged(int seconds)
+    {
+        _restSeconds = seconds;
+        DispatchCircuitConfig();
+    }
+
+    void DispatchCircuitConfig() =>
+        Dispatcher.Dispatch(new UpdateCircuitConfigAction(
+            WorkoutPlanDetail.Id,
+            _rounds,
+            new TimeSpan(0, 0, _restMinutes, _restSeconds)));
+}

@@ -14,6 +14,7 @@ public record WorkoutPlansState
     public WorkoutPlanDetail? SelectedWorkoutPlan { get; init; } = null;
     public PlannedExerciseDetail? SelectedExercise { get; set; } = null;
     public PlannedSetDetail? SelectedSet { get; set; }
+    public PlannedCircuitExerciseDetail? SelectedCircuitExercise { get; set; } = null;
 }
 
 public record WorkoutPlanDetail
@@ -25,6 +26,19 @@ public record WorkoutPlanDetail
 
     public bool IsActive { get; init; } = true;
     public bool IsRegularRoutine { get; init; } = false;
+    public WorkoutType WorkoutType { get; init; } = WorkoutType.Standard;
+    public int Rounds { get; init; } = 3;
+    public TimeSpan RestBetweenRounds { get; init; } = TimeSpan.FromMinutes(2);
+}
+
+public record PlannedCircuitExerciseDetail
+{
+    public Guid Id { get; init; } = Guid.NewGuid();
+    public string ExerciseName { get; init; } = string.Empty;
+    public MetricType MetricType { get; init; }
+    public int? TargetReps { get; init; }
+    public decimal? TargetWeight { get; init; }
+    public decimal? TargetTime { get; init; }
 }
 
 public record PlannedExerciseDetail

@@ -1,0 +1,82 @@
+@using GymTracker.BlazorClient.Features.Workout.Perform.Circuit.Components
+@using GymTracker.BlazorClient.Features.Workout.Perform.Circuit.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers.CountdownTimer.Store
+@using System.Linq
+@inherits FluxorComponent
+
+@inject IDispatcher Dispatcher
+@inject IState<CircuitPerformState> CircuitState
+@inject IState<CountdownTimerState> CountdownState
+
+<div class="fullHeight d-flex flex-column">
+    <ProgressHeader PlanName="@CircuitState.Value.PlanName"
+                    CurrentRound="@CircuitState.Value.CurrentRound"
+                    TotalRounds="@CircuitState.Value.TotalRounds"
+                    CurrentExerciseIndex="@CircuitState.Value.CurrentExerciseIndex"
+                    TotalExercises="@CircuitState.Value.Exercises.Length" />
+
+    <div class="flex-grow-1 d-flex flex-row overflow-hidden">
+        @if (CircuitState.Value.Exercises.Length > 0)
+        {
+            <ExerciseList Exercises="@CircuitState.Value.Exercises"
+                          CurrentExerciseIndex="@CircuitState.Value.CurrentExerciseIndex"
+                          Phase="@CircuitState.Value.Phase" />
+            <MudDivider Vertical="true" FlexItem="true" />
+        }
+
+        <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+            <div class="flex-grow-1 overflow-auto">
+                @if (CircuitState.Value.Phase == CircuitPhase.Resting)
+                {
+                    <RestScreen CompletedRound="@CircuitState.Value.CurrentRound"
+                                TotalRounds="@CircuitState.Value.TotalRounds"
+                                NextExerciseName="@(CircuitState.Value.Exercises.Length > 0 ? CircuitState.Value.Exercises[0].ExerciseName : null)"
+                                CountdownState="@CountdownState.Value"
+                                OnSkipRest="HandleSkipRest"
+                                OnAddTime="HandleAddTime" />
+                }
+                else if (CircuitState.Value.CurrentExercise is not null)
+                {
+                    <ExerciseScreen @ref="_exerciseScreen"
+                                    Exercise="@CircuitState.Value.CurrentExercise" />
+                }
+            </div>
+
+            @if (CircuitState.Value.Phase == CircuitPhase.Exercising)
+            {
+                <div class="pa-4">
+                    <MudButton Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Style="height: 72px;"
+                               OnClick="HandleDone">
+                        Done &mdash; @NextLabel
+                    </MudButton>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    ExerciseScreen? _exerciseScreen;
+
+    string NextLabel
+    {
+        get
+        {
+            var s = CircuitState.Value;
+            return s.CurrentExerciseIndex < s.Exercises.Length - 1
+                ? "Next Exercise"
+                : s.CurrentRound < s.TotalRounds ? "Rest" : "Finish";
+        }
+    }
+
+    void HandleDone() => _exerciseScreen?.TriggerDone();
+    void HandleSkipRest() => Dispatcher.Dispatch(new CircuitSkipRestAction());
+
+    void HandleAddTime()
+    {
+        var extra = CountdownState.Value.Duration + TimeSpan.FromSeconds(30);
+        Dispatcher.Dispatch(new CountdownTimerStartWithDurationAction(extra));
+    }
+}

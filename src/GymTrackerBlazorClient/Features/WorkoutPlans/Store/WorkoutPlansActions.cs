@@ -15,3 +15,11 @@ public record SetExerciseAction(PlannedExercise Exercise);
 public record ChangeOrderAction(Guid WorkoutPlanId, Guid ExerciseId, OrderDirection Direction);
 public record RemoveExerciseFromWorkoutAction(Guid WorkoutPlanId, Guid ExerciseId);
 public record AddSetToExerciseAction(Guid WorkoutPlanId, PlannedExerciseDetail ExerciseDetail);
+
+// Circuit-specific actions
+public record SetWorkoutPlanTypeAction(Guid WorkoutPlanId, WorkoutType WorkoutType);
+public record UpdateCircuitConfigAction(Guid WorkoutPlanId, int Rounds, TimeSpan RestBetweenRounds);
+public record AddExerciseToCircuitAction(Guid WorkoutPlanId, Guid ExerciseId);
+public record FetchCircuitExerciseAction(Guid WorkoutPlanId, Guid ExerciseId);
+public record SetCircuitExerciseAction(PlannedExercise Exercise);
+public record UpdateCircuitExerciseTargetAction(Guid WorkoutPlanId, Guid ExerciseId, int? TargetReps, decimal? TargetWeight, decimal? TargetTime);

@@ -1,0 +1,79 @@
+@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+@using GymTracker.Domain.Models;
+
+@inject IDispatcher Dispatcher
+
+<MudPaper Class="pa-2">
+    <MudStack Class="fullHeight ma-0">
+        <MudText Typo="Typo.h6">@Exercise.ExerciseName</MudText>
+        <MudText Typo="Typo.caption" Color="Color.Secondary">@Exercise.MetricType</MudText>
+
+        @if (Exercise.MetricType is MetricType.Time or MetricType.TimeAndDistance)
+        {
+            <MudField Variant="Variant.Outlined" Label="Target Duration (seconds)">
+                <MudNumericField @bind-Value="_targetTimeSeconds"
+                                 @bind-Value:after="HandleChange"
+                                 Variant="Variant.Text"
+                                 Underline="false"
+                                 HideSpinButtons="false"
+                                 Min="1" Max="3600" />
+            </MudField>
+        }
+        else
+        {
+            <MudField Variant="Variant.Outlined" Label="Target Reps">
+                <MudNumericField @bind-Value="_targetReps"
+                                 @bind-Value:after="HandleChange"
+                                 Variant="Variant.Text"
+                                 Underline="false"
+                                 HideSpinButtons="false"
+                                 Min="1" Max="999" />
+            </MudField>
+
+            @if (Exercise.MetricType == MetricType.Weight)
+            {
+                <MudField Variant="Variant.Outlined" Label="Target Weight (kg)">
+                    <MudNumericField @bind-Value="_targetWeight"
+                                     @bind-Value:after="HandleChange"
+                                     Variant="Variant.Text"
+                                     Underline="false"
+                                     HideSpinButtons="false"
+                                     Min="0" Max="9999" />
+                </MudField>
+            }
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid WorkoutPlanId { get; set; }
+
+    [Parameter, EditorRequired]
+    public PlannedCircuitExerciseDetail Exercise { get; set; } = default!;
+
+    int? _targetReps;
+    decimal? _targetWeight;
+    int? _targetTimeSeconds;
+
+    protected override void OnParametersSet()
+    {
+        _targetReps = Exercise.TargetReps;
+        _targetWeight = Exercise.TargetWeight;
+        _targetTimeSeconds = Exercise.TargetTime.HasValue ? (int)Exercise.TargetTime.Value : null;
+        base.OnParametersSet();
+    }
+
+    void HandleChange()
+    {
+        if (Exercise.MetricType is MetricType.Time or MetricType.TimeAndDistance)
+        {
+            Dispatcher.Dispatch(new UpdateCircuitExerciseTargetAction(WorkoutPlanId, Exercise.Id, null, null, (decimal?)_targetTimeSeconds));
+        }
+        else
+        {
+            decimal? weight = Exercise.MetricType == MetricType.Weight ? _targetWeight : null;
+            Dispatcher.Dispatch(new UpdateCircuitExerciseTargetAction(WorkoutPlanId, Exercise.Id, _targetReps, weight, null));
+        }
+    }
+}

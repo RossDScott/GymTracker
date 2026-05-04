@@ -1,0 +1,50 @@
+@using GymTracker.BlazorClient.Features.Common.FullHeightList
+@using GymTracker.BlazorClient.Features.Common;
+@using GymTracker.BlazorClient.Features.SidePanel;
+@using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+@using GymTracker.BlazorClient.Features.Common.ExercisePicker.Components;
+@using System.Collections.Immutable;
+@using GymTracker.Domain.Models;
+
+@inject IDispatcher Dispatcher
+@inject SidePanelService SidePanelService
+
+<MudItem xs="4" Class="mb-0 fullHeight fullWidth" Style="position: relative">
+    <MudText Typo="Typo.overline">Planned Exercises</MudText>
+    <FullHeightList CanReorder="true"
+                    List="WorkoutPlanDetail.PlannedExercises"
+                    SelectedId="SelectedExerciseId"
+                    OnAddItem="HandleAddExercise"
+                    OnItemClick="OnExerciseSelected"
+                    OnChangeOrder="((ListItem item, OrderDirection direction)x)
+                        => HandleChangeOrder(x.item, x.direction)">
+    </FullHeightList>
+</MudItem>
+
+@code {
+    [Parameter, EditorRequired]
+    public WorkoutPlanDetail WorkoutPlanDetail { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<ListItem> OnExerciseSelected { get; set; }
+
+    [Parameter, EditorRequired]
+    public Guid? SelectedExerciseId { get; set; } = null;
+
+    async Task HandleAddExercise()
+    {
+        var response = SidePanelService.ShowSidePanel<ExercisePicker, ListItem>();
+        var result = await response.Result();
+
+        if (!result.Canceled)
+        {
+            var exerciseId = result.Data!.Id;
+            Dispatcher.Dispatch(new AddExerciseToWorkoutPlanAction(WorkoutPlanDetail.Id, exerciseId));
+        }
+    }
+
+    void HandleChangeOrder(ListItem item, OrderDirection direction)
+    {
+        Dispatcher.Dispatch(new ChangeOrderAction(WorkoutPlanDetail.Id, item.Id, direction));
+    }
+}

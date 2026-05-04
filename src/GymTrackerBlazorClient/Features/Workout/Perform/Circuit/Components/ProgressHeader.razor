@@ -1,0 +1,25 @@
+﻿<div class="d-flex flex-column pa-2 gap-1" style="border-bottom: 1px solid var(--mud-palette-divider)">
+    <div class="d-flex flex-row justify-space-between align-center">
+        <MudText Typo="Typo.subtitle1" Class="font-weight-bold">@PlanName</MudText>
+    </div>
+    <div class="d-flex flex-row gap-4">
+        <div class="flex-1">
+            <MudText Typo="Typo.caption">Round @CurrentRound of @TotalRounds</MudText>
+            <MudProgressLinear Value="@(CurrentRound * 100.0 / TotalRounds)"
+                               Color="Color.Primary" Rounded="true" Size="Size.Small" />
+        </div>
+        <div class="flex-1">
+            <MudText Typo="Typo.caption">Exercise @(CurrentExerciseIndex + 1) of @TotalExercises</MudText>
+            <MudProgressLinear Value="@((CurrentExerciseIndex + 1) * 100.0 / TotalExercises)"
+                               Color="Color.Secondary" Rounded="true" Size="Size.Small" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string PlanName { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public int CurrentRound { get; set; }
+    [Parameter, EditorRequired] public int TotalRounds { get; set; }
+    [Parameter, EditorRequired] public int CurrentExerciseIndex { get; set; }
+    [Parameter, EditorRequired] public int TotalExercises { get; set; }
+}

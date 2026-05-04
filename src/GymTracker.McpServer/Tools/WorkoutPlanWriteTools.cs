@@ -94,10 +94,68 @@ public static class WorkoutPlanWriteTools
         return (exercises, null);
     }
 
+    private record CircuitExerciseInput
+    {
+        public Guid ExerciseId { get; init; }
+        public int? Reps { get; init; }
+        public decimal? Weight { get; init; }
+        public decimal? Time { get; init; }
+    }
+
+    private static (List<PlannedExercise>? exercises, string? error) ParseCircuitExercises(
+        string json, List<Exercise> allExercises)
+    {
+        List<CircuitExerciseInput>? inputs;
+        try
+        {
+            inputs = JsonSerializer.Deserialize<List<CircuitExerciseInput>>(json, InputJsonOptions);
+        }
+        catch (Exception ex)
+        {
+            return (null, $"Failed to parse circuitExercisesJson: {ex.Message}");
+        }
+
+        if (inputs is null || inputs.Count == 0)
+            return ([], null);
+
+        var exercises = new List<PlannedExercise>();
+        for (var i = 0; i < inputs.Count; i++)
+        {
+            var input = inputs[i];
+            var exercise = allExercises.FirstOrDefault(e => e.Id == input.ExerciseId);
+            if (exercise is null)
+                return (null, $"Exercise with id '{input.ExerciseId}' not found.");
+
+            exercises.Add(new PlannedExercise
+            {
+                Order = i + 1,
+                Exercise = exercise,
+                PlannedSets =
+                [
+                    new PlannedExerciseSet
+                    {
+                        Order = 0,
+                        SetType = DefaultData.SetType.Set,
+                        OrderForSetType = 1,
+                        TargetMetrics = new ExerciseSetMetrics
+                        {
+                            Reps = input.Reps,
+                            Weight = input.Weight,
+                            Time = input.Time
+                        }
+                    }
+                ]
+            });
+        }
+
+        return (exercises, null);
+    }
+
     [McpServerTool(Name = "create_workout_plan")]
     [Description("""
         Create a new workout plan. Call get_exercises first to get exercise IDs.
-        plannedExercisesJson is a JSON array where each element has:
+
+        For Standard plans, plannedExercisesJson is a JSON array where each element has:
           exerciseId (guid, required),
           restIntervalSeconds (int, default 120),
           autoTriggerRestTimer (bool, default true),
@@ -105,7 +163,14 @@ public static class WorkoutPlanWriteTools
           targetRepsUpper (int, default 12),
           targetWeightIncrement (decimal, default 2.5),
           sets: array of { setType ("Warm-up"|"Set"|"Drop-set"), reps (int?), weight (decimal?), time (decimal?), distance (decimal?) }
-        Order and OrderForSetType are assigned automatically by position.
+
+        For Circuit plans, use circuitExercisesJson instead — a JSON array where each element has:
+          exerciseId (guid, required),
+          reps (int?, for Reps or Weight exercises),
+          weight (decimal?, for Weight exercises),
+          time (decimal?, for Time exercises — seconds)
+        Circuit plans also require circuitRounds and circuitRestSeconds.
+
         NOTE: WorkoutStatistics/ExerciseStatistics/WorkoutPlanStatistics are not updated — the app recalculates them on next use.
         """)]
     public static async Task<string> CreateWorkoutPlan(
@@ -113,28 +178,51 @@ public static class WorkoutPlanWriteTools
         [Description("Display name for the workout plan")] string name,
         [Description("Whether the plan is active (default true)")] bool isActive = true,
         [Description("Whether this is a regular routine (default false)")] bool isRegularRoutine = false,
-        [Description("JSON array of planned exercises — see tool description for schema")] string plannedExercisesJson = "[]")
+        [Description("'Standard' (default) or 'Circuit'")] string workoutType = "Standard",
+        [Description("JSON array of planned exercises for Standard plans — see tool description for schema")] string plannedExercisesJson = "[]",
+        [Description("JSON array of circuit exercises — used when workoutType is Circuit")] string circuitExercisesJson = "[]",
+        [Description("Number of rounds for Circuit plans (default 3)")] int circuitRounds = 3,
+        [Description("Rest between rounds in seconds for Circuit plans (default 120)")] int circuitRestSeconds = 120)
     {
         try
         {
             var allExercises = await dataService.GetExercisesAsync();
-            var (exercises, error) = ParsePlannedExercises(plannedExercisesJson, allExercises);
-            if (error is not null)
-                return JsonSerializer.Serialize(new { Success = false, Error = error });
+            var parsedType = workoutType.Equals("Circuit", StringComparison.OrdinalIgnoreCase)
+                ? WorkoutType.Circuit : WorkoutType.Standard;
+
+            List<PlannedExercise> exercises;
+            if (parsedType == WorkoutType.Circuit)
+            {
+                var (circuitExercises, circuitError) = ParseCircuitExercises(circuitExercisesJson, allExercises);
+                if (circuitError is not null)
+                    return JsonSerializer.Serialize(new { Success = false, Error = circuitError });
+                exercises = circuitExercises!;
+            }
+            else
+            {
+                var (stdExercises, stdError) = ParsePlannedExercises(plannedExercisesJson, allExercises);
+                if (stdError is not null)
+                    return JsonSerializer.Serialize(new { Success = false, Error = stdError });
+                exercises = stdExercises!;
+            }
 
             var plan = new WorkoutPlan
             {
                 Name = name,
                 IsAcitve = isActive,
                 IsRegularRoutine = isRegularRoutine,
-                PlannedExercises = exercises!
+                WorkoutType = parsedType,
+                CircuitConfig = parsedType == WorkoutType.Circuit
+                    ? new CircuitConfig { Rounds = circuitRounds, RestBetweenRounds = TimeSpan.FromSeconds(circuitRestSeconds) }
+                    : null,
+                PlannedExercises = exercises
             };
 
             var plans = await dataService.GetWorkoutPlansAsync();
             plans.Add(plan);
             await dataService.SaveWorkoutPlansAsync(plans);
 
-            return JsonSerializer.Serialize(new { Success = true, plan.Id, plan.Name }, OutputJsonOptions);
+            return JsonSerializer.Serialize(new { Success = true, plan.Id, plan.Name, WorkoutType = parsedType.ToString() }, OutputJsonOptions);
         }
         catch (Exception ex)
         {
@@ -146,7 +234,7 @@ public static class WorkoutPlanWriteTools
     [Description("""
         Full replace of an existing workout plan by ID. All fields including exercises are replaced.
         Call get_workout_plans first to get the plan ID and current structure.
-        The plannedExercisesJson schema is identical to create_workout_plan.
+        The plannedExercisesJson schema (Standard) and circuitExercisesJson schema (Circuit) are identical to create_workout_plan.
         WARNING: This is a full replace — exercises not included will be removed. New GUIDs are assigned to exercises.
         """)]
     public static async Task<string> UpdateWorkoutPlan(
@@ -155,7 +243,11 @@ public static class WorkoutPlanWriteTools
         [Description("Display name for the workout plan")] string name,
         [Description("Whether the plan is active")] bool isActive = true,
         [Description("Whether this is a regular routine")] bool isRegularRoutine = false,
-        [Description("JSON array of planned exercises — see create_workout_plan for schema")] string plannedExercisesJson = "[]")
+        [Description("'Standard' (default) or 'Circuit'")] string workoutType = "Standard",
+        [Description("JSON array of planned exercises for Standard plans")] string plannedExercisesJson = "[]",
+        [Description("JSON array of circuit exercises — used when workoutType is Circuit")] string circuitExercisesJson = "[]",
+        [Description("Number of rounds for Circuit plans (default 3)")] int circuitRounds = 3,
+        [Description("Rest between rounds in seconds for Circuit plans (default 120)")] int circuitRestSeconds = 120)
     {
         try
         {
@@ -168,23 +260,42 @@ public static class WorkoutPlanWriteTools
                 return JsonSerializer.Serialize(new { Success = false, Error = $"WorkoutPlan with id '{id}' not found." });
 
             var allExercises = await dataService.GetExercisesAsync();
-            var (exercises, error) = ParsePlannedExercises(plannedExercisesJson, allExercises);
-            if (error is not null)
-                return JsonSerializer.Serialize(new { Success = false, Error = error });
+            var parsedType = workoutType.Equals("Circuit", StringComparison.OrdinalIgnoreCase)
+                ? WorkoutType.Circuit : WorkoutType.Standard;
+
+            List<PlannedExercise> exercises;
+            if (parsedType == WorkoutType.Circuit)
+            {
+                var (circuitExercises, circuitError) = ParseCircuitExercises(circuitExercisesJson, allExercises);
+                if (circuitError is not null)
+                    return JsonSerializer.Serialize(new { Success = false, Error = circuitError });
+                exercises = circuitExercises!;
+            }
+            else
+            {
+                var (stdExercises, stdError) = ParsePlannedExercises(plannedExercisesJson, allExercises);
+                if (stdError is not null)
+                    return JsonSerializer.Serialize(new { Success = false, Error = stdError });
+                exercises = stdExercises!;
+            }
 
             var updated = existing with
             {
                 Name = name,
                 IsAcitve = isActive,
                 IsRegularRoutine = isRegularRoutine,
-                PlannedExercises = exercises!
+                WorkoutType = parsedType,
+                CircuitConfig = parsedType == WorkoutType.Circuit
+                    ? new CircuitConfig { Rounds = circuitRounds, RestBetweenRounds = TimeSpan.FromSeconds(circuitRestSeconds) }
+                    : null,
+                PlannedExercises = exercises
             };
 
             var index = plans.IndexOf(existing);
             plans[index] = updated;
             await dataService.SaveWorkoutPlansAsync(plans);
 
-            return JsonSerializer.Serialize(new { Success = true, updated.Id, updated.Name }, OutputJsonOptions);
+            return JsonSerializer.Serialize(new { Success = true, updated.Id, updated.Name, WorkoutType = parsedType.ToString() }, OutputJsonOptions);
         }
         catch (Exception ex)
         {

@@ -29,9 +29,16 @@ public static class WorkoutPlanTools
             p.Id,
             p.Name,
             p.IsRegularRoutine,
+            WorkoutType = p.WorkoutType.ToString(),
+            CircuitConfig = p.CircuitConfig == null ? null : new
+            {
+                p.CircuitConfig.Rounds,
+                RestBetweenRoundsSeconds = (int)p.CircuitConfig.RestBetweenRounds.TotalSeconds
+            },
             Exercises = p.PlannedExercises.OrderBy(e => e.Order).Select(e => new
             {
                 Exercise = e.Exercise.Name,
+                e.Exercise.MetricType,
                 e.TargetRepsLower,
                 e.TargetRepsUpper,
                 e.TargetWeightIncrement,

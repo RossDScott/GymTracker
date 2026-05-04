@@ -3,6 +3,7 @@
 @using GymTracker.BlazorClient.Features.Common;
 @using GymTracker.BlazorClient.Features.Common.FullHeightList
 @using GymTracker.BlazorClient.Features.WorkoutPlans.Store;
+@using GymTracker.Domain.Models;
 
 @inherits FluxorComponent
 
@@ -24,15 +25,23 @@
         {
             <WorkoutPlan WorkoutPlanDetail="State.Value.SelectedWorkoutPlan"
                          OnWorkoutPlanUpdated="HandleUpdateWorkout"
-                         SelectedExerciseId="State.Value.SelectedExercise?.Id"
+                         SelectedExerciseId="State.Value.SelectedWorkoutPlan.WorkoutType == WorkoutType.Circuit
+                             ? State.Value.SelectedCircuitExercise?.Id
+                             : State.Value.SelectedExercise?.Id"
                          OnExerciseSelected="HandleSelectExercise">
             </WorkoutPlan>
         }
     </MudItem>
     <MudItem xs="5" Class="">
-        @if (State.Value.SelectedExercise is not null)
+        @if (State.Value.SelectedWorkoutPlan?.WorkoutType == WorkoutType.Circuit
+             && State.Value.SelectedCircuitExercise is not null)
         {
-            <PlannedExercise Exercise="State.Value.SelectedExercise!" 
+            <PlannedCircuitExercise Exercise="State.Value.SelectedCircuitExercise!"
+                                    WorkoutPlanId="State.Value.SelectedWorkoutPlan!.Id" />
+        }
+        else if (State.Value.SelectedExercise is not null)
+        {
+            <PlannedExercise Exercise="State.Value.SelectedExercise!"
                              WorkoutPlanId="State.Value.SelectedWorkoutPlan!.Id"></PlannedExercise>
         }
     </MudItem>
@@ -60,8 +69,14 @@
     void HandleUpdateWorkout(WorkoutPlanDetail updateDTO) =>
         Dispatcher.Dispatch(new UpsertWorkoutPlanAction(updateDTO));
 
-    void HandleSelectExercise(ListItem item) => Dispatcher.Dispatch(
-            new FetchExerciseAction(State.Value.SelectedWorkoutPlan!.Id, item.Id));
+    void HandleSelectExercise(ListItem item)
+    {
+        var planId = State.Value.SelectedWorkoutPlan!.Id;
+        if (State.Value.SelectedWorkoutPlan.WorkoutType == WorkoutType.Circuit)
+            Dispatcher.Dispatch(new FetchCircuitExerciseAction(planId, item.Id));
+        else
+            Dispatcher.Dispatch(new FetchExerciseAction(planId, item.Id));
+    }
 
 
 }

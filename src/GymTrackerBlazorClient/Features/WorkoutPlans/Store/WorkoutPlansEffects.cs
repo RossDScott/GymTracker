@@ -175,6 +175,102 @@ public class WorkoutPlansEffects
         dispatcher.Dispatch(new SetExerciseAction(exercise));
     }
 
+    [EffectMethod]
+    public async Task OnSetWorkoutPlanType(SetWorkoutPlanTypeAction action, IDispatcher dispatcher)
+    {
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindOrDefaultByIdAsync(action.WorkoutPlanId)
+            ?? new WorkoutPlan { Id = action.WorkoutPlanId };
+
+        workoutPlan.WorkoutType = action.WorkoutType;
+
+        if (action.WorkoutType == WorkoutType.Circuit)
+        {
+            workoutPlan.PlannedExercises = new List<PlannedExercise>();
+            workoutPlan.CircuitConfig ??= new CircuitConfig();
+        }
+        else
+        {
+            workoutPlan.PlannedExercises = new List<PlannedExercise>();
+            workoutPlan.CircuitConfig = null;
+        }
+
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
+        dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
+    }
+
+    [EffectMethod]
+    public async Task OnUpdateCircuitConfig(UpdateCircuitConfigAction action, IDispatcher dispatcher)
+    {
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
+        workoutPlan.CircuitConfig ??= new CircuitConfig();
+        workoutPlan.CircuitConfig.Rounds = action.Rounds;
+        workoutPlan.CircuitConfig.RestBetweenRounds = action.RestBetweenRounds;
+
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
+        dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
+    }
+
+    [EffectMethod]
+    public async Task OnAddExerciseToCircuit(AddExerciseToCircuitAction action, IDispatcher dispatcher)
+    {
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
+        var exercise = await _clientStorage.Exercises.FindByIdAsync(action.ExerciseId);
+        var order = workoutPlan.PlannedExercises.Count;
+
+        var targetMetrics = exercise.MetricType is MetricType.Time or MetricType.TimeAndDistance
+            ? new ExerciseSetMetrics { Time = 30m }
+            : exercise.MetricType == MetricType.Weight
+                ? new ExerciseSetMetrics { Reps = 10, Weight = 20m }
+                : new ExerciseSetMetrics { Reps = 20 };
+
+        var plannedExercise = new PlannedExercise
+        {
+            Exercise = exercise,
+            Order = order,
+            PlannedSets = new List<PlannedExerciseSet>
+            {
+                new PlannedExerciseSet
+                {
+                    Order = 0, OrderForSetType = 1, SetType = DefaultData.SetType.Set,
+                    TargetMetrics = targetMetrics
+                }
+            }
+        };
+
+        workoutPlan.PlannedExercises.Add(plannedExercise);
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
+        dispatcher.Dispatch(new SetWorkoutPlanAction(workoutPlan));
+    }
+
+    [EffectMethod]
+    public async Task OnFetchCircuitExercise(FetchCircuitExerciseAction action, IDispatcher dispatcher)
+    {
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
+        var exercise = workoutPlan.PlannedExercises.Single(x => x.Id == action.ExerciseId);
+        dispatcher.Dispatch(new SetCircuitExerciseAction(exercise));
+    }
+
+    [EffectMethod]
+    public async Task OnUpdateCircuitExerciseTarget(UpdateCircuitExerciseTargetAction action, IDispatcher dispatcher)
+    {
+        var workoutPlan = await _clientStorage.WorkoutPlans.FindByIdAsync(action.WorkoutPlanId);
+        var exercise = workoutPlan.PlannedExercises.Single(x => x.Id == action.ExerciseId);
+        var targetSet = exercise.PlannedSets.OrderBy(s => s.Order).FirstOrDefault();
+
+        if (targetSet != null)
+        {
+            targetSet.TargetMetrics = new ExerciseSetMetrics
+            {
+                Reps = action.TargetReps,
+                Weight = action.TargetWeight,
+                Time = action.TargetTime
+            };
+        }
+
+        await _clientStorage.WorkoutPlans.UpsertAsync(workoutPlan);
+        dispatcher.Dispatch(new SetCircuitExerciseAction(exercise));
+    }
+
     private async Task LoadWorkoutPlans(IDispatcher dispatcher)
     {
         var workoutPlans = await _clientStorage.WorkoutPlans.GetOrDefaultAsync();
