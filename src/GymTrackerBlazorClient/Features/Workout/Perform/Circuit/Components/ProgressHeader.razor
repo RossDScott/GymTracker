@@ -1,24 +1,14 @@
 ﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers.Stopwatch.Store
-@using GymTracker.BlazorClient.Features.Workout.End.Store
-@using GymTracker.BlazorClient.Features.Common
 @inherits FluxorComponent
 
-@inject IDispatcher Dispatcher
 @inject IState<StopwatchState> StopwatchState
-@inject IDialogService DialogService
 
 <div class="d-flex flex-column pa-2 gap-1" style="border-bottom: 1px solid var(--mud-palette-divider)">
     <div class="d-flex flex-row justify-space-between align-center">
         <MudText Typo="Typo.subtitle1" Class="font-weight-bold">@PlanName</MudText>
-        <div class="d-flex flex-row align-center gap-2">
-            <MudText Typo="Typo.body2" Color="Color.Secondary">
-                @StopwatchState.Value.Duration.ToString(@"hh\:mm\:ss")
-            </MudText>
-            <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small"
-                       OnClick="HandleEndWorkout">
-                End Workout
-            </MudButton>
-        </div>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">
+            @StopwatchState.Value.Duration.ToString(@"hh\:mm\:ss")
+        </MudText>
     </div>
     <div class="d-flex flex-row gap-4">
         <div class="flex-1">
@@ -41,17 +31,4 @@
     [Parameter, EditorRequired] public int CurrentExerciseIndex { get; set; }
     [Parameter, EditorRequired] public int TotalExercises { get; set; }
 
-    async Task HandleEndWorkout()
-    {
-        var parameters = new DialogParameters<ConfirmDialog>
-        {
-            { x => x.Title, "End workout?" },
-            { x => x.Message, "Your progress will be saved up to this point." },
-            { x => x.ConfirmText, "End Workout" }
-        };
-        var dialog = await DialogService.ShowAsync<ConfirmDialog>("", parameters);
-        var result = await dialog.Result;
-        if (!(result?.Canceled ?? true))
-            Dispatcher.Dispatch(new EndWorkoutAction());
-    }
 }
