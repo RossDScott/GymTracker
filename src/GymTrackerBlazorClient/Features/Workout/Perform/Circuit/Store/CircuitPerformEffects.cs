@@ -1,8 +1,8 @@
-using Fluxor;
+﻿using Fluxor;
 using GymTracker.BlazorClient.Extensions;
 using GymTracker.BlazorClient.Features.Workout.End.Store;
-using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.CountdownTimer.Store;
-using GymTracker.BlazorClient.Features.Workout.Perform.Components.SideBar.Timers.Stopwatch.Store;
+using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers.CountdownTimer.Store;
+using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers.Stopwatch.Store;
 using GymTracker.BlazorClient.Features.Workout.Perform.Store;
 using GymTracker.Domain.Models;
 using GymTracker.LocalStorage.Core;
