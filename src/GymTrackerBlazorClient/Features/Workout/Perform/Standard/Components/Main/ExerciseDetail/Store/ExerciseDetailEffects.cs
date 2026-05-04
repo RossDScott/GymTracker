@@ -1,0 +1,224 @@
+﻿using Fluxor;
+using GymTracker.BlazorClient.Extensions;
+using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar.Timers.CountdownTimer.Store;
+using GymTracker.BlazorClient.Features.Workout.Perform.Store;
+using GymTracker.Domain.Models;
+using GymTracker.Domain.Models.Extensions;
+using GymTracker.LocalStorage.Core;
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
+
+namespace GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.Main.ExerciseDetail.Store;
+
+public class ExerciseDetailEffects
+{
+    private readonly IClientStorage _clientStorage;
+    private readonly NavigationManager _navigationManager;
+    private readonly ISnackbar _snackbar;
+
+    public ExerciseDetailEffects(IClientStorage clientStorage, NavigationManager navigationManager, ISnackbar snackbar)
+    {
+        _clientStorage = clientStorage;
+        _navigationManager = navigationManager;
+        _snackbar = snackbar;
+    }
+
+    [EffectMethod]
+    public async Task OnSetSelectedExercise(SetSelectedExerciseAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        var exercise = workout!.Exercises.Single(x => x.Id == action.ExerciseId);
+
+        dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+
+        var settings = await _clientStorage.AppSettings.GetAsync();
+        dispatcher.DispatchWithDelay(new SetSetTypesAction(settings!.SetType));
+    }
+
+    [EffectMethod]
+    public async Task OnSetSetData(SetSetDataAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
+        var set = exercise.Sets.Single(x => x.Id == action.EditSet.Id);
+
+        if (set.PlannedExerciseSet != null)
+        {
+            set.PlannedExerciseSet.TargetMetrics.Weight = action.EditSet.TargetWeight;
+            set.PlannedExerciseSet.TargetMetrics.Reps = action.EditSet.TargetReps;
+            set.PlannedExerciseSet.TargetMetrics.Time = action.EditSet.TargetTime;
+        }
+
+        set.Metrics.Weight = action.EditSet.ActualWeight;
+        set.Metrics.Reps = action.EditSet.ActualReps;
+        set.Metrics.Time = action.EditSet.ActualTime;
+
+        UpdateSubsequentPlannedSets(exercise, set);
+
+        await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+
+        if (!set.Completed && (set.Metrics.Weight.HasValue || set.Metrics.Reps.HasValue))
+            dispatcher.DispatchWithDelay(new ToggleSetCompletedAction(exercise.Id, set.Id, false));
+    }
+
+    [EffectMethod]
+    public async Task OnSetWeightIncrement(SetWeightIncrementAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
+
+        if (exercise.PlannedExercise != null)
+            exercise.PlannedExercise.TargetWeightIncrement = action.WeightIncrement;
+
+        await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+    }
+
+    [EffectMethod]
+    public async Task OnToggleSetCompleted(ToggleSetCompletedAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
+        var set = exercise.Sets.Single(x => x.Id == action.SetId);
+
+        set.Completed = !set.Completed;
+        if (set.Completed)
+        {
+            set.Metrics.Distance = set.Metrics.Distance ?? set.PlannedExerciseSet?.TargetMetrics.Distance;
+            set.Metrics.Reps = set.Metrics.Reps ?? set.PlannedExerciseSet?.TargetMetrics.Reps;
+            set.Metrics.Weight = set.Metrics.Weight ?? set.PlannedExerciseSet?.TargetMetrics.Weight;
+            set.Metrics.Time = set.Metrics.Time ?? set.PlannedExerciseSet?.TargetMetrics.Time;
+            set.CompletedOn = DateTimeOffset.Now;
+
+            UpdateSubsequentPlannedSets(exercise, set);
+
+            if (action.AutoUnselect)
+                dispatcher.DispatchWithDelay(new SetSelectedSetAction(null));
+
+            if (exercise.PlannedExercise?.AutoTriggerRestTimer ?? false)
+            {
+                var interval = set.SetType switch
+                {
+                    DefaultData.SetType.WarmUp => TimeSpan.FromMinutes(1),
+                    DefaultData.SetType.Set => exercise.PlannedExercise.RestInterval,
+                    _ => TimeSpan.FromMinutes(1),
+                };
+                dispatcher.Dispatch(new CountdownTimerStartWithDurationAction(interval));
+            }
+        }
+        else
+        {
+            set.Metrics.Distance = null;
+            set.Metrics.Reps = null;
+            set.Metrics.Weight = null;
+            set.Metrics.Time = null;
+            set.CompletedOn = null;
+        }
+
+        await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+
+        if (set.Completed && set.SetType == DefaultData.SetType.Set)
+        {
+            var exerciseStat = await _clientStorage.ExerciseStatistics
+                .FindOrDefaultByIdAsync(exercise.Exercise.Id);
+
+            var historicalSets = exerciseStat?.Logs
+                .SelectMany(l => l.Sets) ?? Enumerable.Empty<ExerciseSetMetrics>();
+
+            var previousWorkoutSets = exercise.Sets
+                .Where(s => s.SetType == DefaultData.SetType.Set
+                         && s.Completed
+                         && s.Id != set.Id)
+                .Select(s => s.Metrics);
+
+            var milestones = MilestoneDetector.DetectSetMilestones(
+                set.Metrics,
+                exercise.Exercise.MetricType,
+                historicalSets,
+                previousWorkoutSets);
+
+            foreach (var milestone in milestones)
+            {
+                _snackbar.Add(
+                    $"{exercise.Exercise.Name}: {milestone.Description}",
+                    Severity.Success,
+                    config =>
+                    {
+                        config.VisibleStateDuration = 5000;
+                        config.Icon = Icons.Material.Filled.EmojiEvents;
+                    });
+            }
+        }
+    }
+
+    [EffectMethod]
+    public async Task OnDeleteSet(DeleteSetAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
+        var set = exercise.Sets.Single(x => x.Id == action.SetId);
+
+        exercise.Sets.Remove(set);
+
+        await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+    }
+
+    [EffectMethod]
+    public async Task OnAddSet(AddSetAction action, IDispatcher dispatcher)
+    {
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        var exercise = workout!.Exercises.Single(x => x.Id == action.WorkoutExerciseId);
+
+        var order = exercise.Sets
+                            .OrderByDescending(x => x.Order)
+                            .FirstOrDefault()?
+                            .Order + 1 ?? 1;
+
+        var previousForSetType = exercise.Sets
+                                      .Where(x => x.SetType == action.SetType)
+                                      .OrderByDescending(x => x.OrderForSetType)
+                                      .FirstOrDefault();
+
+        var orderForSetType = previousForSetType?.OrderForSetType + 1 ?? 0;
+        PlannedExerciseSet? plannedExerciseSet = previousForSetType?.PlannedExerciseSet;
+
+        if (plannedExerciseSet != null)
+            plannedExerciseSet = plannedExerciseSet with { Id = Guid.NewGuid() };
+
+        var newSet = new WorkoutExerciseSet(null)
+        {
+            SetType = action.SetType,
+            Order = order,
+            OrderForSetType = orderForSetType,
+            PlannedExerciseSet = plannedExerciseSet
+        };
+
+        exercise.Sets.Add(newSet);
+
+        await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new SetExerciseDetailAction(exercise));
+    }
+
+    private void UpdateSubsequentPlannedSets(WorkoutExercise exercise, WorkoutExerciseSet set)
+    {
+        if (set.SetType != DefaultData.SetType.Set)
+            return;
+
+        var subsequentSets = exercise.Sets
+                                     .Where(x => x.SetType == DefaultData.SetType.Set)
+                                     .Where(x => x.OrderForSetType > set.OrderForSetType)
+                                     .ToList();
+
+        foreach (var subsequentSet in subsequentSets)
+        {
+            if (subsequentSet.PlannedExerciseSet == null) continue;
+
+            subsequentSet.PlannedExerciseSet.TargetMetrics.Reps = set.Metrics.Reps;
+            subsequentSet.PlannedExerciseSet.TargetMetrics.Distance = set.Metrics.Distance;
+            subsequentSet.PlannedExerciseSet.TargetMetrics.Weight = set.Metrics.Weight;
+        }
+    }
+}

@@ -1,0 +1,78 @@
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.Main.ExerciseDetail.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Store
+@using GymTracker.BlazorClient.Features.Common
+@using GymTracker.BlazorClient.Features.Workout.End.Store
+@inherits FluxorComponent
+
+@inject IDispatcher Dispatcher
+@inject IState<ExerciseDetailState> State
+@inject IState<WorkoutState> WorkoutState
+
+
+<div class="d-flex flex-column fullWidth fullHeight">
+    <ExerciseSets></ExerciseSets>
+
+    @if (nextSet is not null)
+    {
+        <div class="mt-auto pa-4">
+            <MudButton Variant="Variant.Outlined"
+                       FullWidth="true"
+                       Style="height: 72px;"
+                       OnClick="HandleNext">Next</MudButton>
+        </div>
+    }
+    else if (nextExercise is not null)
+    {
+        <div class="mt-auto pa-4">
+            <MudButton Variant="Variant.Outlined"
+                       FullWidth="true"
+                       Style="height: 72px;"
+                       OnClick="HandleNextExercise">Next Exercise</MudButton>
+        </div>
+    }
+    else
+    {
+        <div class="mt-auto pa-4">
+            <MudButton Variant="Variant.Outlined"
+                       FullWidth="true"
+                       Style="height: 72px;"
+                       OnClick="HandleEndWorkout">End Workout</MudButton>
+        </div>
+    }
+</div>
+
+@code {
+    private Set? nextSet => State.Value.Sets.FirstOrDefault(s => !s.Completed);
+
+    private ListItem? nextExercise
+    {
+        get
+        {
+            var list = WorkoutState.Value.Workout.ExerciseList;
+            var current = list.FirstOrDefault(e => e.Id == State.Value.WorkoutExerciseId);
+            if (current == null) return null;
+            var currentIndex = list.IndexOf(current);
+            if (currentIndex < 0 || currentIndex + 1 >= list.Length) return null;
+            return list[currentIndex + 1];
+        }
+    }
+
+    private void HandleNext()
+    {
+        if (nextSet is not null)
+        {
+            Dispatcher.Dispatch(new ToggleSetCompletedAction(State.Value.WorkoutExerciseId, nextSet.Id, true));
+        }
+    }
+
+    private void HandleNextExercise()
+    {
+        if (nextExercise is not null)
+        {
+            Dispatcher.Dispatch(new SetSelectedExerciseAction(nextExercise.Id));
+        }
+    }
+
+    private void HandleEndWorkout() =>
+        Dispatcher.Dispatch(new EndWorkoutAction());
+}

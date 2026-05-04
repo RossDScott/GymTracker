@@ -5,7 +5,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-		<Version>1.7.19.0</Version>
+		<Version>1.7.20.0</Version>
 		<RunAOTCompilation>true</RunAOTCompilation>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>partial</TrimMode>
@@ -39,8 +39,8 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <None Include="Features\Workout\Perform\Components\SideBar\Timers\CountdownTimer\Components\CountdownTimer.razor" />
-	  <None Include="Features\Workout\Perform\Components\SideBar\Timers\Stopwatch\Components\Stopwatch.razor" />
+	  <None Include="Features\Workout\Perform\Standard\Components\SideBar\Timers\CountdownTimer\Components\CountdownTimer.razor" />
+	  <None Include="Features\Workout\Perform\Standard\Components\SideBar\Timers\Stopwatch\Components\Stopwatch.razor" />
 	</ItemGroup>
 	
 	<ItemGroup>

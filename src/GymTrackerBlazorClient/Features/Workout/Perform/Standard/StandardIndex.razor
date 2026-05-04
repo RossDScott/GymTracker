@@ -1,0 +1,24 @@
+@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.Main
+@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.Main.ExerciseDetail.Store
+@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.SideBar
+@using GymTracker.BlazorClient.Features.Workout.Perform.Store
+
+@inherits FluxorComponent
+
+@inject IDispatcher Dispatcher
+@inject IState<WorkoutState> State
+
+<div id="mainContent" class="fullHeight fullWidth d-flex" @onclick="() => Dispatcher.Dispatch(new SetSelectedSetAction(null))">
+    <div id="sessionSidebar" class="fullHeight">
+        <SideBar></SideBar>
+    </div>
+
+    <MudDivider Vertical="true" FlexItem="true" Class="mx-3" />
+
+    <div id="mainSession" Class="flex-grow-1 fullHeight">
+        @if (State.Value.SelectedExerciseId.HasValue)
+        {
+            <Main></Main>
+        }
+    </div>
+</div>

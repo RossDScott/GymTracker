@@ -1,0 +1,36 @@
+﻿@using GymTracker.BlazorClient.Features.Workout.Perform.Standard.Components.Main.ExerciseDetail.Store
+@using GymTracker.BlazorClient.Features.Common.UpDownNumericEditor
+
+@inject IDispatcher Dispatcher
+
+<MudItem xs="1" Class="d-flex py-0 textCenter flex-column">
+    <UpDownIntegerEditor @bind-Value="EditSet.TargetReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
+</MudItem>
+<MudItem xs="2" class="textCenter py-0 mr-6">
+    <UpDownDecimalEditor @bind-Value="EditSet.TargetWeight"
+                         @bind-Value:after="handleRowDataChange"
+                         Increment="WeightIncrement"
+                         AdornmentText="Kg"></UpDownDecimalEditor>
+</MudItem>
+<MudItem xs="1" class="textCenter py-0">
+    <UpDownIntegerEditor @bind-Value="EditSet.ActualReps" @bind-Value:after="handleRowDataChange"></UpDownIntegerEditor>
+</MudItem>
+<MudItem xs="2" class="textCenter mr-4 py-0">
+    <UpDownDecimalEditor @bind-Value="EditSet.ActualWeight"
+                         @bind-Value:after="handleRowDataChange"
+                         Increment="WeightIncrement"
+                         AdornmentText="Kg"></UpDownDecimalEditor>
+</MudItem>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid WorkoutExerciseId { get; set; }
+
+    [Parameter, EditorRequired]
+    public decimal WeightIncrement { get; set; }
+
+    [Parameter, EditorRequired]
+    public EditSet EditSet { get; set; } = default!;
+
+    private void handleRowDataChange() => Dispatcher.Dispatch(new SetSetDataAction(WorkoutExerciseId, EditSet));
+}
