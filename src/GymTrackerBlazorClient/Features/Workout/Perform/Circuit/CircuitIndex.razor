@@ -44,13 +44,14 @@
 
             @if (CircuitState.Value.Phase == CircuitPhase.Exercising)
             {
-                <MudButton Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           FullWidth="true"
-                           Style="height: 96px; font-size: 1.1rem; font-weight: bold; border-radius: 0; flex-shrink: 0"
-                           OnClick="HandleDone">
-                    Done &mdash; @NextLabel
-                </MudButton>
+                <div class="pa-4">
+                    <MudButton Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Style="height: 72px;"
+                               OnClick="HandleDone">
+                        Done &mdash; @NextLabel
+                    </MudButton>
+                </div>
             }
         </div>
     </div>
