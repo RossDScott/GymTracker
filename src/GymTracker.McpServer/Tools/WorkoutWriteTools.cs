@@ -97,10 +97,25 @@ public static class WorkoutWriteTools
 
     [McpServerTool(Name = "create_workout")]
     [Description("""
-        Record a completed or in-progress workout session. Call get_workout_plans first to get the plan ID and exercise IDs.
+        Record a completed or in-progress workout session. Call get_workout_plans first to get the plan ID, exercise IDs, and MetricType values.
+
+        MetricType (from get_workout_plans) determines which metric fields to populate in sets:
+          "Weight"          — reps (int) + weight (decimal, kg)
+          "Reps"            — reps (int) only
+          "Time"            — time (decimal, seconds) only
+          "TimeAndDistance" — time (decimal, seconds) + distance (decimal, metres)
+
         exercisesJson is a JSON array where each element has:
           exerciseId (guid, required — must be an exercise in the specified plan),
-          sets: array of { setType ("Warm-up"|"Set"|"Drop-set"), completed (bool), completedOn (ISO 8601, optional), reps (int?), weight (decimal?), time (decimal?), distance (decimal?) }
+          sets: array of objects, one per completed set:
+            setType ("Warm-up"|"Set"|"Drop-set") — "Warm-up" for warm-up sets, "Set" for working sets, "Drop-set" for drop sets,
+            completed (bool) — true if the set was actually performed,
+            completedOn (ISO 8601 string, optional) — timestamp when this specific set was completed,
+            reps (int?) — reps performed (Weight or Reps exercises),
+            weight (decimal?) — weight used in kg (Weight exercises),
+            time (decimal?) — duration in seconds (Time or TimeAndDistance exercises),
+            distance (decimal?) — distance in metres (TimeAndDistance exercises)
+
         workoutStart / workoutEnd: ISO 8601 timestamps e.g. "2026-05-03T10:00:00+01:00". workoutEnd is optional.
         NOTE: Statistics blobs are NOT updated. Workouts will appear in get_workout_history but NOT in get_workout_statistics until the app recalculates them.
         """)]
@@ -161,9 +176,25 @@ public static class WorkoutWriteTools
     [McpServerTool(Name = "update_workout")]
     [Description("""
         Full replace of a workout record by ID. All fields are replaced.
-        Call get_workout_history to find the workout ID.
-        The exercisesJson schema is identical to create_workout.
+        Call get_workout_history to find the workout ID. Call get_workout_plans to get exercise IDs and MetricType values.
         WARNING: Statistics blobs are NOT updated. Prefer creating new workouts over editing old ones.
+
+        MetricType (from get_workout_plans) determines which metric fields to populate in sets:
+          "Weight"          — reps (int) + weight (decimal, kg)
+          "Reps"            — reps (int) only
+          "Time"            — time (decimal, seconds) only
+          "TimeAndDistance" — time (decimal, seconds) + distance (decimal, metres)
+
+        exercisesJson is a JSON array where each element has:
+          exerciseId (guid, required — must be an exercise in the specified plan),
+          sets: array of objects, one per set:
+            setType ("Warm-up"|"Set"|"Drop-set") — "Warm-up" for warm-up sets, "Set" for working sets, "Drop-set" for drop sets,
+            completed (bool) — true if the set was actually performed,
+            completedOn (ISO 8601 string, optional) — timestamp when this specific set was completed,
+            reps (int?) — reps performed (Weight or Reps exercises),
+            weight (decimal?) — weight used in kg (Weight exercises),
+            time (decimal?) — duration in seconds (Time or TimeAndDistance exercises),
+            distance (decimal?) — distance in metres (TimeAndDistance exercises)
         """)]
     public static async Task<string> UpdateWorkout(
         GymDataService dataService,
