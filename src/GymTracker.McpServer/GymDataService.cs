@@ -80,4 +80,11 @@ public class GymDataService
         var json = JsonSerializer.Serialize(workouts, WriteJsonOptions);
         await _backupClient.BackupAsync("Workouts", json);
     }
+
+    public async Task SaveExercisesAsync(List<Exercise> exercises)
+    {
+        await BackupBeforeWriteAsync("Exercises");
+        var json = JsonSerializer.Serialize(exercises, WriteJsonOptions);
+        await _backupClient.BackupAsync("Exercises", json);
+    }
 }

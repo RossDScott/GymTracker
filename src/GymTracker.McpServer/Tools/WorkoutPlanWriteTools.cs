@@ -153,23 +153,40 @@ public static class WorkoutPlanWriteTools
 
     [McpServerTool(Name = "create_workout_plan")]
     [Description("""
-        Create a new workout plan. Call get_exercises first to get exercise IDs.
+        Create a new workout plan. Call get_exercises first to get exercise IDs and MetricType values.
+
+        WorkoutType values:
+          "Standard" — exercises performed sequentially; each exercise has multiple sets tracked independently with rest timers.
+          "Circuit"  — exercises cycled in rotation for N rounds; rest only between rounds, not between exercises.
+
+        MetricType (from get_exercises) determines which set fields to populate:
+          "Weight"          — reps (int) + weight (decimal, kg)
+          "Reps"            — reps (int) only
+          "Time"            — time (decimal, seconds) only
+          "TimeAndDistance" — time (decimal, seconds) + distance (decimal, metres)
 
         For Standard plans, plannedExercisesJson is a JSON array where each element has:
           exerciseId (guid, required),
-          restIntervalSeconds (int, default 120),
-          autoTriggerRestTimer (bool, default true),
-          targetRepsLower (int, default 8),
-          targetRepsUpper (int, default 12),
-          targetWeightIncrement (decimal, default 2.5),
-          sets: array of { setType ("Warm-up"|"Set"|"Drop-set"), reps (int?), weight (decimal?), time (decimal?), distance (decimal?) }
+          restIntervalSeconds (int, default 120) — rest after this exercise in seconds,
+          autoTriggerRestTimer (bool, default true) — start rest timer automatically on set completion,
+          targetRepsLower (int, default 8) — lower bound of the target rep range,
+          targetRepsUpper (int, default 12) — upper bound of the target rep range,
+          targetWeightIncrement (decimal, default 2.5) — kg increment when progressive overload is applied,
+          sets: array of objects, one per planned set:
+            setType ("Warm-up"|"Set"|"Drop-set") — "Warm-up" for warm-up sets, "Set" for working sets, "Drop-set" for drop sets,
+            reps (int?) — target reps (Weight or Reps exercises),
+            weight (decimal?) — target weight in kg (Weight exercises),
+            time (decimal?) — target duration in seconds (Time or TimeAndDistance exercises),
+            distance (decimal?) — target distance in metres (TimeAndDistance exercises)
 
         For Circuit plans, use circuitExercisesJson instead — a JSON array where each element has:
           exerciseId (guid, required),
-          reps (int?, for Reps or Weight exercises),
-          weight (decimal?, for Weight exercises),
-          time (decimal?, for Time exercises — seconds)
-        Circuit plans also require circuitRounds and circuitRestSeconds.
+          reps (int?) — for Weight or Reps exercises,
+          weight (decimal?) — for Weight exercises (kg),
+          time (decimal?) — for Time exercises (seconds)
+        Circuit plan round config (as separate parameters):
+          circuitRounds      — number of times to cycle through all exercises (default 3, min 1),
+          circuitRestSeconds — rest in seconds between each round (default 120); no rest between exercises within a round.
 
         NOTE: WorkoutStatistics/ExerciseStatistics/WorkoutPlanStatistics are not updated — the app recalculates them on next use.
         """)]
@@ -178,11 +195,11 @@ public static class WorkoutPlanWriteTools
         [Description("Display name for the workout plan")] string name,
         [Description("Whether the plan is active (default true)")] bool isActive = true,
         [Description("Whether this is a regular routine (default false)")] bool isRegularRoutine = false,
-        [Description("'Standard' (default) or 'Circuit'")] string workoutType = "Standard",
-        [Description("JSON array of planned exercises for Standard plans — see tool description for schema")] string plannedExercisesJson = "[]",
-        [Description("JSON array of circuit exercises — used when workoutType is Circuit")] string circuitExercisesJson = "[]",
-        [Description("Number of rounds for Circuit plans (default 3)")] int circuitRounds = 3,
-        [Description("Rest between rounds in seconds for Circuit plans (default 120)")] int circuitRestSeconds = 120)
+        [Description("Workout structure type. \"Standard\" (default) — sequential exercises with per-set tracking. \"Circuit\" — exercises cycled in rounds.")] string workoutType = "Standard",
+        [Description("JSON array of planned exercises for Standard plans — see tool description for full schema")] string plannedExercisesJson = "[]",
+        [Description("JSON array of circuit exercises for Circuit plans — each element: { exerciseId (guid), reps (int?), weight (decimal?, kg), time (decimal?, seconds) }")] string circuitExercisesJson = "[]",
+        [Description("Circuit only: number of rounds to cycle through all exercises (default 3, min 1)")] int circuitRounds = 3,
+        [Description("Circuit only: rest period in seconds between rounds (default 120); no rest between exercises within a round")] int circuitRestSeconds = 120)
     {
         try
         {
@@ -234,8 +251,40 @@ public static class WorkoutPlanWriteTools
     [Description("""
         Full replace of an existing workout plan by ID. All fields including exercises are replaced.
         Call get_workout_plans first to get the plan ID and current structure.
-        The plannedExercisesJson schema (Standard) and circuitExercisesJson schema (Circuit) are identical to create_workout_plan.
         WARNING: This is a full replace — exercises not included will be removed. New GUIDs are assigned to exercises.
+
+        WorkoutType values:
+          "Standard" — exercises performed sequentially; each exercise has multiple sets tracked independently with rest timers.
+          "Circuit"  — exercises cycled in rotation for N rounds; rest only between rounds, not between exercises.
+
+        MetricType (visible in get_workout_plans response) determines which set fields to populate:
+          "Weight"          — reps (int) + weight (decimal, kg)
+          "Reps"            — reps (int) only
+          "Time"            — time (decimal, seconds) only
+          "TimeAndDistance" — time (decimal, seconds) + distance (decimal, metres)
+
+        For Standard plans, plannedExercisesJson is a JSON array where each element has:
+          exerciseId (guid, required),
+          restIntervalSeconds (int, default 120) — rest after this exercise in seconds,
+          autoTriggerRestTimer (bool, default true) — start rest timer automatically on set completion,
+          targetRepsLower (int, default 8) — lower bound of the target rep range,
+          targetRepsUpper (int, default 12) — upper bound of the target rep range,
+          targetWeightIncrement (decimal, default 2.5) — kg increment when progressive overload is applied,
+          sets: array of objects, one per planned set:
+            setType ("Warm-up"|"Set"|"Drop-set") — "Warm-up" for warm-up sets, "Set" for working sets, "Drop-set" for drop sets,
+            reps (int?) — target reps (Weight or Reps exercises),
+            weight (decimal?) — target weight in kg (Weight exercises),
+            time (decimal?) — target duration in seconds (Time or TimeAndDistance exercises),
+            distance (decimal?) — target distance in metres (TimeAndDistance exercises)
+
+        For Circuit plans, use circuitExercisesJson instead — a JSON array where each element has:
+          exerciseId (guid, required),
+          reps (int?) — for Weight or Reps exercises,
+          weight (decimal?) — for Weight exercises (kg),
+          time (decimal?) — for Time exercises (seconds)
+        Circuit plan round config (as separate parameters):
+          circuitRounds      — number of times to cycle through all exercises (default 3, min 1),
+          circuitRestSeconds — rest in seconds between each round (default 120); no rest between exercises within a round.
         """)]
     public static async Task<string> UpdateWorkoutPlan(
         GymDataService dataService,
@@ -243,11 +292,11 @@ public static class WorkoutPlanWriteTools
         [Description("Display name for the workout plan")] string name,
         [Description("Whether the plan is active")] bool isActive = true,
         [Description("Whether this is a regular routine")] bool isRegularRoutine = false,
-        [Description("'Standard' (default) or 'Circuit'")] string workoutType = "Standard",
-        [Description("JSON array of planned exercises for Standard plans")] string plannedExercisesJson = "[]",
-        [Description("JSON array of circuit exercises — used when workoutType is Circuit")] string circuitExercisesJson = "[]",
-        [Description("Number of rounds for Circuit plans (default 3)")] int circuitRounds = 3,
-        [Description("Rest between rounds in seconds for Circuit plans (default 120)")] int circuitRestSeconds = 120)
+        [Description("Workout structure type. \"Standard\" (default) — sequential exercises with per-set tracking. \"Circuit\" — exercises cycled in rounds.")] string workoutType = "Standard",
+        [Description("JSON array of planned exercises for Standard plans — see tool description for full schema")] string plannedExercisesJson = "[]",
+        [Description("JSON array of circuit exercises for Circuit plans — each element: { exerciseId (guid), reps (int?), weight (decimal?, kg), time (decimal?, seconds) }")] string circuitExercisesJson = "[]",
+        [Description("Circuit only: number of rounds to cycle through all exercises (default 3, min 1)")] int circuitRounds = 3,
+        [Description("Circuit only: rest period in seconds between rounds (default 120); no rest between exercises within a round")] int circuitRestSeconds = 120)
     {
         try
         {
