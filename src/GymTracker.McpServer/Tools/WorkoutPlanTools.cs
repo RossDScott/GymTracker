@@ -10,7 +10,16 @@ public static class WorkoutPlanTools
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     [McpServerTool(Name = "get_workout_plans")]
-    [Description("Get all workout plans with their exercises and target sets")]
+    [Description("""
+        Get all workout plans with their exercises and target sets.
+        WorkoutType in the response is "Standard" (sequential sets per exercise) or "Circuit" (exercises cycled in rounds).
+        CircuitConfig (present for Circuit plans) contains Rounds and RestBetweenRoundsSeconds.
+        MetricType on each exercise indicates which metric fields are relevant when recording sets:
+          "Weight"          — reps + weight (kg)
+          "Reps"            — reps only
+          "Time"            — time (seconds) only
+          "TimeAndDistance" — time (seconds) + distance (metres)
+        """)]
     public static async Task<string> GetWorkoutPlans(
         GymDataService dataService,
         [Description("Include inactive plans (default false)")] bool includeInactive = false,

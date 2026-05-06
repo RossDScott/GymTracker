@@ -10,7 +10,14 @@ public static class ExerciseTools
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     [McpServerTool(Name = "get_exercises")]
-    [Description("Get all tracked exercises, optionally filtered by body target or equipment")]
+    [Description("""
+        Get all tracked exercises, optionally filtered by body target or equipment.
+        The MetricType field in each exercise indicates which metric fields to populate when recording sets:
+          "Weight"          — reps (int) + weight (decimal, kg)
+          "Reps"            — reps (int) only
+          "Time"            — time (decimal, seconds) only
+          "TimeAndDistance" — time (decimal, seconds) + distance (decimal, metres)
+        """)]
     public static async Task<string> GetExercises(
         GymDataService dataService,
         [Description("Filter by body target (e.g. 'Chest', 'Back', 'Legs')")] string? bodyTarget = null,
