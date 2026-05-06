@@ -140,6 +140,49 @@ public class CircuitPerformEffects
     }
 
     [EffectMethod]
+    public async Task OnCircuitCompleteRound(CircuitCompleteRoundAction action, IDispatcher dispatcher)
+    {
+        var state = _circuitState.Value;
+        var workout = await _clientStorage.CurrentWorkout.GetAsync();
+        ArgumentNullException.ThrowIfNull(workout);
+
+        var orderedExercises = workout.Exercises.OrderBy(e => e.Order).ToList();
+
+        for (int i = state.CurrentExerciseIndex; i < orderedExercises.Count; i++)
+        {
+            var set = orderedExercises[i].Sets.OrderBy(s => s.Order).ElementAt(state.CurrentRound - 1);
+            if (!set.Completed)
+            {
+                set.Completed = true;
+                set.CompletedOn = DateTimeOffset.Now;
+
+                var targetItem = state.Exercises[i];
+                if (targetItem.TargetReps.HasValue)
+                    set.Metrics.Reps = targetItem.TargetReps;
+                if (targetItem.TargetWeight.HasValue)
+                    set.Metrics.Weight = targetItem.TargetWeight;
+                if (targetItem.TargetTime.HasValue)
+                    set.Metrics.Time = targetItem.TargetTime;
+            }
+        }
+
+        await _clientStorage.CurrentWorkout.SetAsync(workout);
+        dispatcher.Dispatch(new CountdownTimerResetAction());
+
+        if (state.CurrentRound < state.TotalRounds)
+        {
+            dispatcher.Dispatch(new CircuitSetProgressAction(
+                state.CurrentRound, 0, CircuitPhase.Resting));
+            dispatcher.DispatchWithDelay(
+                new CountdownTimerStartWithDurationAction(state.RestBetweenRounds), 500);
+        }
+        else
+        {
+            dispatcher.Dispatch(new EndWorkoutAction());
+        }
+    }
+
+    [EffectMethod]
     public Task OnCircuitSkipRest(CircuitSkipRestAction action, IDispatcher dispatcher)
     {
         var state = _circuitState.Value;
