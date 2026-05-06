@@ -44,12 +44,18 @@
 
             @if (CircuitState.Value.Phase == CircuitPhase.Exercising)
             {
-                <div class="pa-4">
+                <div class="pa-4 d-flex flex-row gap-2">
                     <MudButton Variant="Variant.Outlined"
                                FullWidth="true"
                                Style="height: 72px;"
                                OnClick="HandleDone">
                         Done &mdash; @NextLabel
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               FullWidth="true"
+                               Style="height: 72px;"
+                               OnClick="HandleCompleteRound">
+                        Done Round &mdash; @RoundLabel
                     </MudButton>
                 </div>
             }
@@ -71,7 +77,17 @@
         }
     }
 
+    string RoundLabel
+    {
+        get
+        {
+            var s = CircuitState.Value;
+            return s.CurrentRound < s.TotalRounds ? "Skip to Rest" : "Finish";
+        }
+    }
+
     void HandleDone() => _exerciseScreen?.TriggerDone();
+    void HandleCompleteRound() => Dispatcher.Dispatch(new CircuitCompleteRoundAction());
     void HandleSkipRest() => Dispatcher.Dispatch(new CircuitSkipRestAction());
 
     void HandleAddTime()
