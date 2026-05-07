@@ -59,8 +59,8 @@
         {
             <MudPaper Class="pa-3 mb-2" Elevation="1">
                 <div class="d-flex justify-space-between">
-                    <MudText Typo="Typo.subtitle2">@workout.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
                     <MudText Typo="Typo.subtitle2">@workout.WorkoutPlanName</MudText>
+                    <MudText Typo="Typo.subtitle2">@workout.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
                 </div>
                 @WorkoutView(workout)
             </MudPaper>
