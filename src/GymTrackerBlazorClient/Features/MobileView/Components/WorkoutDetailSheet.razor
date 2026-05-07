@@ -1,0 +1,121 @@
+@using GymTracker.Domain.Models
+@using GymTracker.Domain.Models.Extensions
+@using GymTracker.Domain.Models.Statistics
+
+<div class="d-flex flex-column" style="height:100%; overflow:hidden;">
+
+    @* Header *@
+    <MudPaper Elevation="2" Class="pa-3" Style="flex-shrink:0;">
+        <div class="d-flex justify-space-between align-center">
+            <div>
+                <MudText Typo="Typo.subtitle1" Style="font-weight:600;">
+                    @if (Stat?.HasVolumePR == true)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Small" Color="Color.Warning" Class="mr-1" Style="vertical-align:text-bottom;" />
+                    }
+                    @Stat?.WorkoutPlanName
+                </MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">
+                    @Stat?.CompletedOn.ToString("dd/MM/yy HH:mm")
+                    &nbsp;·&nbsp;
+                    @FormatDuration(Stat?.TotalTime)
+                </MudText>
+            </div>
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" OnClick="OnClose" />
+        </div>
+    </MudPaper>
+
+    @* Body *@
+    <div style="flex:1; overflow-y:auto; padding: 8px 12px;">
+
+        @if (IsLoading)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mt-2" />
+        }
+        else if (Error is not null)
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-2">@Error</MudAlert>
+        }
+        else if (Detail is null)
+        {
+            <MudText Typo="Typo.body2" Class="mud-text-secondary mt-3 text-center">Detail not available.</MudText>
+        }
+        else
+        {
+            @foreach (var exercise in Detail.Exercises.OrderBy(e => e.Order))
+            {
+                var exerciseStat = Stat?.Exercises.FirstOrDefault(s => s.ExerciseName == exercise.Exercise.Name);
+
+                <div class="mb-3">
+                    <div class="d-flex align-center mb-1">
+                        @if (exerciseStat?.HasPR == true)
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Small" Color="Color.Warning" Class="mr-1" />
+                        }
+                        <MudText Typo="Typo.body1" Style="font-weight:600;">@exercise.Exercise.Name</MudText>
+                    </div>
+
+                    @foreach (var set in exercise.Sets.OrderBy(s => s.Order))
+                    {
+                        <div class="d-flex justify-space-between" style="@(set.Completed ? "" : "opacity:0.45;")">
+                            <MudText Typo="Typo.body2">@set.ToSetTypeAndSequence()</MudText>
+                            <MudText Typo="Typo.body2">
+                                @if (set.Completed)
+                                {
+                                    @set.Metrics.GetMeasureText(exercise.Exercise.MetricType)
+                                }
+                                else
+                                {
+                                    <text>—</text>
+                                }
+                            </MudText>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    @* Footer *@
+    @if (Stat is not null && !IsLoading && Error is null)
+    {
+        <MudPaper Elevation="2" Class="pa-3" Style="flex-shrink:0;">
+            <div class="d-flex justify-space-between">
+                <MudText Typo="Typo.subtitle2">
+                    @if (Stat.HasVolumePR)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Small" Color="Color.Warning" Class="mr-1" Style="vertical-align:text-bottom;" />
+                    }
+                    Total Volume
+                </MudText>
+                <MudText Typo="Typo.subtitle2">
+                    @if (Stat.IsRepsOnly)
+                    {
+                        @($"{Stat.TotalReps} reps")
+                    }
+                    else
+                    {
+                        @Stat.TotalWeightVolumeWithMeasure
+                    }
+                </MudText>
+            </div>
+        </MudPaper>
+    }
+
+</div>
+
+@code {
+    [Parameter] public WorkoutStatistic? Stat { get; set; }
+    [Parameter] public Workout? Detail { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private static string FormatDuration(TimeSpan? duration)
+    {
+        if (duration is null) return string.Empty;
+        return duration.Value.TotalHours >= 1
+            ? $"{(int)duration.Value.TotalHours}h {duration.Value.Minutes}m"
+            : $"{duration.Value.Minutes}m";
+    }
+}

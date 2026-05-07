@@ -1,4 +1,5 @@
 @page "/mobile"
+@using GymTracker.Domain.Models
 @using GymTracker.Domain.Models.Statistics
 @using GymTracker.BlazorClient.Features.Home.Components.WorkoutHistory
 @using GymTracker.BlazorClient.Features.AppBar.Store
@@ -57,7 +58,7 @@
         <MudText Typo="Typo.subtitle1" Class="mb-1">Previous</MudText>
         @foreach (var workout in _workouts)
         {
-            <MudPaper Class="pa-3 mb-2" Elevation="1">
+            <MudPaper Class="pa-3 mb-2" Elevation="1" Style="cursor:pointer;" @onclick="() => HandleWorkoutTap(workout)">
                 <div class="d-flex justify-space-between">
                     <MudText Typo="Typo.subtitle2">@workout.WorkoutPlanName</MudText>
                     <MudText Typo="Typo.subtitle2">@workout.CompletedOn.ToString("dd/MM/yy HH:mm")</MudText>
@@ -69,17 +70,36 @@
 
 </MudContainer>
 
+<MudDrawer @bind-Open="_drawerOpen" Anchor="Anchor.Bottom" Elevation="4"
+           Variant="DrawerVariant.Temporary" ClipMode="DrawerClipMode.Never"
+           Style="height:80vh;">
+    <WorkoutDetailSheet
+        Stat="_selectedWorkout"
+        Detail="_selectedWorkoutDetail"
+        IsLoading="_loadingDetail"
+        Error="_detailError"
+        OnClose="() => _drawerOpen = false" />
+</MudDrawer>
+
 @code {
     private string? _sasUri;
     private WorkoutStatistic[]? _workouts;
+    private Workout[]? _allWorkouts;
     private NextWorkoutSummary? _nextWorkout;
     private bool _isLoading;
     private string? _error;
     private bool _settingsOpen = true;
     private bool _showSasUri;
 
+    private bool _drawerOpen;
+    private bool _loadingDetail;
+    private string? _detailError;
+    private WorkoutStatistic? _selectedWorkout;
+    private Workout? _selectedWorkoutDetail;
+
     private const string StorageKey = "MobileSasUri";
     private const string BlobKey = "WorkoutStatistics";
+    private const string WorkoutsBlobKey = "Workouts";
     private const string NextWorkoutBlobKey = "NextWorkoutSummary";
 
     protected override void OnInitialized()
@@ -105,6 +125,7 @@
     {
         await JS.InvokeVoidAsync("localStorage.setItem", StorageKey, _sasUri);
         _settingsOpen = false;
+        _allWorkouts = null; // reset cache when SAS URI changes
         await FetchWorkouts();
     }
 
@@ -153,6 +174,43 @@
         finally
         {
             _isLoading = false;
+        }
+    }
+
+    private async Task LoadFullWorkouts()
+    {
+        if (_allWorkouts is not null) return;
+        var uri = new Uri(_sasUri!);
+        var url = $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}/{Uri.EscapeDataString(WorkoutsBlobKey)}{uri.Query}";
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.SetBrowserRequestCache(BrowserRequestCache.NoCache);
+        var response = await Http.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        _allWorkouts = await response.Content.ReadFromJsonAsync<Workout[]>();
+    }
+
+    private async Task HandleWorkoutTap(WorkoutStatistic stat)
+    {
+        _loadingDetail = true;
+        _drawerOpen = true;
+        _selectedWorkout = stat;
+        _selectedWorkoutDetail = null;
+        _detailError = null;
+        StateHasChanged();
+
+        try
+        {
+            await LoadFullWorkouts();
+            _selectedWorkoutDetail = _allWorkouts?.FirstOrDefault(w => w.Id == stat.WorkoutId);
+        }
+        catch (Exception ex)
+        {
+            _detailError = $"Failed to load detail: {ex.Message}";
+        }
+        finally
+        {
+            _loadingDetail = false;
+            StateHasChanged();
         }
     }
 
