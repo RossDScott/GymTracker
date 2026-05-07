@@ -77,7 +77,7 @@
         Stat="_selectedWorkout"
         Detail="_selectedWorkoutDetail"
         IsLoading="_loadingDetail"
-        Error="_detailError"
+        Error="@_detailError"
         OnClose="() => _drawerOpen = false" />
 </MudDrawer>
 
@@ -205,7 +205,8 @@
         }
         catch (Exception ex)
         {
-            _detailError = $"Failed to load detail: {ex.Message}";
+            _detailError = $"{ex.GetType().Name}: {ex.Message}\n{ex.InnerException?.Message}";
+            await JS.InvokeVoidAsync("console.error", "Workout detail error", ex.ToString());
         }
         finally
         {
