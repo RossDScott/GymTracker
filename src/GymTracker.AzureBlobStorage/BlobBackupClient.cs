@@ -18,6 +18,12 @@ public class BlobBackupClient : IDataBackupClient
         return $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}/{Uri.EscapeDataString(blobName)}{uri.Query}";
     }
 
+    // Appends a unique value to the SAS query so blob reads bypass the browser HTTP cache.
+    // Azure validates only the signed SAS parameters and ignores unknown query params, so the
+    // SAS signature is unaffected.
+    private static string NoCacheUrl(string containerSasUri, string blobName)
+        => $"{BlobUrl(containerSasUri, blobName)}&_={DateTimeOffset.UtcNow.Ticks}";
+
     private async ValueTask<string?> GetContainerSasUri()
     {
         var sasUri = (await _appSettings.GetAsync()).AzureBlobBackupContainerSASURI;
@@ -41,7 +47,14 @@ public class BlobBackupClient : IDataBackupClient
     {
         var sasUri = await GetContainerSasUri();
         ArgumentNullException.ThrowIfNull(sasUri);
-        var response = await _http.GetAsync(BlobUrl(sasUri, key));
+        var request = new HttpRequestMessage(HttpMethod.Get, NoCacheUrl(sasUri, key));
+        request.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+        {
+            NoCache = true,
+            NoStore = true
+        };
+        request.Headers.Pragma.ParseAdd("no-cache");
+        var response = await _http.SendAsync(request);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
     }
@@ -50,7 +63,7 @@ public class BlobBackupClient : IDataBackupClient
     {
         var sasUri = await GetContainerSasUri();
         ArgumentNullException.ThrowIfNull(sasUri);
-        var response = await _http.SendAsync(new HttpRequestMessage(HttpMethod.Head, BlobUrl(sasUri, key)));
+        var response = await _http.SendAsync(new HttpRequestMessage(HttpMethod.Head, NoCacheUrl(sasUri, key)));
         return response.IsSuccessStatusCode;
     }
 
