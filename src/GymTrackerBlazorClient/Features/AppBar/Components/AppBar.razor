@@ -14,8 +14,17 @@
     Fixed="false">
     <MudBreadcrumbs Items="State.Value.Breadcrumbs.ToList()"></MudBreadcrumbs>
     <MudSpacer />
-    @if (NavigationManager.Uri.EndsWith("/mobile", StringComparison.OrdinalIgnoreCase))
+    @if (IsMobileCharts)
     {
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       Color="Color.Inherit"
+                       OnClick='() => NavigationManager.NavigateTo("/mobile")' />
+    }
+    @if (IsMobileHome)
+    {
+        <MudIconButton Icon="@Icons.Material.Filled.BarChart"
+                       Color="Color.Inherit"
+                       OnClick='() => NavigationManager.NavigateTo("/mobile/charts")' />
         <MudIconButton Icon="@Icons.Material.Filled.Settings"
                        Color="Color.Inherit"
                        OnClick="() => Dispatcher.Dispatch(new ToggleMobileSettingsAction())" />
@@ -33,6 +42,9 @@
     void OnLocationChanged(object? sender, LocationChangedEventArgs e) => StateHasChanged();
 
     public new void Dispose() => NavigationManager.LocationChanged -= OnLocationChanged;
+
+    bool IsMobileHome => NavigationManager.Uri.EndsWith("/mobile", StringComparison.OrdinalIgnoreCase);
+    bool IsMobileCharts => NavigationManager.Uri.Contains("/mobile/charts", StringComparison.OrdinalIgnoreCase);
 
     void HandleNavigateHome() => NavigationManager.NavigateTo("/");
     void HandleNavigateToSettings() => NavigationManager.NavigateTo("/settings");

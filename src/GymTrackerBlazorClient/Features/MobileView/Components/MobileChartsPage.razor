@@ -1,0 +1,166 @@
+@page "/mobile/charts"
+@using ApexCharts
+@using GymTracker.Domain.Models.Statistics
+
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<PageTitle>Charts</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="pa-2">
+
+    @if (_isLoading)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-3" />
+    }
+    else if (_error is not null)
+    {
+        <MudAlert Severity="Severity.Error" Class="mb-3">@_error</MudAlert>
+    }
+    else if (!_hasData)
+    {
+        <MudText Typo="Typo.body1" Class="mt-4 text-center mud-text-secondary">
+            No data available. Configure your SAS URI on the
+            <MudLink Href="/mobile">main page</MudLink> first.
+        </MudText>
+    }
+    else
+    {
+        @if (_volumeSeriesByPlan.Count > 0)
+        {
+            <MudText Typo="Typo.subtitle1" Class="mb-1">Volume — last 2 months</MudText>
+            <MudPaper Class="pa-2 mb-4" Elevation="1" Style="background:#32333d;">
+                <ApexChart TItem="WorkoutStatistic"
+                           Options="_volumeChartOptions"
+                           XAxisType="XAxisType.Datetime">
+                    @foreach (var (planName, stats) in _volumeSeriesByPlan)
+                    {
+                        <ApexPointSeries TItem="WorkoutStatistic"
+                                         Items="stats"
+                                         Name="@planName"
+                                         SeriesType="SeriesType.Line"
+                                         XValue="@(e => e.CompletedOn)"
+                                         YValue="@(e => e.TotalWeightVolume)"
+                                         OrderBy="x => x.X" />
+                    }
+                </ApexChart>
+            </MudPaper>
+        }
+
+        @foreach (var stat in _exerciseStats)
+        {
+            <MudText Typo="Typo.subtitle2" Class="mb-1">@stat.ExerciseName</MudText>
+            <MudPaper Class="pa-2 mb-3" Elevation="1" Style="background:#32333d;">
+                <ApexChart TItem="ExerciseLog"
+                           XAxisType="XAxisType.Datetime"
+                           Options="_exerciseChartOptions">
+                    <ApexPointSeries TItem="ExerciseLog"
+                                     Items="stat.Logs"
+                                     Name="@stat.ExerciseMetric"
+                                     SeriesType="SeriesType.Line"
+                                     XValue="@(e => e.WorkoutDateTime)"
+                                     YValue="@(e => e.TotalVolume)"
+                                     OrderBy="x => x.X" />
+                </ApexChart>
+            </MudPaper>
+        }
+    }
+
+</MudContainer>
+
+@code {
+    private bool _isLoading;
+    private bool _hasData;
+    private string? _error;
+
+    private Dictionary<string, List<WorkoutStatistic>> _volumeSeriesByPlan = new();
+    private List<ExerciseStatistic> _exerciseStats = new();
+
+    private const string StorageKey = "MobileSasUri";
+    private const string WorkoutStatsBlobKey = "WorkoutStatistics";
+    private const string ExerciseStatsBlobKey = "ExerciseStatistics";
+
+    private readonly ApexChartOptions<WorkoutStatistic> _volumeChartOptions = new()
+    {
+        Chart = new Chart
+        {
+            Background = "#32333d",
+            Toolbar = new Toolbar { Show = false },
+            ForeColor = "#fff",
+            Width = "100%",
+            Height = "220px"
+        }
+    };
+
+    private readonly ApexChartOptions<ExerciseLog> _exerciseChartOptions = new()
+    {
+        Chart = new Chart
+        {
+            Background = "#32333d",
+            Toolbar = new Toolbar { Show = false },
+            ForeColor = "#fff",
+            Width = "100%",
+            Height = "200px"
+        },
+        Colors = new List<string> { "#77B6EA" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var sasUri = await JS.InvokeAsync<string?>("localStorage.getItem", StorageKey);
+        if (string.IsNullOrWhiteSpace(sasUri))
+        {
+            _hasData = false;
+            return;
+        }
+        await FetchData(sasUri);
+    }
+
+    private async Task FetchData(string sasUri)
+    {
+        _isLoading = true;
+        try
+        {
+            var uri = new Uri(sasUri);
+            var cutoff = DateTimeOffset.UtcNow.AddDays(-60);
+
+            var wsRequest = new HttpRequestMessage(HttpMethod.Get, BlobUrl(uri, WorkoutStatsBlobKey));
+            wsRequest.SetBrowserRequestCache(BrowserRequestCache.NoCache);
+            var wsResponse = await Http.SendAsync(wsRequest);
+            wsResponse.EnsureSuccessStatusCode();
+            var allWorkoutStats = await wsResponse.Content.ReadFromJsonAsync<WorkoutStatistic[]>();
+
+            _volumeSeriesByPlan = allWorkoutStats?
+                .Where(x => !x.IsRepsOnly && x.CompletedOn >= cutoff)
+                .OrderBy(x => x.CompletedOn)
+                .GroupBy(x => x.WorkoutPlanName)
+                .ToDictionary(g => g.Key, g => g.ToList())
+                ?? new();
+
+            var esRequest = new HttpRequestMessage(HttpMethod.Get, BlobUrl(uri, ExerciseStatsBlobKey));
+            esRequest.SetBrowserRequestCache(BrowserRequestCache.NoCache);
+            var esResponse = await Http.SendAsync(esRequest);
+            if (esResponse.IsSuccessStatusCode)
+            {
+                var allExerciseStats = await esResponse.Content.ReadFromJsonAsync<ExerciseStatistic[]>();
+                _exerciseStats = allExerciseStats?
+                    .Where(x => x.ShowChartOnHomePage)
+                    .ToList()
+                    ?? new();
+            }
+
+            _hasData = true;
+        }
+        catch (Exception ex)
+        {
+            _error = $"Failed to load chart data: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static string BlobUrl(Uri containerUri, string blobName)
+        => $"{containerUri.Scheme}://{containerUri.Host}{containerUri.AbsolutePath}/{Uri.EscapeDataString(blobName)}{containerUri.Query}&_={DateTimeOffset.UtcNow.Ticks}";
+}
