@@ -50,10 +50,10 @@
         @foreach (var stat in _exerciseStats)
         {
             <MudText Typo="Typo.subtitle2" Class="mb-1">@stat.ExerciseName</MudText>
-            <MudPaper Class="pa-2 mb-3" Elevation="1" Style="background:#32333d;">
+            <MudPaper @key="stat.ExerciseId" Class="pa-2 mb-3" Elevation="1" Style="background:#32333d;">
                 <ApexChart TItem="ExerciseLog"
                            XAxisType="XAxisType.Datetime"
-                           Options="_exerciseChartOptions">
+                           Options="BuildExerciseChartOptions(stat)">
                     <ApexPointSeries TItem="ExerciseLog"
                                      Items="stat.Logs"
                                      Name="@stat.ExerciseMetric"
@@ -92,10 +92,11 @@
         }
     };
 
-    private readonly ApexChartOptions<ExerciseLog> _exerciseChartOptions = new()
+    private static ApexChartOptions<ExerciseLog> BuildExerciseChartOptions(ExerciseStatistic stat) => new()
     {
         Chart = new Chart
         {
+            Id = $"exercise-{stat.ExerciseId}",
             Background = "#32333d",
             Toolbar = new Toolbar { Show = false },
             ForeColor = "#fff",
