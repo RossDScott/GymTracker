@@ -1,0 +1,46 @@
+name: Deploy MCP Server
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - src/GymTracker.McpServer/**
+      - src/GymTracker.Domain/**
+      - .github/workflows/mcp-server-deploy.yml
+  workflow_dispatch:
+
+permissions:
+  id-token: write # GitHub OIDC token for Azure login, no stored deployment secret
+  contents: read
+
+concurrency:
+  group: mcp-server-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish
+        run: dotnet publish src/GymTracker.McpServer/GymTracker.McpServer.csproj -c Release -o ${{ runner.temp }}/mcp-server
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.MCP_WEBAPP_NAME }}
+          package: ${{ runner.temp }}/mcp-server
