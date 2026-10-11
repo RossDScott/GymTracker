@@ -27,16 +27,20 @@ Remote [MCP](https://modelcontextprotocol.io) server exposing GymTracker data (e
    - **Identifier:** `https://<app>.azurewebsites.net/mcp`. This must exactly match the URL you'll add in Claude.
    - **Signing algorithm:** RS256.
    - In the API settings, enable **Allow Offline Access** (refresh tokens).
+   - In the API settings, under **Default Permissions for Third-Party Applications**, set **User-Delegated Access** to **Authorized** and leave **Client Access** unauthorized.
+     - Claude registers a new third-party client on each connection, so access can't be granted per application.
+     - Without this, sign-in fails with `Client "..." is not authorized to access resource server "..."`.
 3. Under **Settings**:
    - **General → API Authorization Settings → Default Audience:** the API identifier above.
    - **Advanced:** enable **Dynamic Client Registration**.
    - **Advanced:** enable the **Resource Parameter Compatibility Profile**, so Claude's RFC 8707 `resource` parameter is treated as the audience.
-4. Under **Authentication**:
-   - Pick your login connection (e.g. Social → Google).
+4. Under **Authentication → Database → Username-Password-Authentication**:
    - Enable **Promote Connection to Domain Level** so DCR-registered clients can use it.
-   - On database connections, enable **Disable Sign Ups**.
-5. Sign in once (e.g. via the connection's "Try" button). Then copy your **user_id** from **User Management → Users**, e.g. `google-oauth2|1234…`. This is your `AllowedSubjects` value.
-6. Optional defence in depth: add a Post-Login **Action** that calls `api.access.deny()` for any email other than yours.
+   - Create your user under **User Management → Users → Create User**, then enable **Disable Sign Ups** on the connection.
+   - A social login (e.g. Google) also works, but needs your own Google OAuth client; Auth0's shared dev keys aren't meant for real use.
+5. Copy your **user_id** from **User Management → Users**, e.g. `auth0|65f1c…`. This is your `AllowedSubjects` value.
+6. Recommended: under **Security → Multi-factor Auth**, enable **One-time Password** and set the policy to **Always**.
+7. Optional defence in depth: add a Post-Login **Action** that calls `api.access.deny()` for any email other than yours.
 
 ### 2. Azure
 1. Fill in `infra/mcp-server.parameters.json` (or pass `-p` values), then deploy:
@@ -45,6 +49,8 @@ Remote [MCP](https://modelcontextprotocol.io) server exposing GymTracker data (e
    az deployment group create -g rg-gymtracker-mcp -f infra/mcp-server.bicep -p @infra/mcp-server.parameters.json
    ```
    This creates the plan, the web app and its managed identity, and the container-scoped role assignment.
+   - If it fails with `SubscriptionIsOverQuotaForSku`, the subscription has no App Service quota for that SKU in that region. Add `location=<region>` to deploy the app elsewhere, use `skuName=F1`, or request quota under **Quotas → App Service**.
+   - F1 is free but sleeps when idle. The first request afterwards can take 10–20 s and may time out Claude's connection. Open `/healthz` to wake it, then retry.
 2. Set up GitHub deployment without secrets (OIDC):
    - Create an Entra app registration.
    - Add a federated credential for this repo with entity type **Environment** and name `production`.
@@ -83,6 +89,6 @@ The local MCP URL is `http://localhost:5123/mcp`. To get tokens locally, add tha
 |---|---|
 | `Mcp:ServerUrl` | `https://gymtracker-mcp.azurewebsites.net/mcp` (resource id and required token audience) |
 | `Auth0:Domain` | `gymtracker.eu.auth0.com` |
-| `Auth0:AllowedSubjects:0..n` | `google-oauth2\|1234567890` |
+| `Auth0:AllowedSubjects:0..n` | `auth0\|65f1c0a1b2c3d4e5f6a7b8c9` |
 | `Storage:BlobServiceUri` | `https://mystorage.blob.core.windows.net` |
 | `Storage:ContainerName` | `backups` |
