@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appName": { "value": "<unique-app-name>" },
+    "auth0Domain": { "value": "<tenant>.<region>.auth0.com" },
+    "allowedSubjects": { "value": [ "<your Auth0 user id, e.g. google-oauth2|1234567890>" ] },
+    "storageAccountName": { "value": "<existing storage account>" },
+    "storageResourceGroup": { "value": "<storage account resource group>" },
+    "containerName": { "value": "<existing backup container>" }
+  }
+}
